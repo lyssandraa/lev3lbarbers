@@ -28,7 +28,7 @@ const StyledHeader = styled.header`
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 15px;
+    padding: 20px;
     color: white;
 
   .siteTitle {
@@ -36,6 +36,8 @@ const StyledHeader = styled.header`
     font-weight: bold;
     cursor: pointer;
     margin-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 `;
 
