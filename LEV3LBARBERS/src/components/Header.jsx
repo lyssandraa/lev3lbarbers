@@ -23,12 +23,12 @@ export default Header;
 
 const StyledHeader = styled.header`
     background: #000;
+    width: 100%;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 15px;
-    border-radius: 5px;
     color: white;
 
   .siteTitle {
