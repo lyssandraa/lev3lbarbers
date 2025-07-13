@@ -1,9 +1,16 @@
 import './App.css'
+import {BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
+import Header from './components/Header'
 
 function App() {
   return (
     <>
-      <h1>LEV3L BARBERS</h1>
+    <Header></Header>
     </>
   )
 }
