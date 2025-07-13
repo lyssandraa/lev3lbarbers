@@ -5,12 +5,14 @@ import {BrowserRouter as Router,
   Navigate,
 } from "react-router-dom";
 
-import Header from './components/Header'
+import Header from './components/Header';
+import Home from './pages/Home';
 
 function App() {
   return (
     <>
     <Header></Header>
+    <Home></Home>
     </>
   )
 }
