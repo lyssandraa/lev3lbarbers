@@ -31,12 +31,14 @@ font-family: 'Bebas Neue', sans-serif;
     align-items: center;
     color: #FFFF;
     letter-spacing: 3px;  
+    position: sticky;
+    top: 0;
 
   .siteTitle {
     font-size: 2.5rem;
     cursor: pointer;
     padding: 20px 0 10px 0;
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid #f2f2f2;
     width: 100%;
   }
 `;
@@ -45,15 +47,41 @@ const NavList = styled.ul`
     list-style: none;
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: space-around;
+    gap: 20px;
     width: 90%;
-    padding: 10px 100px 10px 100px;
+    padding: 15px 100px 10px 100px;
     margin: 0;
     font-size: 22px;
 
   li {
+    position: relative;
     flex: 1;
     text-align: center;
     cursor: pointer;
+
+    &:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%) scaleY(0);
+      height: 70%;
+      width: 2px;
+      background-color: white;
+      opacity: 0;
+      animation: fadeInDivider 0.6s ease forwards;
+      animation-delay: 0.3s;
+    }
+
+    @media (max-width: 768px) {
+      &:not(:last-child)::after {
+        display: none;
+      }
   }
+      @keyframes fadeInDivider {
+    to {
+      transform: translateY(-50%) scaleY(1);
+      opacity: 0.6;
+    }
 `;
