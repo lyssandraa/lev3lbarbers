@@ -9,7 +9,7 @@ const Home = () => {
       <LogoStyled src={logo} alt="Logo" />
       <SloganContainer>
         <Slogan>
-          <span>Take Your Style</span>
+          <span>Take Your Style </span>
           <EmphasizedLine>
             to the Next <Lev3l>LEV3<span style={{ display: 'inline-block', transform: 'scaleX(-1)'}}>L</span></Lev3l>
           </EmphasizedLine>
@@ -33,16 +33,17 @@ const HomeStyled = styled.div`
     flex-direction: column;
     padding: 1rem;
     text-align: center;
+    gap: 0rem;
   }
 `;
 
 const LogoStyled = styled.img`
-  width: 500px;
+  width: 300px;
   height: auto;
   border-radius: 20px;
 
   @media (max-width: 768px) {
-    width: 80%;
+    width: 60%;
   }
 `;
 
@@ -50,38 +51,15 @@ const SloganContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
+  z-index: 0;
+  pointer-events: none;
 `;
 
-// const Slogan = styled.h2`
-// font-family: 'Dancing Script', 'Brush Script MT', cursive;
-//   font-size: 3.5rem;
-//   font-weight: bold;
-//   letter-spacing: 2px;
-//   line-height: 1.1;
-//   text-align: center;
-//   color: #1a1a1a;
-// 
-//   animation: fadeInUp 1.2s ease-out ;
-// 
-//   span {
-    // display: block;
-//   }
-// 
-//   @keyframes fadeInUp {
-    // from {
-    //   opacity: 0;
-    //   transform: translateY(50px);
-    // }
-    // to {
-    //   opacity: 1;
-    //   transform: translateY(0);
-    // }
-//   }
-// `;
 
 const Slogan = styled.h2`
   font-family: 'Dancing Script', cursive;
-  font-size: 3.5rem;
+  font-size: 2.5rem;
   font-weight: 700;
   letter-spacing: 2px;
   line-height: 1.1;
@@ -92,8 +70,18 @@ const Slogan = styled.h2`
   animation: slideIn 1.5s ease-out forwards;
   animation-delay: 0.3s;
 
+  pointer-events: none;
+
   span {
     display: block;
+  }
+
+  @media (max-width: 768px) {
+  margin: 0;
+  padding-bottom: 15px;
+    span {
+      display: inline;
+    }
   }
 
   @keyframes slideIn {
@@ -115,10 +103,13 @@ const Slogan = styled.h2`
 
 const EmphasizedLine = styled.span`
   margin-top: 0.3rem;
+  @media (max-width: 768px) {
+    margin-top: 0.1rem; 
+  }
 `;
 
 const Lev3l = styled.span`
-  font-size: 4rem;
+  font-size: 3rem;
   letter-spacing: 2px;
   font-weight: bold;
   font-family: 'Bebas Neue', sans-serif;

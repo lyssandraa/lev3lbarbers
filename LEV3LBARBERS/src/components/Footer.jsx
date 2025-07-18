@@ -35,8 +35,6 @@ const StyledFooter = styled.footer`
     height: 80px;
     background-color: #000;
     color: #ffff;
-    position: fixed;
-    bottom: 0;
     width: 100%;
     font-family: 'Bebas Neue', sans-serif;
     display: flex;
