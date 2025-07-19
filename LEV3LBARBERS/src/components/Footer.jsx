@@ -6,109 +6,141 @@ const Footer = () => {
     return (
         <StyledFooter> 
             <FooterContent>
-            <FooterLeft>
-                <div>LEV3<span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span> BARBERS</div>
-                <ul>
-                    <li>SHOP</li>
-                    <li>CONTACT US</li>
-                    <li>PRIVACY POLICY</li>
-                </ul>
-            </FooterLeft>
+                <FooterLeft>
+                    <div>LEV<span style={{ color: 'black' }}>3</span><span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span> BARBERS</div>
+                    <ul>
+                        <li>SHOP</li>
+                        <li>CONTACT US</li>
+                        <li>PRIVACY POLICY</li>
+                    </ul>
+                </FooterLeft>
 
-            <FooterRight>
-                <div>Social Media</div>
-                <IconRow>
-                    <a href="https://www.facebook.com/people/Lev3l-barbers/61565542892469/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FaFacebookF /></a>
-                    <a href="https://www.instagram.com/lev3l_barbers/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><FaInstagram /></a>
-                    <a href="https://www.tiktok.com/@lev3lbarbers" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><FaTiktok /></a>
-                </IconRow>
-            </FooterRight>
+                <FooterRight>
+                    <BottomRight>
+                        <JoinTitle>JOIN THE LEVEL</JoinTitle>
+                        <IconRow>
+                            <a href="https://www.facebook.com/people/Lev3l-barbers/61565542892469/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FaFacebookF /></a>
+                            <a href="https://www.instagram.com/lev3l_barbers/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><FaInstagram /></a>
+                            <a href="https://www.tiktok.com/@lev3lbarbers" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><FaTiktok /></a>
+                        </IconRow>
+                    </BottomRight>
+                </FooterRight>
             </FooterContent>
         </StyledFooter>
-    )
-}
+    );
+};
 
 export default Footer;
 
+// Styles
+
 const StyledFooter = styled.footer`
     width: 100%;
-    height: 80px;
-    background-color: #000;
-    color: #ffff;
-    width: 100%;
+    height: 150px;
+    background: linear-gradient(to bottom, #1f1f1f 70%, #151515 100%);
+    color: #fff;
     font-family: 'Bebas Neue', sans-serif;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 0 30px;
+    align-items: stretch;
+    padding: 0 20px;
     box-sizing: border-box;
     overflow: hidden;
 `;
 
 const FooterContent = styled.div`
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  box-sizing: border-box;
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    padding: 0 20px;
+    box-sizing: border-box;
 `;
 
 const FooterLeft = styled.div`
     display: flex;
     flex-direction: column;
+    justify-content: center;
     font-size: 1.4rem;
     line-height: 1.3;
 
-    div{
-    font-size: 2rem;
-    margin: 0;
-    padding: 0;
-    cursor: pointer;
+    div {
+        font-size: 2rem;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+        color: #990000;
+        text-shadow:
+            -1px -1px 0 #E6E6ED,
+            1px -1px 0 #E6E6ED,
+            -1px  1px 0 #E6E6ED,
+            1px  1px 0 #E6E6ED;
     }
 
     ul {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    gap: 0.5rem 1rem;
-    padding: 0;
-    margin: 0;
+        display: grid;
+        grid-template-columns: repeat(1, auto);
+        gap: 0.5rem 1rem;
+        padding: 0;
+        margin: 0;
     }
 
     li {
-    text-align: left;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    font-size: 1rem;
+        text-align: left;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        font-size: 1rem;
+
+        &:hover {
+            transform: scale(1.1);
+            color: #1d2b53;
+        }
     }
 `;
 
 const FooterRight = styled.div`
     display: flex;
     flex-direction: column;
-    font-size: 1.5rem;
+    justify-content: flex-end;
     align-items: flex-end;
+    flex: 1;
+    position: relative;
+`;
+
+const BottomRight = styled.div`
+    position: absolute;
+    bottom: 10px;
+    right: 0;
+    text-align: right;
+`;
+
+const JoinTitle = styled.div`
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    font-weight: 500;
+    color: #ccc;
+    margin-bottom: 6px;
+    text-transform: uppercase;
 `;
 
 const IconRow = styled.div`
     display: flex;
     gap: 15px;
-    margin-top: 0.3rem;
     font-size: 1.4rem;
     cursor: pointer;
 
     a {
-    color: #fff;   
-    display: inline-flex; 
-    align-items: center;
-    transition: color 0.2s ease-in-out;
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        transition: color 0.2s ease-in-out, transform 0.2s ease;
 
-    &:hover {
-      color: #ff6600; 
+        &:hover {
+            color: #ff6600;
+            transform: scale(1.2);
+        }
     }
-  }
-
 `;

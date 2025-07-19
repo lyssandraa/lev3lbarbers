@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import logo from "../assets/logo.png";
+import logo from "../assets/image.png";
+import homeBackground from "../assets/homeBackground.png";
 import "@fontsource/dancing-script";
 
 const Home = () => {
@@ -11,7 +12,7 @@ const Home = () => {
         <Slogan>
           <span>Take Your Style </span>
           <EmphasizedLine>
-            to the Next <Lev3l>LEV3<span style={{ display: 'inline-block', transform: 'scaleX(-1)'}}>L</span></Lev3l>
+            to the Next <Lev3l>LEV3<span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span></Lev3l>
           </EmphasizedLine>
         </Slogan>
       </SloganContainer>
@@ -25,15 +26,20 @@ const HomeStyled = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
-  gap: 2rem;
-  background-color: #f2f2f2;
+  padding: 3rem 2rem;
+  gap: 3rem;
+  background-image: url(${homeBackground});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 10px 20px rgba(0, 0, 0, 0.1);
+  color: #fffaf6;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    padding: 1rem;
+    padding: 2rem 1rem;
     text-align: center;
-    gap: 0rem;
+    gap: 1rem;
   }
 `;
 
@@ -41,6 +47,7 @@ const LogoStyled = styled.img`
   width: 300px;
   height: auto;
   border-radius: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 
   @media (max-width: 768px) {
     width: 60%;
@@ -56,15 +63,14 @@ const SloganContainer = styled.div`
   pointer-events: none;
 `;
 
-
 const Slogan = styled.h2`
   font-family: 'Dancing Script', cursive;
-  font-size: 2.5rem;
+  font-size: 2.7rem;
   font-weight: 700;
-  letter-spacing: 2px;
-  line-height: 1.1;
+  letter-spacing: 1.5px;
+  line-height: 1.2;
   text-align: center;
-  color: #1a1a1a;
+  color: #fffaf6;
 
   opacity: 0;
   animation: slideIn 1.5s ease-out forwards;
@@ -77,8 +83,9 @@ const Slogan = styled.h2`
   }
 
   @media (max-width: 768px) {
-  margin: 0;
-  padding-bottom: 15px;
+    font-size: 2.2rem;
+    margin: 0;
+    padding-bottom: 15px;
     span {
       display: inline;
     }
@@ -100,17 +107,20 @@ const Slogan = styled.h2`
   }
 `;
 
-
 const EmphasizedLine = styled.span`
-  margin-top: 0.3rem;
+  margin-top: 0.5rem;
+  display: block;
+
   @media (max-width: 768px) {
-    margin-top: 0.1rem; 
+    margin-top: 0.3rem;
+    display: inline;
   }
 `;
 
 const Lev3l = styled.span`
-  font-size: 3rem;
+  font-size: 3.2rem;
   letter-spacing: 2px;
   font-weight: bold;
   font-family: 'Bebas Neue', sans-serif;
+  color: #fffaf6;
 `;

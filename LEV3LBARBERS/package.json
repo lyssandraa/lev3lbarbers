@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@fontsource/dancing-script": "^5.2.6",
+    "@iconify-icons/game-icons": "^1.2.1",
+    "@iconify/react": "^6.0.0",
     "iconify-icon": "^3.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
