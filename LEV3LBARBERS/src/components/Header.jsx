@@ -1,27 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import shopOpen from "../common/shopOpen";
 import styled, { keyframes, css } from "styled-components";
-import { FiMenu, FiX } from "react-icons/fi";
-import 'iconify-icon';
+import { FiX, FiMenu } from "react-icons/fi";
 
 const Header = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-
   const isOpen = shopOpen();
 
   return (
     <StyledHeader>
       <TopRow>
         <ShopStatus>
-          <ScissorsIcon icon="mdi:scissors-cutting" $isOpen={isOpen} />
+          <BarberPole $isOpen={isOpen} />
           <StatusText $isOpen={isOpen}>{isOpen ? "OPEN" : "CLOSED"}</StatusText>
         </ShopStatus>
 
-        <div className="siteTitle" onClick={() => navigate("/")}>
-          LEV3<span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span> BARBERS
-        </div>
+        <AnimatedTitle onClick={() => navigate("/")}>
+          LEV<span style={{ color: 'black' }}>3</span>
+          <span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span> BARBERS
+        </AnimatedTitle>
 
         <MenuToggle onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <FiX size={28} /> : <FiMenu size={28} />}
@@ -42,70 +41,117 @@ const Header = () => {
 
 export default Header;
 
-const wiggle = keyframes`
+
+const stripesMove = keyframes`
+  0% { background-position: 0 0; }
+  100% { background-position: 0 60px; }
+`;
+
+const sway = keyframes`
   0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(15deg); }
-  50% { transform: rotate(-10deg); }
-  75% { transform: rotate(10deg); }
+  25% { transform: rotate(3deg); }
+  50% { transform: rotate(-3deg); }
+  75% { transform: rotate(2deg); }
+`;
+
+const fadeSlideUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translate(-50%, 15px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 `;
 
 const StyledHeader = styled.header`
   font-family: 'Bebas Neue', sans-serif;
-  background: #000;
-  width: 100%;
-  color: #FFFF;
-  letter-spacing: 3px;
+  background: linear-gradient(to bottom, #1f1f1f 70%, #151515 100%);
+  color: #d6d6d6;
   position: sticky;
   top: 0;
+  width: 100%;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 `;
 
 const TopRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 5%;
-  text-align: center;
+  padding: 10px 5%;
+  position: relative;
+`;
 
-  .siteTitle {
-    font-size: 2.5rem;
-    cursor: pointer;
-    flex: 1;
-    text-align: center;
+const AnimatedTitle = styled.div`
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  color: #990000;
+  animation: ${fadeSlideUp} 0.8s ease-out forwards;
+  opacity: 0;
+  text-shadow:
+    -1px -1px 0 #E6E6ED,
+     1px -1px 0 #E6E6ED,
+    -1px  1px 0 #E6E6ED,
+     1px  1px 0 #E6E6ED;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #1d2b53;
   }
 
   @media (max-width: 768px) {
-    padding: 20px 10px;
-    .siteTitle {
-      font-size: 2rem;
-    }
+    font-size: 2rem;
   }
 `;
 
 const ShopStatus = styled.div`
-  display: none;
-
-  @media (max-width: 768px) {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: white;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fffaf6;
+  gap: 6px;
 `;
 
-const ScissorsIcon = styled("iconify-icon")`
-  font-size: 1.5rem;
-  color: ${({ $isOpen }) => ($isOpen ? "#0f0" : "#f00")};
+const BarberPole = styled.div`
+  width: 16px;
+  height: 48px;
+  border-radius: 8px;
+  background: repeating-linear-gradient(
+    45deg,
+    #ff003c 0,
+    #ff003c 5px,
+    #ffffff 5px,
+    #ffffff 10px,
+    #00ccff 10px,
+    #00ccff 15px
+  );
+  background-size: 16px 60px;
+
+  box-shadow:
+    0 0 4px #ff003c,
+    0 0 6px #00ccff;
 
   ${({ $isOpen }) =>
     $isOpen &&
     css`
-      animation: ${wiggle} 1.2s ease-in-out infinite;
+      animation: ${stripesMove} 2s linear infinite, ${sway} 3s ease-in-out infinite;
+      transform-origin: center bottom;
     `}
 `;
 
 const StatusText = styled.span`
-  font-size: 1rem;
-  color: ${({ $isOpen }) => ($isOpen ? "#0f0" : "#f00")};
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  color: ${({ $isOpen }) => ($isOpen ? "#4caf50" : "#990000")};
 `;
 
 const MenuToggle = styled.div`
@@ -114,11 +160,12 @@ const MenuToggle = styled.div`
   @media (max-width: 768px) {
     display: block;
     cursor: pointer;
+    color: #fffaf6;
     transition: transform 0.3s ease, color 0.3s ease;
 
     &:hover {
-      transform: scale(1.1) rotate(5deg);
-      color: #ccc;
+      transform: scale(1.1);
+      color: #1d2b53;
     }
   }
 `;
@@ -133,32 +180,33 @@ const NavList = styled.ul`
   padding: 15px 5% 10px 5%;
   margin: 0;
   font-size: 22px;
+  color: #fffaf6;
 
   li {
     position: relative;
     flex: 1;
     text-align: center;
     cursor: pointer;
+    transition: color 0.3s ease;
 
-    &:not(:last-child)::after {
+    &:hover {
+      color: #1d2b53;
+    }
+
+    &::after {
       content: "";
       position: absolute;
-      right: -10px;
-      top: 50%;
-      transform: translateY(-50%) scaleY(0);
-      height: 70%;
-      width: 2px;
-      background-color: white;
-      opacity: 0;
-      animation: fadeInDivider 0.6s ease forwards;
-      animation-delay: 0.3s;
+      left: 50%;
+      bottom: -5px;
+      width: 0%;
+      height: 2px;
+      background-color: #3b5998;
+      transition: width 0.3s ease, left 0.3s ease;
     }
-  }
 
-  @keyframes fadeInDivider {
-    to {
-      transform: translateY(-50%) scaleY(1);
-      opacity: 0.6;
+    &:hover::after {
+      width: 50%;
+      left: 25%;
     }
   }
 
@@ -166,14 +214,12 @@ const NavList = styled.ul`
     flex-direction: column;
     align-items: center;
     width: 100%;
-    background-color: #000;
-    padding: 0;
-    margin-top: 0;
+    background-color: #1a1a1a;
     font-size: 1.2rem;
     gap: 10px;
 
     position: fixed;
-    top: 60px;
+    top: 90px;
     left: 0;
     right: 0;
     max-height: ${({ $open }) => ($open ? "100vh" : "0")};
@@ -187,15 +233,20 @@ const NavList = styled.ul`
       flex: none;
       width: 100%;
       padding: 12px 0;
-      border-bottom: 1px solid #333;
+      border-bottom: 1px solid #fffaf6;
+      color: #fffaf6;
 
       &:last-child {
         border-bottom: none;
       }
-    }
 
-    li::after {
-      display: none;
+      &:hover {
+        color: #1d2b53;
+      }
+
+      &::after {
+        display: none;
+      }
     }
   }
 `;
