@@ -1,13 +1,26 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import shopOpen from "../common/shopOpen";
 import styled, { keyframes, css } from "styled-components";
 import { FiX, FiMenu } from "react-icons/fi";
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const isOpen = shopOpen();
+
+  const handleAvailabilityClick = () => {
+    setMenuOpen(false);
+    if (location.pathname === "/") {
+      const el = document.getElementById("availability");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      navigate("/#availability");
+    }
+  };
 
   return (
     <StyledHeader>
@@ -28,12 +41,12 @@ const Header = () => {
       </TopRow>
 
       <NavList $open={menuOpen}>
-        <li onClick={() => navigate("/")}>HOME</li>
-        <li onClick={() => navigate("/availability")}>Availability</li>
-        <li>SERVICES</li>
-        <li>SHOP</li>
-        <li>LOCATION</li>
-        <li>CONTACT</li>
+        <li onClick={() => { navigate("/"); setMenuOpen(false); }}>HOME</li>
+        <li onClick={handleAvailabilityClick}>AVAILABILITY</li>
+        <li onClick={() => { navigate("/services"); setMenuOpen(false); }}>SERVICES</li>
+        <li onClick={() => { navigate("/shop"); setMenuOpen(false); }}>SHOP</li>
+        <li onClick={() => { navigate("/location"); setMenuOpen(false); }}>LOCATION</li>
+        <li onClick={() => { navigate("/contact"); setMenuOpen(false); }}>CONTACT</li>
       </NavList>
     </StyledHeader>
   );

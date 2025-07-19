@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { FaFacebookF, FaTiktok, FaInstagram } from "react-icons/fa";
 
@@ -9,9 +10,9 @@ const Footer = () => {
                 <FooterLeft>
                     <div>LEV<span style={{ color: 'black' }}>3</span><span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span> BARBERS</div>
                     <ul>
-                        <li>SHOP</li>
-                        <li>CONTACT US</li>
-                        <li>PRIVACY POLICY</li>
+                        <li><Link to="/shop">SHOP</Link></li>
+                        <li><Link to="/contact">CONTACT US</Link></li>
+                        <li><Link to="/privacy-policy">PRIVACY POLICY</Link></li>
                     </ul>
                 </FooterLeft>
 
@@ -94,9 +95,18 @@ const FooterLeft = styled.div`
         cursor: pointer;
         font-size: 1rem;
 
+        a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #1d2b53;
+    }
+  }
+
         &:hover {
             transform: scale(1.1);
-            color: #1d2b53;
         }
     }
 `;
