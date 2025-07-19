@@ -22,6 +22,18 @@ const Header = () => {
     }
   };
 
+  const handleScrollToContactSection = (sectionId) => {
+    setMenuOpen(false);
+    if (location.pathname === "/contact") {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      navigate(`/contact#${sectionId}`);
+    }
+  };
+
   return (
     <StyledHeader>
       <TopRow>
@@ -30,7 +42,7 @@ const Header = () => {
           <StatusText $isOpen={isOpen}>{isOpen ? "OPEN" : "CLOSED"}</StatusText>
         </ShopStatus>
 
-        <AnimatedTitle onClick={() => navigate("/")}>
+        <AnimatedTitle onClick={() => { navigate("/"); setMenuOpen(false); }}>
           LEV<span style={{ color: 'black' }}>3</span>
           <span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span> BARBERS
         </AnimatedTitle>
@@ -45,14 +57,16 @@ const Header = () => {
         <li onClick={handleAvailabilityClick}>AVAILABILITY</li>
         <li onClick={() => { navigate("/services"); setMenuOpen(false); }}>SERVICES</li>
         <li onClick={() => { navigate("/shop"); setMenuOpen(false); }}>SHOP</li>
-        <li onClick={() => { navigate("/location"); setMenuOpen(false); }}>LOCATION</li>
-        <li onClick={() => { navigate("/contact"); setMenuOpen(false); }}>CONTACT</li>
+        <li onClick={() => handleScrollToContactSection("location")}>LOCATION</li>
+        <li onClick={() => handleScrollToContactSection("info")}>CONTACT INFO</li>
+        <li onClick={() => handleScrollToContactSection("hours")}>OPENING HOURS</li>
       </NavList>
     </StyledHeader>
   );
 };
 
 export default Header;
+
 
 
 const stripesMove = keyframes`
