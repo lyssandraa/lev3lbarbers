@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import shopOpen from "../common/shopOpen";
 import styled, { keyframes, css } from "styled-components";
 import { FiX, FiMenu } from "react-icons/fi";
+
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const isOpen = shopOpen();
+  const navRef = useRef();
 
   const handleAvailabilityClick = () => {
     setMenuOpen(false);
@@ -34,11 +36,37 @@ const Header = () => {
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navRef.current && !navRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+  
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+  
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuOpen]);
+  
+
   return (
     <StyledHeader>
       <TopRow>
         <ShopStatus>
-          <BarberPole $isOpen={isOpen} />
+        <div
+  onClick={() => {
+    setMenuOpen(false);
+    navigate("/contact#hours");
+  }}
+  style={{ cursor: "pointer" }}
+>
+  <BarberPole $isOpen={isOpen} />
+</div>
+
           <StatusText $isOpen={isOpen}>{isOpen ? "OPEN" : "CLOSED"}</StatusText>
         </ShopStatus>
 
@@ -52,7 +80,7 @@ const Header = () => {
         </MenuToggle>
       </TopRow>
 
-      <NavList $open={menuOpen}>
+      <NavList $open={menuOpen} ref={navRef}>
         <li onClick={() => { navigate("/"); setMenuOpen(false); }}>HOME</li>
         <li onClick={handleAvailabilityClick}>AVAILABILITY</li>
         <li onClick={() => { navigate("/services"); setMenuOpen(false); }}>SERVICES</li>

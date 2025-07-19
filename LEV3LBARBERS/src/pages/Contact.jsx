@@ -24,7 +24,7 @@ const ContactPage = () => {
 
         <Divider/>
 
-      <Section id="info">
+      <Section id="info" style={{ scrollMarginTop: '90px' }}>
         <SectionTitle>Contact Info</SectionTitle>
         <ContactInfo>
           <p>Phone: <a href="tel:+441234567890">+44 7538 420684</a></p>
@@ -35,7 +35,7 @@ const ContactPage = () => {
 
       <Divider/>
 
-      <Section id="hours">
+      <Section id="hours" style={{ scrollMarginTop: '90px' }}>
         <OpeningTitle>Opening Hours</OpeningTitle>
         <OpeningHours>
           <li>Mon-Thu: 9:00 AM - 6:00 PM</li>
@@ -68,19 +68,17 @@ const Section = styled.section`
 `;
 
 const LocationTitle = styled.h2`
-  font-family: 'Dancing Script', cursive;
   font-size: 3rem;
   text-align: center;
   margin-bottom: 25px;
   color: #f0f0f0;
   text-shadow:
-    0 0 6px rgba(240, 240, 240, 0.7),
-    0 0 12px rgba(240, 240, 240, 0.5),
-    0 0 18px rgba(240, 240, 240, 0.3);
+    0 0 6px rgba(240, 240, 240, 0.5),
+    0 0 12px rgba(240, 240, 240, 0.3),
+    0 0 18px rgba(240, 240, 240, 0.1);
 `;
 
 const SectionTitle = styled.h2`
-  font-family: 'Dancing Script', cursive;
   font-size: 2.8rem;
   text-align: center;
   margin-bottom: 25px;
@@ -150,7 +148,6 @@ const ContactInfo = styled.div`
 `;
 
 const OpeningTitle = styled.h3`
-  font-family: 'Dancing Script', cursive;
   font-size: 2.4rem;
   text-align: center;
   margin-bottom: 15px;

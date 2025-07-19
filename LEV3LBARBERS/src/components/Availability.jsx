@@ -1,6 +1,6 @@
 import React from "react";
 import styled, { keyframes, css } from "styled-components";
-import 'iconify-icon';
+import barberChair from "../assets/barberChair.png"
 import shopOpen from "../common/shopOpen";
 
 const pulse = keyframes`
@@ -27,12 +27,12 @@ const Availability = () => {
           <BarberWrapper>
             {barbers.map((name, idx) => (
               <BarberStack key={idx}>
-                <StyledIcon
-                  icon="mdi:chair-school"
-                  $active={isOpen && name !== ""}
-                />
-                <BarberNameBox>{isOpen && name ? name : ""}</BarberNameBox>
+                <BarberStack key={idx}>
+                  <BarberImage src={barberChair} alt="Barber Chair" $active={isOpen && name !== ""} />
+                    <BarberNameBox>{isOpen && name ? name : ""}</BarberNameBox>
+                  </BarberStack>
               </BarberStack>
+              
             ))}
           </BarberWrapper>
         </Section>
@@ -125,9 +125,9 @@ const BarberStack = styled.div`
   gap: 12px;
 `;
 
-const StyledIcon = styled('iconify-icon')`
-  font-size: 100px;
-  color: ${({ $active }) => ($active ? '#0f0' : '#fff')};
+const BarberImage = styled.img`
+  width: 150px;
+  height: auto;
   ${({ $active }) =>
     $active &&
     css`
@@ -135,9 +135,10 @@ const StyledIcon = styled('iconify-icon')`
     `}
 
   @media (max-width: 768px) {
-    font-size: 70px;
+    width: 170px;
   }
 `;
+
 
 const BarberNameBox = styled.div`
   padding: 10px 18px;
