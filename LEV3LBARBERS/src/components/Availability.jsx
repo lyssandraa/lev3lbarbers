@@ -20,7 +20,7 @@ const Availability = () => {
   const isOpen = shopOpen();
 
   return (
-    <GradientBackground>
+    <GradientBackground id="availability">
       <AvailabityWrapper>
         <Section>
           <Title>AVAILABLE BARBERS</Title>
