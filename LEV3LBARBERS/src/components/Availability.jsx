@@ -15,70 +15,107 @@ const pulse = keyframes`
   }
 `;
 
-const Availability = () =>{
-    const barbers = ["Ari", ""];
+const Availability = () => {
+  const barbers = ["Ari", ""];
+  const isOpen = shopOpen();
 
-    const isOpen = shopOpen();
+  return (
+    <GradientBackground>
+      <AvailabityWrapper>
+        <Section>
+          <Title>AVAILABLE BARBERS</Title>
+          <BarberWrapper>
+            {barbers.map((name, idx) => (
+              <BarberStack key={idx}>
+                <StyledIcon
+                  icon="mdi:chair-school"
+                  $active={isOpen && name !== ""}
+                />
+                <BarberNameBox>{isOpen && name ? name : ""}</BarberNameBox>
+              </BarberStack>
+            ))}
+          </BarberWrapper>
+        </Section>
 
-    return (
-    <AvailabityWrapper>
-      <AvailableBarbers>
-        <Title>AVAILABLE BARBERS</Title>
-        <BarberWrapper>
-          {barbers.map((name, idx) => (
-            <BarberStack key={idx}>
-              <StyledIcon
-                icon="mdi:chair-school"
-                $active={isOpen && name !== ""}
-              />
-              <BarberNameBox>
-                {isOpen && name ? name : ""}
-              </BarberNameBox>
-            </BarberStack>
-          ))}
-        </BarberWrapper>
-      </AvailableBarbers>
-      <WaitingTime>
-        <Title>WAITING TIME</Title>
-        <WaitingTimeBox>{isOpen ? "15 min" : "See You Soon!"}</WaitingTimeBox>
-      </WaitingTime>
-    </AvailabityWrapper>
-    );
+        <Divider />
+
+        <Section>
+            <WaitingTimeWrapper>
+          <Title>WAITING TIME</Title>
+          <WaitingTimeBox>
+            {isOpen ? "15 min" : "See You Soon!"}
+          </WaitingTimeBox>
+          </WaitingTimeWrapper>
+        </Section>
+      </AvailabityWrapper>
+    </GradientBackground>
+  );
 };
 
 export default Availability;
 
+const GradientBackground = styled.div`
+  background: linear-gradient(to bottom, #0a0a0a, #ffffff);
+  width: 100%;
+  padding: 10px 0;
+`;
+
 const AvailabityWrapper = styled.div`
-    font-family: 'Bebas Neue', sans-serif;
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+  color: white;
+  max-width: 1200px;
+  margin: 0 auto;
 
-    & > div {
-        padding: 40px;
-    }
-
-    @media (max-width: 768px) {
+  @media (max-width: 768px) {
     flex-direction: column;
-
-    & > div {
-      padding: 30px;
-    }
   }
 `;
 
-const AvailableBarbers = styled.div`
-    background: #000;
-    color: white;
-    flex: 1;
+const Section = styled.div`
+  flex: 1;
+  padding: 20px;
+
+  @media (max-width: 768px) {
+    padding: 10px 10px;
+  }
+`;
+
+const WaitingTimeWrapper = styled.div`
+    @media (max-width: 768px) {
+        padding-top: 0;
+        padding-bottom: 50px;
+    }
+`;
+
+const Divider = styled.div`
+  width: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 20px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 4px;
+    margin: 15px 0;
+  }
+`;
+
+const Title = styled.h2`
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: white;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
 `;
 
 const BarberWrapper = styled.div`
   display: flex;
   justify-content: center;
   gap: 40px;
-  margin-top: 20px;
+  flex-wrap: wrap;
 `;
 
 const BarberStack = styled.div`
@@ -88,72 +125,38 @@ const BarberStack = styled.div`
   gap: 12px;
 `;
 
-const Title = styled.h2`
-    font-size: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 0;
-    margin: 0;
-`;
-
 const StyledIcon = styled('iconify-icon')`
-    font-size: 100px;
-    color: ${({ $active }) => ($active ? '#0f0' : 'white')};
-    ${({ $active }) =>
-      $active &&
-      css`
-        animation: ${pulse} 2s infinite;
-      `}
+  font-size: 100px;
+  color: ${({ $active }) => ($active ? '#0f0' : '#fff')};
+  ${({ $active }) =>
+    $active &&
+    css`
+      animation: ${pulse} 2s infinite;
+    `}
 
-    @media (max-width: 768px) {
-    font-size: 70px; 
+  @media (max-width: 768px) {
+    font-size: 70px;
   }
 `;
 
 const BarberNameBox = styled.div`
-  background: #f2f2f2;
-  color: ${({ children }) => (children ? '#000' : 'transparent')};
-  padding: 15px;
-  border-radius: 8px;
-  font-size: 1.5rem;
+  padding: 10px 18px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #000;
+  border-radius: 999px;
+  font-size: 1.4rem;
   min-width: 100px;
   text-align: center;
-  height: 48px; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const WaitingTime = styled.div`
-    flex: 1;
-    border-top: 3px solid black;
-    border-right: 3px solid black;
-    background-color: #f2f2f2;
-
-    @media (max-width: 768px) {
-    background-color: #000;
-    color: #fff;
-    border-top: 2px solid #fff;
-    }
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 `;
 
 const WaitingTimeBox = styled.div`
-    margin-top: 20px;
-    background-color: #000;
-    color: white;
-    padding: 20px;
-    font-size: 1.7rem;
-    text-align: center;
-    border-radius: 12px;
-    width: 70%;
-    margin-left: auto;
-    margin-right: auto;
-
-    @media (max-width: 768px) {
-    width: 100%;
-    background-color: #fff;
-    color: #000;
-  }
+  display: inline-block;
+  padding: 16px 45px;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  font-size: 1.8rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin-top: 0;
 `;
