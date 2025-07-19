@@ -6,7 +6,7 @@ const GallerySection = () => {
     <SectionWrapper>
       <SectionTitle>Customer Gallery</SectionTitle>
       <GalleryGrid>
-        {Array.from({ length: 3 }).map((_, index) => (
+        {Array.from({ length: 6 }).map((_, index) => (
           <GalleryItem key={index}>
             <Placeholder>Image {index + 1}</Placeholder>
           </GalleryItem>
@@ -46,11 +46,12 @@ const GalleryGrid = styled.div`
   max-width: 1000px;
 
   @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets/smaller screens */
+  width: 100%;
+    grid-template-columns: repeat(2, 1fr); 
   }
 
   @media (max-width: 480px) {
-    grid-template-columns: 1fr; /* 1 column on very small/mobile screens */
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 
