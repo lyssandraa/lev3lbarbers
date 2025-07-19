@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Availability from './components/Availability';
 import Shop from './pages/Shop';
+import Services from "./pages/Services";
 
 function App() {
   const location = useLocation();
@@ -30,6 +31,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />}/>
       <Route path="/shop" element={<Shop />}/>
+      <Route path="/services" element={<Services />}/>
     </Routes>
 
     {location.pathname === "/" && <Availability />}
