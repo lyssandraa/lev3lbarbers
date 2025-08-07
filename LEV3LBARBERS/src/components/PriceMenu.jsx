@@ -41,26 +41,27 @@ const servicesList = [
   
   const SectionWrapper = styled.section`
     min-height: 90vh;
-    padding: 20px;
+    padding: 0 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
   `;
   
   const MenuTitle = styled.h2`
-    font-family: 'Dancing Script', cursive;
-    font-size: 2.8rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
     text-align: center;
     letter-spacing: 1px;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
+    margin-top: 40px;
     color: #f2f2f2;
     text-shadow:
-      0 0 5px rgba(96, 165, 250, 0.4),
-      0 0 10px rgba(96, 165, 250, 0.3);
+      0 0 5px rgba(255, 255, 255, 0.2),
+      0 0 10px rgba(255, 255, 255, 0.2);
   `;
   
   const MenuCard = styled.div`
-    background: rgba(36, 39, 56, 0.85);
+    background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(6px);
     border-radius: 18px;
     padding: 5px 30px;

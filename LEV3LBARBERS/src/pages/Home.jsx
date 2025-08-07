@@ -1,12 +1,23 @@
-import React from "react";
-import styled from "styled-components";
+import React, { useState, useEffect } from "react";
+import styled, { keyframes, css } from "styled-components";
 import logo from "../assets/image.png";
 import homeBackground from "../assets/homeBackground.png";
 import "@fontsource/dancing-script";
+import Banner from '../common/Banner'
 
 const Home = () => {
+  const [showBookmark, setShowBookmark] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowBookmark(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+
   return (
     <HomeStyled>
+      {showBookmark && (
+        <BookmarkWrapper><FloatingBookmark>EST <br />2023</FloatingBookmark></BookmarkWrapper>)}
       <LogoStyled src={logo} alt="Logo" />
       <SloganContainer>
         <Slogan>
@@ -22,7 +33,28 @@ const Home = () => {
 
 export default Home;
 
+const revealAndHide = keyframes`
+  0% {
+    clip-path: inset(0 0 100% 0);
+    opacity: 1;
+  }
+  20% {
+    clip-path: inset(0 0 0% 0);  
+    opacity: 1;
+  }
+  80% {
+    clip-path: inset(0 0 0% 0);  
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 0 100% 0); 
+    opacity: 0;
+  }
+`;
+
+
 const HomeStyled = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -40,6 +72,43 @@ const HomeStyled = styled.div`
     padding: 2rem 1rem;
     text-align: center;
     gap: 1rem;
+  }
+`;
+
+const BookmarkWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  right: 2.5rem;
+  width: 60px;
+  height: 70px;
+  animation: ${revealAndHide} 5s ease-in-out forwards;
+  overflow: hidden;
+  z-index: 10;
+
+  @media (max-width: 768px) {
+    width: 30px;
+    height: 45px;
+    right: 2.5rem;
+  }
+`;
+
+
+const FloatingBookmark = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: #990000;
+  color: #fffaf6;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: 'Bebas Neue', sans-serif;
+  text-align: center;
+  padding-top: 6px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+    padding-top: 4px;
   }
 `;
 
