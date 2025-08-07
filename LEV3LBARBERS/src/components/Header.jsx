@@ -3,14 +3,18 @@ import { useNavigate, useLocation } from "react-router-dom";
 import shopOpen from "../common/shopOpen";
 import styled, { keyframes, css } from "styled-components";
 import { FiX, FiMenu } from "react-icons/fi";
+import { FaUser } from "react-icons/fa";
 
 
 const Header = () => {
   const navigate = useNavigate();
+  
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const isOpen = shopOpen();
+  const {isOpen} = shopOpen();
   const navRef = useRef();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleAvailabilityClick = () => {
     setMenuOpen(false);
@@ -51,23 +55,33 @@ const Header = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [menuOpen]);
+
+  
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+  
+    setIsLoggedIn(Boolean(token));
+    setIsAdmin(role === 'ADMIN');
+  }, [location.pathname]);  
+
   
 
   return (
     <StyledHeader>
+      
       <TopRow>
         <ShopStatus>
-        <div
-  onClick={() => {
-    setMenuOpen(false);
-    navigate("/contact#hours");
-  }}
-  style={{ cursor: "pointer" }}
->
-  <BarberPole $isOpen={isOpen} />
-</div>
-
-          <StatusText $isOpen={isOpen}>{isOpen ? "OPEN" : "CLOSED"}</StatusText>
+        <div 
+        onClick={() => { 
+          setMenuOpen(false); 
+          navigate("/contact#hours");
+        }}
+        style={{ cursor: "pointer" }}>
+          <BarberPole $isOpen={isOpen} />
+          </div>
+        <StatusText $isOpen={isOpen}>{isOpen ? "OPEN" : "CLOSED"}</StatusText>
         </ShopStatus>
 
         <AnimatedTitle onClick={() => { navigate("/"); setMenuOpen(false); }}>
@@ -75,9 +89,16 @@ const Header = () => {
           <span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span> BARBERS
         </AnimatedTitle>
 
-        <MenuToggle onClick={() => setMenuOpen(!menuOpen)}>
+
+        <RightIcons>
+          <UserIconContainer onClick={() => navigate(isLoggedIn ? 'profile' : '/login')}>
+            <FaUser size={22} />
+          </UserIconContainer>
+
+          <MenuToggle onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <FiX size={28} /> : <FiMenu size={28} />}
-        </MenuToggle>
+          </MenuToggle>
+        </RightIcons>
       </TopRow>
 
       <NavList $open={menuOpen} ref={navRef}>
@@ -88,6 +109,7 @@ const Header = () => {
         <li onClick={() => handleScrollToContactSection("location")}>LOCATION</li>
         <li onClick={() => handleScrollToContactSection("info")}>CONTACT INFO</li>
         <li onClick={() => handleScrollToContactSection("hours")}>OPENING HOURS</li>
+        {isLoggedIn && isAdmin && (<li onClick={() => { navigate("/admin"); setMenuOpen(false); }}>ADMIN PANEL</li>)}
       </NavList>
     </StyledHeader>
   );
@@ -144,7 +166,7 @@ const AnimatedTitle = styled.div`
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 2.5rem;
+  font-size: 2rem;
   letter-spacing: 2px;
   cursor: pointer;
   color: #990000;
@@ -165,6 +187,7 @@ const AnimatedTitle = styled.div`
     font-size: 2rem;
   }
 `;
+
 
 const ShopStatus = styled.div`
   display: flex;
@@ -203,7 +226,7 @@ const BarberPole = styled.div`
 `;
 
 const StatusText = styled.span`
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   text-align: center;
   color: ${({ $isOpen }) => ($isOpen ? "#4caf50" : "#990000")};
@@ -234,7 +257,7 @@ const NavList = styled.ul`
   width: 90%;
   padding: 15px 5% 10px 5%;
   margin: 0;
-  font-size: 22px;
+  font-size: 1rem;
   color: #fffaf6;
 
   li {
@@ -305,3 +328,30 @@ const NavList = styled.ul`
     }
   }
 `;
+
+const UserIconContainer = styled.div`
+  cursor: pointer;
+  margin-right: 12px;
+  color: #fffaf6;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+    color: #1d2b53;
+  }
+
+  @media (max-width: 768px) {
+    margin-right: 0;
+  }
+`;
+
+const RightIcons = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+  }
+`;
+
