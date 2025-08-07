@@ -1,39 +1,64 @@
 import { useState, useEffect } from 'react';
+import api from '../utils/api';
 
 const shopOpen = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [status, setStatus] = useState({
+    isOpen: false,
+    barbers: [],
+    override: false,
+    waitTime: 0,
+  });
+
+  const calculateIsOpenByTime = () => {
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+    let open = false;
+
+    if (day >= 1 && day <= 4) {
+      open = hour >= 9 && hour < 18;
+    } else if (day === 5 || day === 6) {
+      open = hour >= 9 && hour < 19;
+    } else if (day === 0) {
+      open = hour >= 10 && hour < 16;
+    }
+
+    return open;
+  };
+
+  const checkShopStatus = async () => {
+    try {
+      const res = await api.get('/shop-status');
+      const { isOpen: apiIsOpen, override, barbers, waitTime } = res.data;
+
+      setStatus({
+        barbers: barbers || [],
+        waitTime: waitTime || 0,
+        override,
+        isOpen: override ? apiIsOpen : calculateIsOpenByTime(),
+      });
+    } catch (error) {
+      console.error('Failed to fetch shop status:', error);
+      setStatus({
+        isOpen: calculateIsOpenByTime(),
+        barbers: [],
+        waitTime: 0,
+        override: false,
+      });
+    }
+  };
 
   useEffect(() => {
-    const checkOpen = () => {
-      const now = new Date();
-      const day = now.getDay();
-      const hour = now.getHours();
-      let open = false;
-      if (day >= 1 && day <= 4) {
-        open = hour >= 9 && hour < 18;
-      } else if (day === 5 || day === 6) {
-        open = hour >= 9 && hour < 19;
-      } else if (day === 0) {
-        open = hour >= 10 && hour < 16;
-      }
-      setIsOpen(open);
-    };
+    checkShopStatus();
 
-    checkOpen();
+    const interval = setInterval(() => {
+      checkShopStatus();
+    }, 10000);
 
-    const now = new Date();
-    const msUntilNextHour = (60 - now.getMinutes()) * 60 * 1000 - now.getSeconds() * 1000 - now.getMilliseconds();
+    return () => clearInterval(interval);
+  }, [checkShopStatus]);
 
-    const timeoutId = setTimeout(() => {
-      checkOpen();
-      const intervalId = setInterval(checkOpen, 3600000);
-      return () => clearInterval(intervalId);
-    }, msUntilNextHour);
-
-    return () => clearTimeout(timeoutId);
-  }, []);
-
-  return isOpen;
+  return { ...status, refresh: checkShopStatus };
 };
 
 export default shopOpen;

@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import PriceMenu from "../components/PriceMenu";
+import background from '../assets/backgroundImg.png';
 import GallerySection from "../components/GallerySection";
 
 const Services = () => {
@@ -15,13 +16,11 @@ const Services = () => {
 export default Services;
 
 const PageWrapper = styled.div`
-  background: linear-gradient(
-    180deg,
-    #020617 0%,
-    #0f172a 40%,
-    #e0e7ff 90%
-  );
-  min-height: 100vh;
+  background-image: url(${background});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 90vh;
   padding: 20px 20px;
 `;
 // const Divider = styled.div`

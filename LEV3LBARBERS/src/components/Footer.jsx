@@ -15,6 +15,7 @@ const Footer = () => {
             <Brand>
               LEV<span style={{ color: "black" }}>3</span>
               <FlipL>L</FlipL> BARBERS
+              <Established>EST 2023</Established>
             </Brand>
             <NavLinks>
               <li><Link to="/shop">SHOP</Link></li>
@@ -52,17 +53,16 @@ const Footer = () => {
 
 export default Footer;
 
-// Styled Components
 const StyledFooter = styled.footer`
   width: 100%;
-  height: 150px;
+  height: auto;
   background: linear-gradient(to bottom, #1f1f1f 70%, #151515 100%);
   color: #fff;
   font-family: 'Bebas Neue', sans-serif;
   display: flex;
   justify-content: center;
   align-items: stretch;
-  padding: 0 20px;
+  padding: 10px 15px;
   box-sizing: border-box;
 `;
 
@@ -94,11 +94,27 @@ const Brand = styled.div`
     -1px  1px 0 #E6E6ED,
     1px  1px 0 #E6E6ED;
   margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+  font-size: 1.5rem;
+  padding-top: 7px;
+}
 `;
 
 const FlipL = styled.span`
   display: inline-block;
   transform: scaleX(-1);
+`;
+
+const Established = styled.div`
+  font-size: 0.7rem;
+  color: #bbb;
+  margin-top: 0;
+  letter-spacing: 2px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-style: italic;
+  text-shadow: none;
+  cursor: default;
 `;
 
 const NavLinks = styled.ul`
@@ -169,6 +185,7 @@ const ModalOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
+  overflow-y: auto;
   background: rgba(0, 0, 0, 0.75);
   display: flex;
   align-items: center;
