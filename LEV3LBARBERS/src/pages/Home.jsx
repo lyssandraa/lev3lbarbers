@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styled, { keyframes, css } from "styled-components";
-import logo from "../assets/image.png";
-import homeBackground from "../assets/homeBackground.png";
+import logo from "../assets/beigeLogo.png";
+import homeBackground from "../assets/goldHomeBackground.png";
 import "@fontsource/dancing-script";
-import Banner from '../common/Banner'
 
 const Home = () => {
   const [showBookmark, setShowBookmark] = useState(true);
@@ -58,8 +57,8 @@ const HomeStyled = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 3rem 2rem;
-  gap: 3rem;
+  padding: 15rem 10rem;
+  gap: 10rem;
   background-image: url(${homeBackground});
   background-size: cover;
   background-position: center;
@@ -69,9 +68,9 @@ const HomeStyled = styled.div`
 
   @media (max-width: 768px) {
     flex-direction: column;
-    padding: 2rem 1rem;
+    padding: 3rem 1rem 6.5rem 1rem;
     text-align: center;
-    gap: 1rem;
+    gap: 0.5rem;
   }
 `;
 
@@ -113,17 +112,19 @@ const FloatingBookmark = styled.div`
 `;
 
 const LogoStyled = styled.img`
-  width: 300px;
+  width: 40%;
   height: auto;
   border-radius: 20px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.9);
+  
   @media (max-width: 768px) {
     width: 60%;
   }
 `;
 
 const SloganContainer = styled.div`
+  margin-top: 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -134,12 +135,12 @@ const SloganContainer = styled.div`
 
 const Slogan = styled.h2`
   font-family: 'Dancing Script', cursive;
-  font-size: 2.7rem;
+  font-size: 4rem;
   font-weight: 700;
   letter-spacing: 1.5px;
   line-height: 1.2;
   text-align: center;
-  color: #fffaf6;
+  color: #fff0db;
 
   opacity: 0;
   animation: slideIn 1.5s ease-out forwards;
@@ -154,7 +155,7 @@ const Slogan = styled.h2`
   @media (max-width: 768px) {
     font-size: 2.2rem;
     margin: 0;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
     span {
       display: inline;
     }
@@ -179,6 +180,7 @@ const Slogan = styled.h2`
 const EmphasizedLine = styled.span`
   margin-top: 0.5rem;
   display: block;
+  color: #fff0db;
 
   @media (max-width: 768px) {
     margin-top: 0.3rem;
@@ -191,5 +193,5 @@ const Lev3l = styled.span`
   letter-spacing: 2px;
   font-weight: bold;
   font-family: 'Bebas Neue', sans-serif;
-  color: #fffaf6;
+  color: #fff0db;
 `;

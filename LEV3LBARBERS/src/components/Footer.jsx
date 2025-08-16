@@ -12,11 +12,10 @@ const Footer = () => {
       <StyledFooter>
         <FooterContent>
           <FooterLeft>
-            <Brand>
-              LEV<span style={{ color: "black" }}>3</span>
-              <FlipL>L</FlipL> BARBERS
-              <Established>EST 2023</Established>
-            </Brand>
+            <TitleWrapper>
+            <Title>LEV3<span className="flipped-l">L</span> BARBERS</Title>
+            <Established>EST 2023</Established>
+            </TitleWrapper>
             <NavLinks>
               <li><Link to="/shop">SHOP</Link></li>
               <li><Link to="/contact#info">CONTACT US</Link></li>
@@ -84,16 +83,39 @@ const FooterLeft = styled.div`
   line-height: 1.3;
 `;
 
-const Brand = styled.div`
-  font-size: 2rem;
-  color: #990000;
-  cursor: pointer;
-  text-shadow:
-    -1px -1px 0 #E6E6ED,
-    1px -1px 0 #E6E6ED,
-    -1px  1px 0 #E6E6ED,
-    1px  1px 0 #E6E6ED;
+const TitleWrapper = styled.div`
   margin-bottom: 10px;
+
+`;
+const Title = styled.div`
+  font-size: 2rem;
+  cursor: pointer;
+
+  background: linear-gradient(
+    10deg,
+    #a07400 0%,
+    #c89300 20%,
+    #ffd700 40%,
+    #fff8c0 50%,
+    #ffcc00 60%,
+    #c89300 80%,
+    #a07400 100%
+  );
+  background-size: 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+
+  span.flipped-l {
+  display: inline-block;
+    transform: scaleX(-1);
+    background: inherit;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
 
   @media (max-width: 768px) {
   font-size: 1.5rem;
@@ -101,14 +123,9 @@ const Brand = styled.div`
 }
 `;
 
-const FlipL = styled.span`
-  display: inline-block;
-  transform: scaleX(-1);
-`;
-
 const Established = styled.div`
   font-size: 0.7rem;
-  color: #bbb;
+  color: #c99a32;
   margin-top: 0;
   letter-spacing: 2px;
   font-family: 'Bebas Neue', sans-serif;
@@ -128,11 +145,11 @@ const NavLinks = styled.ul`
   li {
     cursor: pointer;
     font-size: 1rem;
-    color: white;
+    color: #fff0db;
     transition: color 0.3s ease;
 
     &:hover {
-      color: #1d2b53;
+      color: #c99a32;
       transform: scale(1.1);
     }
 
@@ -156,7 +173,7 @@ const JoinTitle = styled.div`
   font-size: 1.1rem;
   letter-spacing: 1px;
   font-weight: 500;
-  color: #ccc;
+  color: #c99a32;
   margin-bottom: 6px;
   text-transform: uppercase;
 `;
@@ -167,13 +184,13 @@ const SocialIcons = styled.div`
   font-size: 1.4rem;
 
   a {
-    color: #fff;
+    color: #fff0db;
     display: inline-flex;
     align-items: center;
     transition: color 0.2s ease-in-out, transform 0.2s ease;
 
     &:hover {
-      color: #ff6600;
+      color: #c99a32;
       transform: scale(1.2);
     }
   }

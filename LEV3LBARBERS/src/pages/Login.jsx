@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import background from '../assets/logSignImg.jpg';
+import background from '../assets/logSignImage.png';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import api from '../utils/api';
 
@@ -75,11 +75,10 @@ const Login = () => {
             </ToggleIcon>
           </PasswordWrapper>
           </InputGroup>
-          <p style={{ marginTop: '1rem', textAlign: 'center' }}>
-            <a href="/forgot-password" style={{ color: '#1d2b53', textDecoration: 'none' }}>
-                Forgot Password?
-            </a>
-            </p>
+          
+          <PasswordReset style={{ marginTop: '1rem', textAlign: 'center' }}>
+            <a href="/forgot-password">Forgot Password?</a>
+          </PasswordReset>
 
           <Button type="submit">Log in</Button>
         </form>
@@ -94,74 +93,84 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 90vh;
+  min-height: 100vh;
+  padding: 1rem 2rem;
+
   background-image: url(${background});
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  padding: 1rem 2.5rem;
 `;
 
 const FormWrapper = styled.div`
   width: 100%;
   max-width: 420px;
-  height: 100%;
-  font-family: 'Segoe UI', sans-serif;
-  
+  padding: 3rem 1rem;
+  border-radius: 14px;
+  background: rgba(15, 15, 16, 0.85); /* matte black glass effect */
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 
   h2 {
     text-align: center;
+    margin-top: 0;
     margin-bottom: 1.2rem;
-    color: white;
+    background: linear-gradient(
+    10deg,
+    #a07400 0%,
+    #c89300 20%,
+    #ffd700 40%,
+    #fff8c0 50%,
+    #ffcc00 60%,
+    #c89300 80%,
+    #a07400 100%
+  );
+  background-size: 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
     font-size: 1.8rem;
+    font-weight: 700;
   }
 `;
 
 const InputGroup = styled.div`
-  margin-bottom: 5px;
+  margin-bottom: 1.5rem;
 `;
 
 const Label = styled.label`
   display: block;
-  margin-bottom: 0;
-  font-size: 1.1rem;
-  font-weight: 900;
-  color: white;
+  margin-bottom: 0.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff0db; 
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 14px;
-  margin: 12px 0;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(212, 175, 55, 0.25);
   border-radius: 10px;
   font-size: 1rem;
-  background: #F2F2F2;
-  opacity: 0.5;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f5f5f5;
+  transition: all 0.3s ease;
+
+  &::placeholder {
+    color: rgba(245, 245, 245, 0.6);
+  }
 
   &:focus {
     outline: none;
-    border-color: #1d2b53;
-    background: #fff;
+    border-color: #d4af37;
+    background: rgba(255, 255, 255, 0.15);
   }
 `;
 
-const Button = styled.button`
-  width: 100%;
-  padding: 14px;
-  background: #484547;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  margin-top: 10px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.3s ease;
-
-  &:hover {
-    background: #121214;
-  }
+const PasswordWrapper = styled.div`
+  position: relative;
 `;
 
 const ToggleIcon = styled.div`
@@ -170,26 +179,40 @@ const ToggleIcon = styled.div`
   right: 14px;
   transform: translateY(-50%);
   cursor: pointer;
-  color: white;
+  color: #d4af37;
 
   &:hover {
-    color: #1d2b53;
+    color: #c9a84b;
   }
 `;
 
-const PasswordWrapper = styled.div`
-  position: relative;
+const Button = styled.button`
+  width: 100%;
+  padding: 14px;
+  background: #fff0db;
+  color: #0b0b0c;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  margin-top: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #c9a84b;
+  }
 `;
 
 const ErrorMsg = styled.p`
-  color: white;
+  color: #f28c8c; 
   text-align: center;
   font-size: 0.95rem;
   margin-bottom: 12px;
 `;
 
 const SuccessMsg = styled.p`
-  color: white;
+  color: #a6e3a1; 
   text-align: center;
   font-size: 0.95rem;
   margin-bottom: 12px;
@@ -198,14 +221,24 @@ const SuccessMsg = styled.p`
 const SwitchText = styled.p`
   text-align: center;
   margin-top: 20px;
+  margin-bottom: 2rem;
   font-size: 0.95rem;
+  color: #fff0db; 
 
   a {
-    color: white;
+    color: #c99a32;
     text-decoration: underline;
 
     &:hover {
-      color: #0f1c3e;
+      color: #c9a84b;
     }
   }
+`;
+
+const PasswordReset = styled.p`
+  a {
+    color: #fff0db;
+    text-decoration: none;
+  }
+
 `;

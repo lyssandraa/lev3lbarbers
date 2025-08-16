@@ -85,8 +85,8 @@ const Header = () => {
         </ShopStatus>
 
         <AnimatedTitle onClick={() => { navigate("/"); setMenuOpen(false); }}>
-          LEV<span style={{ color: 'black' }}>3</span>
-          <span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span> BARBERS
+          LEV<span className="black3">3</span>
+          <span className="flipped-l">L</span> BARBERS
         </AnimatedTitle>
 
 
@@ -142,6 +142,15 @@ const fadeSlideUp = keyframes`
   }
 `;
 
+const shimmer = keyframes`
+  0% {
+    background-position: -200%;
+  }
+  100% {
+    background-position: 200%;
+  }
+`;
+
 const StyledHeader = styled.header`
   font-family: 'Bebas Neue', sans-serif;
   background: linear-gradient(to bottom, #1f1f1f 70%, #151515 100%);
@@ -169,18 +178,38 @@ const AnimatedTitle = styled.div`
   font-size: 2rem;
   letter-spacing: 2px;
   cursor: pointer;
-  color: #990000;
-  animation: ${fadeSlideUp} 0.8s ease-out forwards;
-  opacity: 0;
-  text-shadow:
-    -1px -1px 0 #E6E6ED,
-     1px -1px 0 #E6E6ED,
-    -1px  1px 0 #E6E6ED,
-     1px  1px 0 #E6E6ED;
-  transition: color 0.3s ease;
 
-  &:hover {
-    color: #1d2b53;
+  background: linear-gradient(
+    10deg,
+    #a07400 0%,
+    #c89300 20%,
+    #ffd700 40%,
+    #fff8c0 50%,
+    #ffcc00 60%,
+    #c89300 80%,
+    #a07400 100%
+  );
+  background-size: 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+
+  opacity: 0;
+  animation: 
+    ${fadeSlideUp} 1s ease-out forwards,
+    ${shimmer} 4s linear infinite;
+
+  
+
+  span.flipped-l {
+    display: inline-block;
+    transform: scaleX(-1);
+    background: inherit;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
   }
 
   @media (max-width: 768px) {
@@ -238,12 +267,12 @@ const MenuToggle = styled.div`
   @media (max-width: 768px) {
     display: block;
     cursor: pointer;
-    color: #fffaf6;
+    color: #fff0db;
     transition: transform 0.3s ease, color 0.3s ease;
 
     &:hover {
       transform: scale(1.1);
-      color: #1d2b53;
+      color: #c99a32;
     }
   }
 `;
@@ -268,7 +297,7 @@ const NavList = styled.ul`
     transition: color 0.3s ease;
 
     &:hover {
-      color: #1d2b53;
+      color: #c99a32;
     }
 
     &::after {
@@ -311,7 +340,7 @@ const NavList = styled.ul`
       flex: none;
       width: 100%;
       padding: 12px 0;
-      border-bottom: 1px solid #fffaf6;
+      border-bottom: 1px solid #fff0db;
       color: #fffaf6;
 
       &:last-child {
@@ -319,7 +348,7 @@ const NavList = styled.ul`
       }
 
       &:hover {
-        color: #1d2b53;
+        color: #c99a32;
       }
 
       &::after {
@@ -332,12 +361,12 @@ const NavList = styled.ul`
 const UserIconContainer = styled.div`
   cursor: pointer;
   margin-right: 12px;
-  color: #fffaf6;
+  color: #fff0db;
   transition: transform 0.2s ease;
 
   &:hover {
     transform: scale(1.1);
-    color: #1d2b53;
+    color: #c99a32;
   }
 
   @media (max-width: 768px) {

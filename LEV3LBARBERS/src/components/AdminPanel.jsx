@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import api from '../utils/api';
 import styled from 'styled-components';
-import background from '../assets/adminImg.png'
+import background from '../assets/adminImg.png';
 
 const waitLevels = [
     { label: "Level 1 - Smooth Sailing", value: 10 },

@@ -19,10 +19,9 @@ const Availability = () => {
 
   const { level, color, tagline } = isOpen
     ? getWaitLevel(waitTime)
-    : { level: 0, color: "#888", tagline: "See You Soon!" };
+    : { level: 0, color: "#fffaf6", tagline: "See You Soon!" };
 
   return (
-    <GradientBackground id="availability">
       <AvailabityWrapper>
         <Section>
           <Title>AVAILABLE BARBERS</Title>
@@ -40,14 +39,13 @@ const Availability = () => {
 
         <Section>
             <WaitingTimeWrapper>
-            <Title>WAITING LEV3<span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span></Title>
+            <Title>WAITING LEV3<span className="flipped-l">L</span></Title>
           <WaitingLevelBox $color={color} $level={level}>
             {tagline}
           </WaitingLevelBox>
           </WaitingTimeWrapper>
         </Section>
       </AvailabityWrapper>
-    </GradientBackground>
   );
 };
 
@@ -65,22 +63,30 @@ const pulse = keyframes`
   }
 `;
 
-const GradientBackground = styled.div`
-  background: linear-gradient(to bottom, #0a0a0a, #ffffff);
-  width: 100%;
-  padding: 10px 0;
+const pulseGreen = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #4CAF50; }
+  50% { box-shadow: 0 0 15px #4CAF50; }
+`;
+
+const pulseYellowShake = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #FFC107; transform: translateX(0); }
+  50% { box-shadow: 0 0 15px #FFC107; transform: translateX(3px); }
+`;
+
+const pulseRedBounce = keyframes`
+  0%, 100% { box-shadow: 0 0 5px #F44336; transform: translateY(0); }
+  50% { box-shadow: 0 0 20px #F44336; transform: translateY(-5px); }
 `;
 
 const AvailabityWrapper = styled.div`
-  font-family: 'Bebas Neue', sans-serif;
   display: flex;
   flex-direction: row;
   justify-content: center;
-  width: 100%;
   text-align: center;
+  width: 100%;
+  background: black;
+  font-family: 'Bebas Neue', sans-serif;
   color: white;
-  max-width: 1200px;
-  margin: 0 auto;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -89,22 +95,16 @@ const AvailabityWrapper = styled.div`
 
 const Section = styled.div`
   flex: 1;
-  padding: 20px;
+  padding: 100px;
 
   @media (max-width: 768px) {
-    padding: 10px 10px;
+    padding: 20px 10px;
   }
-`;
-
-const WaitingTimeWrapper = styled.div`
-    @media (max-width: 768px) {
-        padding-top: 0;
-        padding-bottom: 50px;
-    }
 `;
 
 const Divider = styled.div`
   width: 2px;
+  height: 32rem;
   background: rgba(255, 255, 255, 0.08);
   margin: 0 20px;
 
@@ -118,8 +118,11 @@ const Divider = styled.div`
 const Title = styled.h2`
   font-size: 1.8rem;
   margin-bottom: 10px;
-  color: white;
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  color: #fff0db;
+
+  span.flipped-l {
+    color: #fff0db;
+  }
 `;
 
 const BarberWrapper = styled.div`
@@ -127,6 +130,7 @@ const BarberWrapper = styled.div`
   justify-content: center;
   gap: 40px;
   flex-wrap: wrap;
+  width: 100%;
 `;
 
 const BarberStack = styled.div`
@@ -153,7 +157,7 @@ const BarberImage = styled.img`
 
 const BarberNameBox = styled.div`
   padding: 10px 18px;
-  background: rgba(255, 255, 255, 0.85);
+  background: #fffaf6;
   color: #000;
   border-radius: 999px;
   font-size: 1.4rem;
@@ -162,32 +166,22 @@ const BarberNameBox = styled.div`
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 `;
 
-
-const pulseGreen = keyframes`
-  0%, 100% { box-shadow: 0 0 5px #4CAF50; }
-  50% { box-shadow: 0 0 15px #4CAF50; }
-`;
-
-const pulseYellowShake = keyframes`
-  0%, 100% { box-shadow: 0 0 5px #FFC107; transform: translateX(0); }
-  50% { box-shadow: 0 0 15px #FFC107; transform: translateX(3px); }
-`;
-
-const pulseRedBounce = keyframes`
-  0%, 100% { box-shadow: 0 0 5px #F44336; transform: translateY(0); }
-  50% { box-shadow: 0 0 20px #F44336; transform: translateY(-5px); }
+const WaitingTimeWrapper = styled.div`
+  @media (max-width: 768px) {
+    padding-top: 0;
+    padding-bottom: 70px;
+  }
 `;
 
 const WaitingLevelBox = styled.div`
-  margin-top: 30px;
+  margin-top: 70px;
   display: inline-block;
   padding: 20px 50px;
   font-size: 1.5rem;
-  color: white;
+  color: black;
   border-radius: 999px;
   background-color: ${({ $color }) => $color};
   box-shadow: 0 0 5px ${({ $color }) => $color};
-  
 
   ${({ $level }) =>
     $level === 1 &&
@@ -204,4 +198,8 @@ const WaitingLevelBox = styled.div`
     css`
       animation: ${pulseRedBounce} 2s infinite;
     `}
+
+  @media (max-width: 768px) {
+  margin-top: 30px;
+}
 `;
