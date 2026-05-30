@@ -22,7 +22,7 @@ import ChangePassword from './pages/ChangePassword';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
 
-import AdminPanel from './components/AdminPanel';
+import AdminPanel from './pages/AdminPanel';
 import shopOpen from './common/shopOpen';
 
 function App() {

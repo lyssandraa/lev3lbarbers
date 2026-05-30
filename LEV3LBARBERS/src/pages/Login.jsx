@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import background from '../assets/logSignImg.jpg';
+import background from '../assets/blackWall.png';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import api from '../utils/api';
+import WelcomePopup from '../modals/MessagePopup';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -11,6 +12,7 @@ const Login = () => {
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const [showPopup, setShowPopup] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -23,13 +25,17 @@ const Login = () => {
 
     try {
       const res = await api.post('/auth/login', form);
-      console.log("Login response:", res.data); 
-
       const { token, role } = res.data;
+
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
-      setMessage('Login successful!');
-      setTimeout(() => navigate('/profile'), 1000);
+      
+      setShowPopup(true);
+
+      setTimeout(() => {
+        setShowPopup(false);
+        navigate('/profile');
+      }, 2000);
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid credentials');
     }
@@ -75,15 +81,14 @@ const Login = () => {
             </ToggleIcon>
           </PasswordWrapper>
           </InputGroup>
-          <p style={{ marginTop: '1rem', textAlign: 'center' }}>
-            <a href="/forgot-password" style={{ color: '#1d2b53', textDecoration: 'none' }}>
-                Forgot Password?
-            </a>
-            </p>
+          <ForgotPassword><a href="/forgot-password">
+            Forgot Password?</a>
+            </ForgotPassword>
 
-          <Button type="submit">Log in</Button>
+          <Button type="submit">Log In</Button>
         </form>
       </FormWrapper>
+      <WelcomePopup show={showPopup} onClose={() => setShowPopup(false)} />
     </Container>
   );
 };
@@ -105,15 +110,18 @@ const Container = styled.div`
 const FormWrapper = styled.div`
   width: 100%;
   max-width: 420px;
-  height: 100%;
-  font-family: 'Segoe UI', sans-serif;
-  
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
 
   h2 {
     text-align: center;
-    margin-bottom: 1.2rem;
-    color: white;
-    font-size: 1.8rem;
+    margin: 0.5rem 0 1.5rem 0;
+    color: #F5F2ED;
+    font-size: 2rem;
+    font-weight: 700;
   }
 `;
 
@@ -123,25 +131,26 @@ const InputGroup = styled.div`
 
 const Label = styled.label`
   display: block;
-  margin-bottom: 0;
+  margin: 0 0 10px 5px;
   font-size: 1.1rem;
-  font-weight: 900;
-  color: white;
+  font-weight: 600;
+  color: #F5F2ED;
 `;
 
 const Input = styled.input`
   width: 100%;
   padding: 14px;
-  margin: 12px 0;
-  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  border: none;
   border-radius: 10px;
   font-size: 1rem;
-  background: #F2F2F2;
-  opacity: 0.5;
+  background: #EDE9E3;
+  color: #121214;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
 
   &:focus {
     outline: none;
-    border-color: #1d2b53;
+    border: 1px solid #C8A860;
     background: #fff;
   }
 `;
@@ -149,18 +158,18 @@ const Input = styled.input`
 const Button = styled.button`
   width: 100%;
   padding: 14px;
-  background: #484547;
-  color: white;
+  background: #C8A860;
+  color: #000;
   border: none;
   border-radius: 10px;
   font-size: 1.1rem;
-  margin-top: 10px;
+  margin: 10px 0;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 700;
   transition: background 0.3s ease;
 
   &:hover {
-    background: #121214;
+    background: #b09050;
   }
 `;
 
@@ -170,10 +179,10 @@ const ToggleIcon = styled.div`
   right: 14px;
   transform: translateY(-50%);
   cursor: pointer;
-  color: white;
+  color: #8C857B;
 
   &:hover {
-    color: #1d2b53;
+    color: #F5F2ED;
   }
 `;
 
@@ -181,15 +190,30 @@ const PasswordWrapper = styled.div`
   position: relative;
 `;
 
+const ForgotPassword = styled.p`
+  margin-top: 1rem; 
+  text-align: center;
+
+  a{
+    color: #F5F2ED; 
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover{
+      color: #8C857B;
+    }
+  }
+`;
+
 const ErrorMsg = styled.p`
-  color: white;
+  color: #F5F2ED;
   text-align: center;
   font-size: 0.95rem;
   margin-bottom: 12px;
 `;
 
 const SuccessMsg = styled.p`
-  color: white;
+  color: #F5F2ED;
   text-align: center;
   font-size: 0.95rem;
   margin-bottom: 12px;
@@ -197,15 +221,17 @@ const SuccessMsg = styled.p`
 
 const SwitchText = styled.p`
   text-align: center;
-  margin-top: 20px;
+  margin: 0 0 1.3rem 0;
   font-size: 0.95rem;
+  color: #F5F2ED;
 
   a {
-    color: white;
+    color: #C8A860;
     text-decoration: underline;
+    transition: color 0.3s ease;
 
     &:hover {
-      color: #0f1c3e;
+      color: #F5F2ED;
     }
   }
 `;

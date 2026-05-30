@@ -1,13 +1,13 @@
 import React from "react";
 import styled from "styled-components";
-import PriceMenu from "../components/PriceMenu";
-import background from '../assets/backgroundImg.png';
+import ServiceMenu from "../components/ServiceMenu";
+import background from '../assets/servicesBackground.png';
 import GallerySection from "../components/GallerySection";
 
 const Services = () => {
   return (
     <PageWrapper>
-      <PriceMenu />
+      <ServiceMenu />
       {/* <Divider />  */}
     </PageWrapper>
   );
@@ -20,8 +20,11 @@ const PageWrapper = styled.div`
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  min-height: 90vh;
+  min-height: 80vh;
   padding: 20px 20px;
+
+  @media (max-width: 768px) {
+  min-height: 90vh;
 `;
 // const Divider = styled.div`
 //   width: 80%;

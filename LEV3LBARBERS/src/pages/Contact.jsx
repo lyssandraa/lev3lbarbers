@@ -1,14 +1,15 @@
 import React from "react";
 import styled from "styled-components";
+import background from '../assets/blackTools.jpg';
 
 const ContactPage = () => {
   return (
     <PageWrapper>
       <Section id="location" style={{ scrollMarginTop: '90px' }}>
-        <LocationTitle>Our Location</LocationTitle>
+        <Title>Our Location</Title>
         <Address>
           76 Eastbank Street,<br />
-          Soutport, UK<br />
+          <strong>Soutport, UK</strong><br />
           PR8 1EF
         </Address>
         <MapWrapper>
@@ -25,22 +26,22 @@ const ContactPage = () => {
         <Divider/>
 
       <Section id="info" style={{ scrollMarginTop: '90px' }}>
-        <SectionTitle>Contact Info</SectionTitle>
+        <Title>Contact Info</Title>
         <ContactInfo>
-          <p>Phone: <a href="tel:+441234567890">+44 7538 420684</a></p>
-          <p>Email: <a href="mailto:lev3lbarbers@gmail.com">lev3lbarbers@gmail.com</a></p>
-          <p>Social Media: LEV3L BARBERS </p>
+          <p><strong>Phone:</strong> <a href="tel:+441234567890">+44 7538 420684</a></p>
+          <p><strong>Email:</strong> <a href="mailto:lev3lbarbers@gmail.com">lev3lbarbers@gmail.com</a></p>
+          <p><strong>Social Media:</strong> LEV3L BARBERS </p>
         </ContactInfo>
       </Section>
 
       <Divider/>
 
       <Section id="hours" style={{ scrollMarginTop: '90px' }}>
-        <OpeningTitle>Opening Hours</OpeningTitle>
+        <Title>Opening Hours</Title>
         <OpeningHours>
-          <li>Mon-Thu: 9:00 AM - 6:00 PM</li>
-          <li>Fri-Sat: 9:00 AM - 7:00 PM</li>
-          <li>Sun: 10:00 AM - 4:00 PM</li>
+          <li><strong>Mon-Thu:</strong> 9:00 AM - 6:00 PM</li>
+          <li><strong>Fri-Sat:</strong> 9:00 AM - 7:00 PM</li>
+          <li><strong>Sun:</strong> 10:00 AM - 4:00 PM</li>
         </OpeningHours>
       </Section>
     </PageWrapper>
@@ -50,13 +51,13 @@ const ContactPage = () => {
 export default ContactPage;
 
 const PageWrapper = styled.div`
-  background: linear-gradient(to bottom, #000000, #ffffff);
+  background: #0d0d0d;
   min-height: 100vh;
   padding: 60px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #222;
+  color: #f5f2ed;
   font-family: 'Bebas Neue', sans-serif;
 `;
 
@@ -64,40 +65,32 @@ const Section = styled.section`
   max-width: 700px;
   width: 100%;
   margin-bottom: 60px;
-  padding: 20px;
+  padding: 20px 30px 30px 30px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 `;
 
-const LocationTitle = styled.h2`
-  font-size: 3rem;
+const Title = styled.h2`
+  font-size: 2.5rem;
   text-align: center;
   margin-bottom: 25px;
-  color: #f0f0f0;
-  text-shadow:
-    0 0 6px rgba(240, 240, 240, 0.5),
-    0 0 12px rgba(240, 240, 240, 0.3),
-    0 0 18px rgba(240, 240, 240, 0.1);
+  color: #f5f2ed;
 `;
-
-const SectionTitle = styled.h2`
-  font-size: 2.8rem;
-  text-align: center;
-  margin-bottom: 25px;
-  color: #222;
-  text-shadow:
-    0 0 6px rgba(255, 255, 255, 0.9),
-    0 0 12px rgba(255, 255, 255, 0.7),
-    0 0 18px rgba(255, 255, 255, 0.5),
-    0 0 24px rgba(255, 255, 255, 0.3);
-`;
-
 
 const Address = styled.address`
   font-style: normal;
   font-size: 1.3rem;
   text-align: center;
-  margin-bottom: 35px;
-  color: #f0f0f0;
+  margin-bottom: 25px;
+  color: #f5f2ed;
   line-height: 1.6;
+
+  strong {
+    color: #c8a860;
+    font-weight: 500;
+  }
 `;
 
 const MapWrapper = styled.div`
@@ -105,8 +98,8 @@ const MapWrapper = styled.div`
   height: 300px;
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 0 15px rgba(0,0,0,0.3);
-  margin-bottom: 40px;
+  box-shadow: 0 0 10px rgba(212, 169, 104, 0.6);
+  margin-bottom: 30px;
 
   iframe {
     width: 100%;
@@ -116,60 +109,53 @@ const MapWrapper = styled.div`
 `;
 
 const Divider = styled.div`
-  width: 100%;
-  max-width: 700px;
+  width: 80%;
   height: 2px;
-  background: rgba(34, 34, 34, 0.15);
-  margin: 30px 0;
-  box-shadow:
-    0 0 8px rgba(34, 34, 34, 0.1);
-  border-radius: 1px;
+  margin: 2rem auto 3rem auto;
+  background: linear-gradient(to right, transparent, #D4A968, transparent);
+  border-radius: 2px;
 `;
-
 
 const ContactInfo = styled.div`
   font-size: 1.3rem;
   text-align: center;
-  color: #222;
+  color: #f5f2ed;
 
   a {
-    color: #222;
+    color: #c8a860;
     text-decoration: none;
-    font-weight: 700;
+    transition: color 0.2s;
 
     &:hover {
-      text-decoration: underline;
+      color: #f5f2ed;
     }
   }
 
   p {
-    margin: 10px 0;
+    margin: 8px 0;
+  }
+
+  strong {
+    color: #c8a860;
+    font-weight: 500;
   }
 `;
-
-const OpeningTitle = styled.h3`
-  font-size: 2.4rem;
-  text-align: center;
-  margin-bottom: 15px;
-  color: #f2f2f2;
-  text-shadow:
-    0 0 4px rgba(0, 0, 0, 0.6),
-    0 0 8px rgba(0, 0, 0, 0.4),
-    0 0 12px rgba(0, 0, 0, 0.3);
-`;
-
-
 
 const OpeningHours = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0;
-  color: #222;
+  color: #f5f2ed;
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1.3rem;
 
   li {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     text-align: center;
+  }
+
+  strong {
+    color: #c8a860;
+    font-weight: 500;
   }
 `;
