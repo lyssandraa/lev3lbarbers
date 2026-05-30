@@ -1,132 +1,159 @@
-import React, {useState, useEffect} from "react";
-import api from "../utils/api";
+import React from "react";
 import styled, { keyframes, css } from "styled-components";
-import barberChair from "../assets/barberChair.png"
+import barberChair from "../assets/barberChair.png";
 import shopOpen from "../common/shopOpen";
 
+const WAIT_LEVELS = [
+  { id: 1, color: "#7cbf7c", label: "Ready for You" },
+  { id: 2, color: "#d4a048", label: "Clippers are Buzzing" },
+  { id: 3, color: "#a74c4c", label: "Worth the Wait" },
+];
+
 const getWaitLevel = (waitTime) => {
-  if (waitTime <= 10) return { level: 1, color: "#4CAF50", tagline: "Smooth Sailing. Walk Right In!" };
-  if (waitTime <= 25) return { level: 2, color: "#FFC107", tagline: "Buzzin' a Little. Grab a Coffee!" };
-  return { level: 3, color: "#F44336", tagline: "Packed House. Patience, Friend!" };
+  if (waitTime <= 10) return 1;
+  if (waitTime <= 25) return 2;
+  return 3;
 };
 
-
 const Availability = () => {
-  
-  const{isOpen, barbers, waitTime } = shopOpen();
-
-  const chairs = [barbers[0] || "", barbers[1] || ""];
-
-  const { level, color, tagline } = isOpen
-    ? getWaitLevel(waitTime)
-    : { level: 0, color: "#888", tagline: "See You Soon!" };
+  const { isOpen, barbers, waitTime } = shopOpen();
+  const topChairs    = [barbers[0] || "", barbers[1] || ""];
+  const bottomChair  = barbers[2] || "";
+  const level = isOpen ? getWaitLevel(waitTime) : 0;
 
   return (
-    <GradientBackground id="availability">
-      <AvailabityWrapper>
+      <Wrapper>
+        <GradientBackground id="availability">
+        <SectionDivider />
         <Section>
           <Title>AVAILABLE BARBERS</Title>
-          <BarberWrapper>
-            {chairs.map((name, idx) => (
-              <BarberStack key={idx}>
-                  <BarberImage src={barberChair} alt="Barber Chair" $active={isOpen && name !== ""} />
-                    <BarberNameBox>{isOpen && name ? name : ""}</BarberNameBox>
-                  </BarberStack>              
-            ))}
-          </BarberWrapper>
+          <BarberTriangle>
+            {/* Top row — two chairs */}
+            <BarberRow>
+              {topChairs.map((name, idx) => (
+                <BarberStack key={idx}>
+                  <BarberImage
+                    src={barberChair}
+                    alt="Barber Chair"
+                    $active={isOpen && !!name}
+                  />
+                  <BarberNameBox>{isOpen && name}</BarberNameBox>
+                </BarberStack>
+              ))}
+            </BarberRow>
+            {/* Bottom row — one chair centred */}
+            <BarberRow>
+              <BarberStack>
+                <BarberImage
+                  src={barberChair}
+                  alt="Barber Chair"
+                  $active={isOpen && !!bottomChair}
+                />
+                <BarberNameBox>{isOpen && bottomChair}</BarberNameBox>
+              </BarberStack>
+            </BarberRow>
+          </BarberTriangle>
         </Section>
 
-        <Divider />
+        <SectionDivider />
 
         <Section>
-            <WaitingTimeWrapper>
-            <Title>WAITING LEV3<span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span></Title>
-          <WaitingLevelBox $color={color} $level={level}>
-            {tagline}
-          </WaitingLevelBox>
+          <WaitingTimeWrapper>
+            <Title>
+              WAITING LEV3L
+            </Title>
+            <LevelsWrapper>
+              {WAIT_LEVELS.map(({ id, color, label }) => (
+                <LevelBox key={id} color={color} active={level === id}>
+                  {label}
+                </LevelBox>
+              ))}
+            </LevelsWrapper>
           </WaitingTimeWrapper>
         </Section>
-      </AvailabityWrapper>
-    </GradientBackground>
+        </GradientBackground>
+      </Wrapper>
+    
   );
 };
 
 export default Availability;
 
+
 const pulse = keyframes`
-  0% {
-    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 10px 10px rgba(0, 255, 0, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
-  }
+  0%   { box-shadow: 0 0 0 0 rgba(212,169,104,0.7); }
+  70%  { box-shadow: 0 0 10px 10px rgba(212,169,104,0); }
+  100% { box-shadow: 0 0 0 0 rgba(212,169,104,0); }
 `;
 
-const GradientBackground = styled.div`
-  background: linear-gradient(to bottom, #0a0a0a, #ffffff);
-  width: 100%;
-  padding: 10px 0;
+const pulseGlow = keyframes`
+  0%, 100% { box-shadow: 0 0 8px rgba(255,255,255,0.2); transform: scale(1); }
+  50%      { box-shadow: 0 0 20px currentColor; transform: scale(1.05); }
 `;
 
-const AvailabityWrapper = styled.div`
-  font-family: 'Bebas Neue', sans-serif;
+const Wrapper = styled.div`
+  font-family: "Bebas Neue", sans-serif;
   display: flex;
   flex-direction: row;
   justify-content: center;
-  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
   text-align: center;
   color: white;
-  max-width: 1200px;
-  margin: 0 auto;
 
   @media (max-width: 768px) {
     flex-direction: column;
   }
 `;
 
+const GradientBackground = styled.div`
+  background: #111111;
+  border-top: 1px solid rgba(200, 168, 96, 0.2);
+  width: 100%;
+  padding: 10px 0;
+`;
+
 const Section = styled.div`
   flex: 1;
-  padding: 20px;
+  padding: 50px;
 
   @media (max-width: 768px) {
-    padding: 10px 10px;
+    padding: 10px;
   }
 `;
 
-const WaitingTimeWrapper = styled.div`
-    @media (max-width: 768px) {
-        padding-top: 0;
-        padding-bottom: 50px;
-    }
-`;
-
-const Divider = styled.div`
-  width: 2px;
-  background: rgba(255, 255, 255, 0.08);
-  margin: 0 20px;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    height: 4px;
-    margin: 15px 0;
-  }
+const SectionDivider = styled.div`
+  width: 80%;
+  height: 2px;
+  margin: 1rem auto;
+  background: linear-gradient(to right, transparent, #d4a968, transparent);
+  border-radius: 2px;
 `;
 
 const Title = styled.h2`
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-  color: white;
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  margin-bottom: 30px;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.1rem;
+  letter-spacing: 1px;
+  color: #f5f2ed;
+
+  span.invertedL {
+    display: inline-block;
+    transform: scaleX(-1);
+  }
 `;
 
-const BarberWrapper = styled.div`
+const BarberTriangle = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+`;
+
+const BarberRow = styled.div`
   display: flex;
   justify-content: center;
   gap: 40px;
-  flex-wrap: wrap;
 `;
 
 const BarberStack = styled.div`
@@ -139,6 +166,9 @@ const BarberStack = styled.div`
 const BarberImage = styled.img`
   width: 150px;
   height: auto;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(212, 169, 104, 0.6);
+
   ${({ $active }) =>
     $active &&
     css`
@@ -150,58 +180,57 @@ const BarberImage = styled.img`
   }
 `;
 
-
 const BarberNameBox = styled.div`
-  padding: 10px 18px;
-  background: rgba(255, 255, 255, 0.85);
-  color: #000;
+  padding: 0.5rem 1.5rem;
+  margin-bottom: 2rem;
+  background: #2b2b2b;
+  color: #f5f2ed;
   border-radius: 999px;
   font-size: 1.4rem;
   min-width: 100px;
   text-align: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #d4a968;
+    color: #2b2b2b;
+  }
 `;
 
-
-const pulseGreen = keyframes`
-  0%, 100% { box-shadow: 0 0 5px #4CAF50; }
-  50% { box-shadow: 0 0 15px #4CAF50; }
+const WaitingTimeWrapper = styled.div`
+  @media (max-width: 768px) {
+    padding-bottom: 50px;
+  }
 `;
 
-const pulseYellowShake = keyframes`
-  0%, 100% { box-shadow: 0 0 5px #FFC107; transform: translateX(0); }
-  50% { box-shadow: 0 0 15px #FFC107; transform: translateX(3px); }
-`;
-
-const pulseRedBounce = keyframes`
-  0%, 100% { box-shadow: 0 0 5px #F44336; transform: translateY(0); }
-  50% { box-shadow: 0 0 20px #F44336; transform: translateY(-5px); }
-`;
-
-const WaitingLevelBox = styled.div`
+const LevelsWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 20px;
   margin-top: 30px;
-  display: inline-block;
-  padding: 20px 50px;
-  font-size: 1.5rem;
-  color: white;
-  border-radius: 999px;
-  background-color: ${({ $color }) => $color};
-  box-shadow: 0 0 5px ${({ $color }) => $color};
-  
+`;
 
-  ${({ $level }) =>
-    $level === 1 &&
+const LevelBox = styled.div`
+  padding: 15px 25px;
+  border-radius: 999px;
+  font-size: 1.2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  color: ${({ active }) => (active ? "#000" : "#ccc")};
+  background: ${({ color, active }) =>
+    active ? color : "rgba(255,255,255,0.05)"};
+  border: 1px solid ${({ color }) => color};
+
+  ${({ active }) =>
+    active &&
     css`
-      animation: ${pulseGreen} 2s infinite;
+      animation: ${pulseGlow} 2.5s infinite;
     `}
-  ${({ $level }) =>
-    $level === 2 &&
-    css`
-      animation: ${pulseYellowShake} 2s infinite;
-    `}
-  ${({ $level }) =>
-    $level === 3 &&
-    css`
-      animation: ${pulseRedBounce} 2s infinite;
-    `}
+
+  &:hover {
+    transform: scale(1.03);
+  }
 `;

@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import shopOpen from "../common/shopOpen";
 import styled, { keyframes, css } from "styled-components";
+import "@fontsource/montserrat";
 import { FiX, FiMenu } from "react-icons/fi";
 import { FaUser } from "react-icons/fa";
-
+import Banner from '../common/Banner';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -58,19 +59,26 @@ const Header = () => {
 
   
 
-  useEffect(() => {
+  const syncAuth = () => {
     const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
-  
+    const role  = localStorage.getItem('role');
     setIsLoggedIn(Boolean(token));
     setIsAdmin(role === 'ADMIN');
-  }, [location.pathname]);  
+  };
+
+  // Re-check on every route change
+  useEffect(() => { syncAuth(); }, [location.pathname]);
+
+  // Also re-check immediately when auth state changes (e.g. logout popup still showing)
+  useEffect(() => {
+    window.addEventListener('auth-changed', syncAuth);
+    return () => window.removeEventListener('auth-changed', syncAuth);
+  }, []);
 
   
 
   return (
     <StyledHeader>
-      
       <TopRow>
         <ShopStatus>
         <div 
@@ -85,8 +93,7 @@ const Header = () => {
         </ShopStatus>
 
         <AnimatedTitle onClick={() => { navigate("/"); setMenuOpen(false); }}>
-          LEV<span style={{ color: 'black' }}>3</span>
-          <span style={{ display: 'inline-block', transform: 'scaleX(-1)' }}>L</span> BARBERS
+          LEV3L BARBERS
         </AnimatedTitle>
 
 
@@ -111,6 +118,7 @@ const Header = () => {
         <li onClick={() => handleScrollToContactSection("hours")}>OPENING HOURS</li>
         {isLoggedIn && isAdmin && (<li onClick={() => { navigate("/admin"); setMenuOpen(false); }}>ADMIN PANEL</li>)}
       </NavList>
+      <Banner />
     </StyledHeader>
   );
 };
@@ -144,14 +152,14 @@ const fadeSlideUp = keyframes`
 
 const StyledHeader = styled.header`
   font-family: 'Bebas Neue', sans-serif;
-  background: linear-gradient(to bottom, #1f1f1f 70%, #151515 100%);
+  background: #0f0f0f;
   color: #d6d6d6;
   position: sticky;
   top: 0;
   width: 100%;
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
 `;
 
 const TopRow = styled.div`
@@ -169,22 +177,22 @@ const AnimatedTitle = styled.div`
   font-size: 2rem;
   letter-spacing: 2px;
   cursor: pointer;
-  color: #990000;
+  color: #F5F2ED;
   animation: ${fadeSlideUp} 0.8s ease-out forwards;
   opacity: 0;
-  text-shadow:
-    -1px -1px 0 #E6E6ED,
-     1px -1px 0 #E6E6ED,
-    -1px  1px 0 #E6E6ED,
-     1px  1px 0 #E6E6ED;
   transition: color 0.3s ease;
 
   &:hover {
-    color: #1d2b53;
+    color: rgba(255, 255, 255, 0.65);
   }
 
   @media (max-width: 768px) {
-    font-size: 2rem;
+    font-size: 2.3rem;
+  }
+
+  span.invertedL {
+    display: inline-block;
+    transform: scaleX(-1);
   }
 `;
 
@@ -243,7 +251,7 @@ const MenuToggle = styled.div`
 
     &:hover {
       transform: scale(1.1);
-      color: #1d2b53;
+      color: #D4A968;
     }
   }
 `;
@@ -268,7 +276,7 @@ const NavList = styled.ul`
     transition: color 0.3s ease;
 
     &:hover {
-      color: #1d2b53;
+      color: #D4A968;
     }
 
     &::after {
@@ -278,7 +286,7 @@ const NavList = styled.ul`
       bottom: -5px;
       width: 0%;
       height: 2px;
-      background-color: #3b5998;
+      background-color: rgba(255, 255, 255, 0.7);
       transition: width 0.3s ease, left 0.3s ease;
     }
 
@@ -292,12 +300,12 @@ const NavList = styled.ul`
     flex-direction: column;
     align-items: center;
     width: 100%;
-    background-color: #1a1a1a;
+    background-color: #0d0d0d;
     font-size: 1.2rem;
     gap: 10px;
 
     position: fixed;
-    top: 90px;
+    top: 130px;
     left: 0;
     right: 0;
     max-height: ${({ $open }) => ($open ? "100vh" : "0")};
@@ -311,7 +319,7 @@ const NavList = styled.ul`
       flex: none;
       width: 100%;
       padding: 12px 0;
-      border-bottom: 1px solid #fffaf6;
+      border-bottom: 1px solid rgba(200,168,96,0.2);
       color: #fffaf6;
 
       &:last-child {
@@ -319,7 +327,7 @@ const NavList = styled.ul`
       }
 
       &:hover {
-        color: #1d2b53;
+        color: #D4A968;
       }
 
       &::after {
@@ -337,7 +345,7 @@ const UserIconContainer = styled.div`
 
   &:hover {
     transform: scale(1.1);
-    color: #1d2b53;
+    color: #D4A968;
   }
 
   @media (max-width: 768px) {

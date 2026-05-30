@@ -1,9 +1,11 @@
 * {
-    box-sizing: border-box;
-    
+  box-sizing: border-box;
 }
 
-body, html{
-    margin: 0;
-    padding: 0;
+body, html {
+  margin: 0;
+  padding: 0;
+  background: #0d0d0d;
+  color: #f5f2ed;
+  -webkit-font-smoothing: antialiased;
 }

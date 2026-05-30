@@ -12,11 +12,10 @@ const Footer = () => {
       <StyledFooter>
         <FooterContent>
           <FooterLeft>
-            <Brand>
-              LEV<span style={{ color: "black" }}>3</span>
-              <FlipL>L</FlipL> BARBERS
+            <Title>
+              LEV3L BARBERS
               <Established>EST 2023</Established>
-            </Brand>
+            </Title>
             <NavLinks>
               <li><Link to="/shop">SHOP</Link></li>
               <li><Link to="/contact#info">CONTACT US</Link></li>
@@ -56,14 +55,15 @@ export default Footer;
 const StyledFooter = styled.footer`
   width: 100%;
   height: auto;
-  background: linear-gradient(to bottom, #1f1f1f 70%, #151515 100%);
-  color: #fff;
+  background: #0a0a0a;
+  color: #d6d6d6;
   font-family: 'Bebas Neue', sans-serif;
   display: flex;
   justify-content: center;
   align-items: stretch;
   padding: 10px 15px;
   box-sizing: border-box;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 `;
 
 const FooterContent = styled.div`
@@ -84,26 +84,25 @@ const FooterLeft = styled.div`
   line-height: 1.3;
 `;
 
-const Brand = styled.div`
+const Title = styled.div`
   font-size: 2rem;
-  color: #990000;
+  color: #F5F2ED;
   cursor: pointer;
-  text-shadow:
-    -1px -1px 0 #E6E6ED,
-    1px -1px 0 #E6E6ED,
-    -1px  1px 0 #E6E6ED,
-    1px  1px 0 #E6E6ED;
   margin-bottom: 10px;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.65);
+  }
 
   @media (max-width: 768px) {
   font-size: 1.5rem;
   padding-top: 7px;
 }
-`;
 
-const FlipL = styled.span`
+span.invertedL{
   display: inline-block;
   transform: scaleX(-1);
+}
 `;
 
 const Established = styled.div`
@@ -128,11 +127,11 @@ const NavLinks = styled.ul`
   li {
     cursor: pointer;
     font-size: 1rem;
-    color: white;
+    color: #fffaf6;
     transition: color 0.3s ease;
 
     &:hover {
-      color: #1d2b53;
+      color: #D4A968;
       transform: scale(1.1);
     }
 
@@ -167,13 +166,13 @@ const SocialIcons = styled.div`
   font-size: 1.4rem;
 
   a {
-    color: #fff;
+    color: #fffaf6;
     display: inline-flex;
     align-items: center;
     transition: color 0.2s ease-in-out, transform 0.2s ease;
 
     &:hover {
-      color: #ff6600;
+      color: #D4A968;
       transform: scale(1.2);
     }
   }
