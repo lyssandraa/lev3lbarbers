@@ -4,9 +4,10 @@ import {BrowserRouter as Router,
   Route,
   useLocation,
 } from "react-router-dom";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import ScrollToTop from './common/scrollToTop';
+import IntroReveal from './common/IntroReveal';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -23,11 +24,34 @@ import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
 
 import AdminPanel from './pages/AdminPanel';
+import RequireAdmin from './common/RequireAdmin';
+import Gallery from './pages/Gallery';
+import WhatsOn from './pages/WhatsOn';
+import Checkout from './pages/Checkout';
+import OrderSuccess from './pages/OrderSuccess';
+import GiftCardVerify from './pages/GiftCardVerify';
+import MemberPay from './pages/MemberPay';
+import Bookings from './pages/Bookings';
+import CookieBanner from './common/CookieBanner';
 import shopOpen from './common/shopOpen';
 
 function App() {
   const location = useLocation();
   const shopStatus = shopOpen();
+  const isHome  = location.pathname === "/";
+  const isAdmin = location.pathname === "/admin";
+
+  const [footerH, setFooterH] = useState(0);
+  useEffect(() => {
+    if (!isHome) return;
+    const el = document.querySelector('footer');
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      setFooterH(entry.target.offsetHeight);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isHome]);
 
   useEffect(() => {
     if (location.hash) {
@@ -40,6 +64,7 @@ function App() {
 
   return (
     <>
+    <IntroReveal />
     <Header isOpen={shopStatus.isOpen}/>
     <ScrollToTop/>
     <Routes>
@@ -53,13 +78,22 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/change-password" element={<ChangePassword />} />
-      <Route path="/admin" element={<AdminPanel refreshShopStatus={shopStatus.refresh} />} />
+      <Route path="/admin" element={<RequireAdmin><AdminPanel refreshShopStatus={shopStatus.refresh} /></RequireAdmin>} />
+      <Route path="/gallery" element={<Gallery />} />
+      <Route path="/whats-on" element={<WhatsOn />} />
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/gc/:code" element={<GiftCardVerify />} />
+      <Route path="/pay/:qrCode" element={<MemberPay />} />
+      <Route path="/bookings" element={<Bookings />} />
 
     </Routes>
 
-    {location.pathname === "/" && <Availability {...shopStatus} />}
+    {isHome && <Availability {...shopStatus} />}
+    {isHome && <div style={{ height: footerH, background: '#f4f0e8' }} />}
 
-    <Footer/>
+    {!isAdmin && <Footer fixed={isHome}/>}
+    <CookieBanner />
     </>
   )
 }

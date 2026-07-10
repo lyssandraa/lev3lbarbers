@@ -1,52 +1,226 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { FiMenu } from 'react-icons/fi';
-import background from '../assets/adminImg.png';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import { MenuIcon, GridIcon, ScanIcon, GiftIcon, CalendarIcon, LayersIcon, GearIcon } from '../common/icons';
 
-import ShopSettings from '../components/ShopSettings';
-import AdminRewards from '../components/AdminRewards';
-import AdminStamps from '../components/AdminStamps';
-import VerifyClaim from '../components/VerifyClaim';
-import AdminServices from '../components/AdminServices';
-import AdminBanners from '../components/AdminBanners';
+import ShopSettings     from '../components/ShopSettings';
+import AdminRewards     from '../components/AdminRewards';
+import AdminStamps      from '../components/AdminStamps';
+import VerifyClaim      from '../components/VerifyClaim';
+import AdminServices    from '../components/AdminServices';
+import AdminBanners     from '../components/AdminBanners';
+import AdminGallery     from '../components/AdminGallery';
+import AdminShop        from '../components/AdminShop';
+import AdminReferrals   from '../components/AdminReferrals';
+import AdminBirthday    from '../components/AdminBirthday';
+import AdminExpiry      from '../components/AdminExpiry';
+import AdminTerms       from '../components/AdminTerms';
+import AdminLoyaltySettings  from '../components/AdminLoyaltySettings';
+import AdminCreateAccounts   from '../components/AdminCreateAccounts';
+import AdminWhatsOn          from '../components/AdminWhatsOn';
+import AdminOrders           from '../components/AdminOrders';
+import AdminGiftCards        from '../components/AdminGiftCards';
+import AdminPromos           from '../components/AdminPromos';
+import AdminBookings        from '../components/AdminBookings';
+import AdminDashboard       from '../components/AdminDashboard';
+import AdminHeroSlideshow   from '../components/AdminHeroSlideshow';
+
+const CREAM = '#f4f0e8';
+const INK   = '#1a1a1a';
+const RED   = '#C41E3A';
+const EASE  = [0.22, 1, 0.36, 1];
+
+// ─── Menu structure ───────────────────────────────────────────────────────────
+// minRole: minimum role required to see this group / item
+const MENU = [
+  {
+    group: 'Overview',
+    minRole: 'ADMIN',
+    Icon: GridIcon,
+    items: [
+      { id: 'dashboard', label: 'Dashboard', minRole: 'ADMIN' },
+    ],
+  },
+  {
+    group: 'Operations',
+    minRole: 'STAFF',
+    Icon: ScanIcon,
+    items: [
+      { id: 'stamps',   label: 'Stamp Manager', minRole: 'STAFF' },
+      { id: 'verify',   label: 'Verify Claim',  minRole: 'STAFF' },
+    ],
+  },
+  {
+    group: 'Rewards',
+    minRole: 'ADMIN',
+    Icon: GiftIcon,
+    items: [
+      { id: 'rewardPool', label: 'Reward Pool',      minRole: 'ADMIN' },
+      { id: 'referrals',  label: 'Referral System',  minRole: 'ADMIN' },
+      { id: 'birthday',   label: 'Birthday Rewards', minRole: 'ADMIN' },
+    ],
+  },
+  {
+    group: 'Bookings',
+    minRole: 'ADMIN',
+    Icon: CalendarIcon,
+    items: [
+      { id: 'bookings', label: 'Booking System', minRole: 'ADMIN' },
+    ],
+  },
+  {
+    group: 'Content',
+    minRole: 'ADMIN',
+    Icon: LayersIcon,
+    items: [
+      { id: 'services',       label: 'Service Portal',   minRole: 'ADMIN' },
+      { id: 'banners',        label: 'Banner Manager',   minRole: 'ADMIN' },
+      { id: 'heroSlideshow',  label: 'Hero Slideshow',   minRole: 'ADMIN' },
+      { id: 'gallery',        label: 'Gallery',          minRole: 'ADMIN' },
+      { id: 'shopProducts', label: 'Shop Products',   minRole: 'ADMIN' },
+      { id: 'whatsOn',      label: "What's On",       minRole: 'ADMIN' },
+      { id: 'orders',       label: 'Orders',           minRole: 'ADMIN' },
+      { id: 'giftCards',    label: 'Gift Cards',       minRole: 'ADMIN' },
+      { id: 'promos',       label: 'Promo Codes',      minRole: 'ADMIN' },
+    ],
+  },
+  {
+    group: 'Settings',
+    minRole: 'ADMIN',
+    Icon: GearIcon,
+    items: [
+      { id: 'shop',          label: 'Shop Settings',    minRole: 'ADMIN' },
+      { id: 'loyalty',       label: 'Loyalty Settings', minRole: 'ADMIN' },
+      { id: 'expiry',        label: 'Reward Expiry',    minRole: 'ADMIN' },
+      { id: 'terms',         label: 'Reward T&C',       minRole: 'ADMIN' },
+      { id: 'createStaff',   label: 'Create Staff',     minRole: 'ADMIN' },
+      { id: 'createAdmin',   label: 'Create Admin',     minRole: 'DEVELOPER' },
+    ],
+  },
+];
+
+const ROLE_LEVELS = { USER: 1, STAFF: 2, ADMIN: 3, DEVELOPER: 4 };
+
+function canSee(userRole, minRole) {
+  return (ROLE_LEVELS[userRole] || 0) >= (ROLE_LEVELS[minRole] || 0);
+}
+
+function findGroupForTab(id) {
+  return MENU.find(g => g.items.some(i => i.id === id))?.group;
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 const AdminPanel = ({ refreshShopStatus }) => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('shop');
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { isLoggedIn, role, isShopUser, logout } = useAuth();
+  const isAdminRole = canSee(role, 'ADMIN');
+  const [activeTab, setActiveTab] = useState(isAdminRole ? 'dashboard' : 'stamps');
+  const [menuOpen, setMenuOpen]   = useState(false);
+  const [openGroups, setOpenGroups] = useState(() => new Set(isAdminRole ? ['Overview'] : ['Operations']));
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role  = localStorage.getItem('role');
-    if (!token || role !== 'ADMIN') navigate('/login');
-  }, [navigate]);
+    if (!isLoggedIn || !isShopUser) navigate('/login');
+  }, [isLoggedIn, isShopUser, navigate]);
+
+  const selectTab = (id) => {
+    setActiveTab(id);
+    setMenuOpen(false);
+    const g = findGroupForTab(id);
+    if (g) setOpenGroups(prev => new Set(prev).add(g));
+  };
+
+  const toggleGroup = (group) => {
+    setOpenGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(group)) next.delete(group); else next.add(group);
+      return next;
+    });
+  };
 
   return (
     <PanelWrapper>
-      {/* Burger Menu */}
-      <BurgerButton onClick={() => setMenuOpen(prev => !prev)}>
-        <FiMenu />
+      <BurgerButton onClick={() => setMenuOpen(p => !p)} aria-label="Toggle menu">
+        {menuOpen ? '✕' : <MenuIcon width={22} height={22} />}
       </BurgerButton>
-
       <Overlay $open={menuOpen} onClick={() => setMenuOpen(false)} />
 
-      <SideMenuOverlay $open={menuOpen}>
-        <MenuItem $active={activeTab==='shop'} onClick={() => { setActiveTab('shop'); setMenuOpen(false); }}>Shop Settings</MenuItem>
-        <MenuItem $active={activeTab==='rewardPool'} onClick={() => { setActiveTab('rewardPool'); setMenuOpen(false); }}>Reward Pool</MenuItem>
-        <MenuItem $active={activeTab==='stamps'} onClick={() => { setActiveTab('stamps'); setMenuOpen(false); }}>Stamp Manager</MenuItem>
-        <MenuItem $active={activeTab==='verify'} onClick={() => { setActiveTab('verify'); setMenuOpen(false); }}>Verify Claim</MenuItem>
-        <MenuItem $active={activeTab==='services'} onClick={() => { setActiveTab('services'); setMenuOpen(false); }}>Service Portal</MenuItem>
-        <MenuItem $active={activeTab==='banners'} onClick={() => { setActiveTab('banners'); setMenuOpen(false); }}>Banner Manager</MenuItem>
-      </SideMenuOverlay>
+      <SideMenu $open={menuOpen}>
+        {MENU.map(({ group, minRole, items, Icon }) => {
+          if (!canSee(role, minRole)) return null;
+          const visible = items.filter(i => canSee(role, i.minRole));
+          if (!visible.length) return null;
+          const isOpen = openGroups.has(group);
+          return (
+            <MenuGroup key={group}>
+              <GroupHead onClick={() => toggleGroup(group)}>
+                <GroupIconWrap><Icon width={14} height={14} /></GroupIconWrap>
+                <GroupLabel>{group}</GroupLabel>
+                <Chevron $open={isOpen}>›</Chevron>
+              </GroupHead>
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <GroupItems
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: EASE }}
+                  >
+                    {visible.map(item => (
+                      <MenuItem
+                        key={item.id}
+                        $active={activeTab === item.id}
+                        onClick={() => selectTab(item.id)}
+                      >
+                        {item.label}
+                      </MenuItem>
+                    ))}
+                  </GroupItems>
+                )}
+              </AnimatePresence>
+            </MenuGroup>
+          );
+        })}
+        <SwitchBarberBtn onClick={logout}>Switch Barber</SwitchBarberBtn>
+      </SideMenu>
 
       <Content>
-        {activeTab==='shop' && <ShopSettings refreshShopStatus={refreshShopStatus} />}
-        {activeTab==='rewardPool' && <AdminRewards />}
-        {activeTab==='stamps' && <AdminStamps />}
-        {activeTab==='verify' && <VerifyClaim />}
-        {activeTab==='services' && <AdminServices />}
-        {activeTab==='banners' && <AdminBanners />}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: EASE }}
+            style={{ width: '100%' }}
+          >
+            {activeTab === 'dashboard'    && <AdminDashboard onNavigate={selectTab} />}
+            {activeTab === 'stamps'       && <AdminStamps />}
+            {activeTab === 'verify'       && <VerifyClaim />}
+            {activeTab === 'rewardPool'   && <AdminRewards />}
+            {activeTab === 'referrals'    && <AdminReferrals />}
+            {activeTab === 'birthday'     && <AdminBirthday />}
+            {activeTab === 'services'     && <AdminServices />}
+            {activeTab === 'banners'       && <AdminBanners />}
+            {activeTab === 'heroSlideshow' && <AdminHeroSlideshow />}
+            {activeTab === 'gallery'       && <AdminGallery />}
+            {activeTab === 'shopProducts' && <AdminShop />}
+            {activeTab === 'whatsOn'      && <AdminWhatsOn />}
+            {activeTab === 'orders'       && <AdminOrders />}
+            {activeTab === 'giftCards'    && <AdminGiftCards />}
+            {activeTab === 'promos'       && <AdminPromos />}
+            {activeTab === 'bookings'     && <AdminBookings />}
+            {activeTab === 'shop'         && <ShopSettings refreshShopStatus={refreshShopStatus} />}
+            {activeTab === 'loyalty'      && <AdminLoyaltySettings />}
+            {activeTab === 'expiry'       && <AdminExpiry />}
+            {activeTab === 'terms'        && <AdminTerms />}
+            {(activeTab === 'createStaff' || activeTab === 'createAdmin') && (
+              <AdminCreateAccounts view={activeTab} />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </Content>
     </PanelWrapper>
   );
@@ -54,76 +228,168 @@ const AdminPanel = ({ refreshShopStatus }) => {
 
 export default AdminPanel;
 
-/** Styled Components **/
+/* ─────────── Styles ─────────── */
+
 const PanelWrapper = styled.div`
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-  padding: 0 2.5rem 2rem 2.5rem;
-  background-image:url(${background});
-  background-size:cover;
-  background-position:center;
-  color:#f2f2f2;
-  font-family:"Segoe UI",sans-serif;
-  position:relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 7rem 2.5rem 3rem;
+  background: ${CREAM};
+  color: ${INK};
+  font-family: 'Montserrat', sans-serif;
+  position: relative;
 `;
 
-const BurgerButton = styled.div`
-  position:fixed;
-  top:7rem;
-  left:1rem;
-  z-index:1001;
-  font-size:2rem;
-  cursor:pointer;
-  color:#fff;
-`;
+const BurgerButton = styled.button`
+  position: fixed;
+  top: 9rem;
+  left: 0.5rem;
+  z-index: 1001;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${CREAM};
+  border: 1px solid rgba(26,26,26,0.15);
+  border-radius: 50%;
+  cursor: pointer;
+  color: ${INK};
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  &:hover { border-color: rgba(26,26,26,0.35); }
 
-const SideMenuOverlay = styled.div`
-  position:fixed;
-  top: 7rem;
-  left:0;
-  height:100vh;
-  width:250px;
-  background: rgba(0,0,0,0.9);
-  padding:2rem 1rem;
-  display:flex;
-  flex-direction:column;
-  transform:${({ $open }) => $open ? 'translateX(0)' : 'translateX(-260px)'};
-  transition:transform 0.3s ease;
-  z-index:1000;
-`;
+  /* Header gains an extra desktop-nav row at this width — push below it */
+  @media (min-width: 769px) {
+    top: 11.3rem;
+  }
 
-const Overlay = styled.div`
-  display:${({ $open }) => $open ? 'block' : 'none'};
-  position:fixed;
-  top:7rem;
-  left:0;
-  width:100vw;
-  height:100vh;
-  background: rgba(0,0,0,0.4);
-  z-index:999;
-`;
-
-const MenuItem = styled.div`
-  padding:1rem;
-  cursor:pointer;
-  background:${({ $active }) => $active ? '#c8b88a' : 'rgba(255,255,255,0.08)'};
-  color:${({ $active }) => $active ? '#000' : '#f5f2ed'};
-  font-weight:${({ $active }) => $active ? '700' : '400'};
-  margin-bottom:0.5rem;
-  border-radius:8px;
-  transition: background 0.2s;
-
-  &:hover {
-    background:${({ $active }) => $active ? '#b2a072' : 'rgba(255,255,255,0.14)'};
+  /* Sidebar is forced open at this width (see SideMenu) — toggle button has nothing to do */
+  @media (min-width: 901px) {
+    display: none;
   }
 `;
 
+const SideMenu = styled.div`
+  position: fixed;
+  top: 8.5rem;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  background: ${CREAM};
+  border-right: 1px solid rgba(26,26,26,0.1);
+  padding: 3rem 0.8rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  overflow-y: auto;
+  transform: ${({ $open }) => $open ? 'translateX(0)' : 'translateX(-260px)'};
+  transition: transform 0.28s ease;
+  z-index: 1000;
+
+  @media (min-width: 769px) {
+    top: 10.8rem;
+  }
+
+  @media (min-width: 901px) {
+    transform: translateX(0);
+  }
+`;
+
+const Overlay = styled.div`
+  display: ${({ $open }) => $open ? 'block' : 'none'};
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,10,0.4);
+  z-index: 999;
+
+  @media (min-width: 901px) { display: none; }
+`;
+
+const MenuGroup = styled.div`
+  margin-bottom: 0.3rem;
+`;
+
+const GroupHead = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.55rem 0.6rem;
+  text-align: left;
+`;
+
+const GroupIconWrap = styled.span`
+  display: flex;
+  color: ${RED};
+  flex-shrink: 0;
+`;
+
+const GroupLabel = styled.span`
+  flex: 1;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(26,26,26,0.55);
+`;
+
+const Chevron = styled.span`
+  font-size: 1rem;
+  color: rgba(26,26,26,0.35);
+  transform: rotate(${({ $open }) => $open ? '90deg' : '0deg'});
+  transition: transform 0.2s ease;
+`;
+
+const GroupItems = styled(motion.div)`
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+`;
+
+const SwitchBarberBtn = styled.button`
+  margin-top: auto;
+  width: 100%;
+  padding: 0.7rem 0.6rem;
+  background: transparent;
+  border: 1px solid rgba(26,26,26,0.15);
+  color: rgba(26,26,26,0.6);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  &:hover { border-color: ${RED}; color: ${RED}; }
+`;
+
+const MenuItem = styled.div`
+  padding: 0.6rem 0.9rem 0.6rem 2.2rem;
+  cursor: pointer;
+  font-size: 0.86rem;
+  background: ${({ $active }) => $active ? 'rgba(196,30,58,0.08)' : 'transparent'};
+  color: ${({ $active }) => $active ? RED : 'rgba(26,26,26,0.65)'};
+  font-weight: ${({ $active }) => $active ? '700' : '400'};
+  border-left: 2px solid ${({ $active }) => $active ? RED : 'transparent'};
+  transition: background 0.18s, color 0.18s;
+  &:hover { background: rgba(26,26,26,0.04); color: ${INK}; }
+`;
+
 const Content = styled.div`
-  max-width:800px;
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  max-width: 800px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (min-width: 901px) {
+    margin-left: 250px;
+  }
 `;

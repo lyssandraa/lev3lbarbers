@@ -1,236 +1,399 @@
-import React from "react";
-import styled, { keyframes, css } from "styled-components";
-import barberChair from "../assets/barberChair.png";
-import shopOpen from "../common/shopOpen";
+import React from 'react';
+import { motion } from 'framer-motion';
+import styled from 'styled-components';
+import barberChair from '../assets/barberChair.png';
+import shopOpen from '../common/shopOpen';
+
+const DARK  = '#0c0c0c';
+const CREAM = '#EAE0CA';
+const RED   = '#C41E3A';
 
 const WAIT_LEVELS = [
-  { id: 1, color: "#7cbf7c", label: "Ready for You" },
-  { id: 2, color: "#d4a048", label: "Clippers are Buzzing" },
-  { id: 3, color: "#a74c4c", label: "Worth the Wait" },
+  { id: 1, label: 'Ready for You',   desc: 'Walk right in',    color: '#22c55e', bars: 1 },
+  { id: 2, label: 'Short Wait',      desc: 'Grab a seat',      color: '#f59e0b', bars: 2 },
+  { id: 3, label: 'Worth the Wait',  desc: 'We\'re pretty busy', color: '#ef4444', bars: 3 },
 ];
 
-const getWaitLevel = (waitTime) => {
-  if (waitTime <= 10) return 1;
-  if (waitTime <= 25) return 2;
-  return 3;
+const getWaitLevel = (w) => (w <= 10 ? 1 : w <= 25 ? 2 : 3);
+
+const containerV = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.13 } },
 };
+const itemV = {
+  hidden: { opacity: 0, y: 28 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+};
+
+const ChairCard = ({ name, active, pulseDelay = 0 }) => (
+  <Chair as={motion.div} variants={itemV} $active={active}>
+    <ChairImgWrap $active={active}>
+      {active && (
+        <SpotlightGlow
+          animate={{ opacity: [0.4, 0.9, 0.4] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut', delay: pulseDelay }}
+        />
+      )}
+      <img src={barberChair} alt="barber chair" />
+    </ChairImgWrap>
+    <ChairName $active={active}>
+      {name || ''}
+    </ChairName>
+  </Chair>
+);
 
 const Availability = () => {
   const { isOpen, barbers, waitTime } = shopOpen();
-  const topChairs    = [barbers[0] || "", barbers[1] || ""];
-  const bottomChair  = barbers[2] || "";
-  const level = isOpen ? getWaitLevel(waitTime) : 0;
+  const chairs = [barbers[0] || '', barbers[1] || '', barbers[2] || ''];
+  const level  = isOpen ? getWaitLevel(waitTime) : 0;
+  const current = WAIT_LEVELS.find(l => l.id === level);
 
   return (
-      <Wrapper>
-        <GradientBackground id="availability">
-        <SectionDivider />
-        <Section>
-          <Title>AVAILABLE BARBERS</Title>
-          <BarberTriangle>
-            {/* Top row — two chairs */}
-            <BarberRow>
-              {topChairs.map((name, idx) => (
-                <BarberStack key={idx}>
-                  <BarberImage
-                    src={barberChair}
-                    alt="Barber Chair"
-                    $active={isOpen && !!name}
+    <Section id="availability">
+      <Inner>
+        <HeaderBlock
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <SectionTitle>Who's In Today</SectionTitle>
+          <TitleRule />
+        </HeaderBlock>
+
+        <Panels>
+          {/* ── Barber chairs — triangle formation ── */}
+          <Panel>
+            <PanelLabel>Available Barbers</PanelLabel>
+
+            <TriangleWrap>
+              <TopRow
+                as={motion.div}
+                variants={containerV}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.2 }}
+              >
+                {[0, 1].map(i => (
+                  <ChairCard
+                    key={i}
+                    name={isOpen ? chairs[i] : 'Closed'}
+                    active={isOpen && !!chairs[i]}
+                    pulseDelay={i * 0.6}
                   />
-                  <BarberNameBox>{isOpen && name}</BarberNameBox>
-                </BarberStack>
-              ))}
-            </BarberRow>
-            {/* Bottom row — one chair centred */}
-            <BarberRow>
-              <BarberStack>
-                <BarberImage
-                  src={barberChair}
-                  alt="Barber Chair"
-                  $active={isOpen && !!bottomChair}
+                ))}
+              </TopRow>
+              <BottomRow
+                as={motion.div}
+                variants={containerV}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.2 }}
+              >
+                <ChairCard
+                  name={isOpen ? chairs[2] : 'Closed'}
+                  active={isOpen && !!chairs[2]}
+                  pulseDelay={1.2}
                 />
-                <BarberNameBox>{isOpen && bottomChair}</BarberNameBox>
-              </BarberStack>
-            </BarberRow>
-          </BarberTriangle>
-        </Section>
+              </BottomRow>
+            </TriangleWrap>
+          </Panel>
 
-        <SectionDivider />
+          <Divider />
 
-        <Section>
-          <WaitingTimeWrapper>
-            <Title>
-              WAITING LEV3L
-            </Title>
-            <LevelsWrapper>
-              {WAIT_LEVELS.map(({ id, color, label }) => (
-                <LevelBox key={id} color={color} active={level === id}>
-                  {label}
-                </LevelBox>
-              ))}
-            </LevelsWrapper>
-          </WaitingTimeWrapper>
-        </Section>
-        </GradientBackground>
-      </Wrapper>
-    
+          {/* ── Wait level ── */}
+          <Panel>
+            <PanelLabel>Waiting Level</PanelLabel>
+
+            {!isOpen ? (
+              <ClosedMsg
+                as={motion.div}
+                initial={{ opacity: 0, x: -16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+              >
+                We're closed right now.
+                <ClosedSub>Check back during opening hours.</ClosedSub>
+              </ClosedMsg>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <BarTrack>
+                  <BarFill
+                    $level={level}
+                    initial={{ width: '0%' }}
+                    whileInView={{ width: level === 1 ? '33.33%' : level === 2 ? '66.66%' : '100%' }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
+                  />
+                </BarTrack>
+                <BarScale>
+                  <BarScaleTick>Low</BarScaleTick>
+                  <BarScaleTick>Medium</BarScaleTick>
+                  <BarScaleTick>High</BarScaleTick>
+                </BarScale>
+
+                <CurrentStatus>
+                  <StatusText $color={current?.color}>{current?.label}</StatusText>
+                  <StatusDesc>{current?.desc}</StatusDesc>
+                </CurrentStatus>
+              </motion.div>
+            )}
+          </Panel>
+        </Panels>
+      </Inner>
+    </Section>
   );
 };
 
 export default Availability;
 
+/* ─────────── Styles ─────────── */
 
-const pulse = keyframes`
-  0%   { box-shadow: 0 0 0 0 rgba(212,169,104,0.7); }
-  70%  { box-shadow: 0 0 10px 10px rgba(212,169,104,0); }
-  100% { box-shadow: 0 0 0 0 rgba(212,169,104,0); }
+const Section = styled.section`
+  background: ${DARK};
+  color: ${CREAM};
+  padding: 5.5rem 0 6rem;
+  margin-top: -100vh;
+  position: relative;
+  z-index: 20;
+  border-radius: 28px 28px 0 0;
 `;
 
-const pulseGlow = keyframes`
-  0%, 100% { box-shadow: 0 0 8px rgba(255,255,255,0.2); transform: scale(1); }
-  50%      { box-shadow: 0 0 20px currentColor; transform: scale(1.05); }
-`;
-
-const Wrapper = styled.div`
-  font-family: "Bebas Neue", sans-serif;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  max-width: 100%;
+const Inner = styled.div`
+  max-width: 1100px;
   margin: 0 auto;
-  text-align: center;
-  color: white;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
+  padding: 0 6%;
 `;
 
-const GradientBackground = styled.div`
-  background: #111111;
-  border-top: 1px solid rgba(200, 168, 96, 0.2);
-  width: 100%;
-  padding: 10px 0;
+const HeaderBlock = styled(motion.div)`
+  margin-bottom: 4rem;
 `;
 
-const Section = styled.div`
-  flex: 1;
-  padding: 50px;
-
-  @media (max-width: 768px) {
-    padding: 10px;
-  }
+const SectionTitle = styled.h2`
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 8vw, 110px);
+  letter-spacing: -1px;
+  line-height: 0.9;
+  margin: 0;
+  color: ${CREAM};
 `;
 
-const SectionDivider = styled.div`
-  width: 80%;
+const TitleRule = styled.div`
+  width: 48px;
   height: 2px;
-  margin: 1rem auto;
-  background: linear-gradient(to right, transparent, #d4a968, transparent);
-  border-radius: 2px;
+  background: ${RED};
+  margin: 1rem 0 0;
 `;
 
-const Title = styled.h2`
-  margin-bottom: 30px;
-  font-family: "Bebas Neue", sans-serif;
-  font-size: 2.1rem;
-  letter-spacing: 1px;
-  color: #f5f2ed;
+const Panels = styled.div`
+  display: flex;
+  align-items: flex-start;
+  @media (max-width: 768px) { flex-direction: column; }
+`;
 
-  span.invertedL {
-    display: inline-block;
-    transform: scaleX(-1);
+const Panel = styled.div`
+  flex: 1;
+  @media (max-width: 768px) { padding: 0 0 3.5rem; width: 100%; }
+`;
+
+const Divider = styled.div`
+  width: 1px;
+  align-self: stretch;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.08) 80%, transparent);
+  margin: 0 5%;
+  @media (max-width: 768px) {
+    width: 100%; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.08) 80%, transparent);
+    margin: 0 0 3.5rem;
   }
 `;
 
-const BarberTriangle = styled.div`
+const PanelLabel = styled.h3`
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.5rem, 2vw, 1.4rem);
+  letter-spacing: 3px;
+  color: rgba(234, 224, 202, 0.5);
+  margin: 0 0 2rem;
+`;
+
+/* ── Chairs ── */
+
+const TriangleWrap = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 `;
 
-const BarberRow = styled.div`
+const TopRow = styled.div`
+  display: flex;
+  gap: 4rem;
+  @media (max-width: 600px) { gap: 2.5rem; }
+  @media (max-width: 400px) { gap: 1.5rem; }
+`;
+
+const BottomRow = styled.div`
   display: flex;
   justify-content: center;
-  gap: 40px;
 `;
 
-const BarberStack = styled.div`
+const Chair = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
+  opacity: ${({ $active }) => $active ? 1 : 0.22};
+  transition: opacity 0.3s;
 `;
 
-const BarberImage = styled.img`
-  width: 150px;
-  height: auto;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(212, 169, 104, 0.6);
+const ChairImgWrap = styled.div`
+  position: relative;
+  width: 210px;
 
-  ${({ $active }) =>
-    $active &&
-    css`
-      animation: ${pulse} 2s infinite;
-    `}
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    position: relative;
+    z-index: 1;
+    filter: ${({ $active }) => $active
+      ? 'drop-shadow(0 0 20px rgba(196,146,42,0.35))'
+      : 'grayscale(1) brightness(0.25)'};
+    transition: filter 0.4s;
+  }
 
-  @media (max-width: 768px) {
-    width: 170px;
+  @media (max-width: 768px) { width: 160px; }
+  @media (max-width: 480px) { width: 130px; }
+`;
+
+const SpotlightGlow = styled(motion.div)`
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 65%,
+    rgba(196,146,42,0.28) 0%,
+    rgba(196,30,58,0.1) 40%,
+    transparent 68%
+  );
+  z-index: 0;
+  pointer-events: none;
+`;
+
+const ChairName = styled.span`
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.3rem, 3vw, 1.4rem);
+  letter-spacing: 3px;
+  color: ${({ $active }) => $active ? CREAM : 'rgba(234,224,202,0.22)'};
+  transition: color 0.3s;
+`;
+
+/* ── Wait level ── */
+
+const BarTrack = styled.div`
+  width: 100%;
+  height: 18px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.55);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.55rem;
+`;
+
+const BarFill = styled(motion.div)`
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  border-radius: 6px;
+  background: ${({ $level }) =>
+    $level === 1
+      ? 'linear-gradient(90deg, #14532d 0%, #16a34a 45%, #4ade80 100%)'
+      : $level === 2
+      ? 'linear-gradient(90deg, #14532d 0%, #22c55e 30%, #ca8a04 65%, #fde047 100%)'
+      : 'linear-gradient(90deg, #14532d 0%, #22c55e 22%, #ca8a04 48%, #ea580c 72%, #ef4444 100%)'
+  };
+  box-shadow: 5px 0 28px ${({ $level }) =>
+    $level === 1 ? '#22c55e' : $level === 2 ? '#fde047' : '#ef4444'}55;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom,
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.04) 50%,
+      transparent 100%
+    );
+    border-radius: 6px;
   }
 `;
 
-const BarberNameBox = styled.div`
-  padding: 0.5rem 1.5rem;
+const BarScale = styled.div`
+  display: flex;
   margin-bottom: 2rem;
-  background: #2b2b2b;
-  color: #f5f2ed;
-  border-radius: 999px;
-  font-size: 1.4rem;
-  min-width: 100px;
+`;
+
+const BarScaleTick = styled.span`
+  flex: 1;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(234, 224, 202, 0.75);
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  &:first-child { text-align: left; }
+  &:last-child  { text-align: right; }
+`;
 
-  &:hover {
-    background: #d4a968;
-    color: #2b2b2b;
+const CurrentStatus = styled.div`
+  margin-bottom: 2rem;
+`;
+
+const StatusText = styled.div`
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  letter-spacing: 0px;
+  line-height: 1;
+  color: ${({ $color }) => $color};
+  margin-bottom: 0.5rem;
+
+  @media (max-width: 600px) {
+    font-size: clamp(2.8rem, 9vw, 4rem);
   }
 `;
 
-const WaitingTimeWrapper = styled.div`
-  @media (max-width: 768px) {
-    padding-bottom: 50px;
-  }
+const StatusDesc = styled.div`
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(234, 224, 202, 0.75);
 `;
 
-const LevelsWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 30px;
+
+const ClosedMsg = styled.div`
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.6rem, 3.5vw, 2rem);
+  letter-spacing: 2px;
+  color: rgba(234, 224, 202, 0.35);
+  line-height: 1.4;
 `;
 
-const LevelBox = styled.div`
-  padding: 15px 25px;
-  border-radius: 999px;
-  font-size: 1.2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  color: ${({ active }) => (active ? "#000" : "#ccc")};
-  background: ${({ color, active }) =>
-    active ? color : "rgba(255,255,255,0.05)"};
-  border: 1px solid ${({ color }) => color};
-
-  ${({ active }) =>
-    active &&
-    css`
-      animation: ${pulseGlow} 2.5s infinite;
-    `}
-
-  &:hover {
-    transform: scale(1.03);
-  }
+const ClosedSub = styled.p`
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(234, 224, 202, 0.22);
+  margin: 10px 0 0;
 `;

@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { BACKEND } from '../config';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5001'
+  baseURL: BACKEND
 });
 
 // Add token automatically if it exists

@@ -1,11 +1,27 @@
-* {
+*, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body, html {
-  margin: 0;
-  padding: 0;
-  background: #0d0d0d;
-  color: #f5f2ed;
+  background: #0E1118;
+  color: #EAE0CA;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
+
+/* Thin custom scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: rgba(242,237,228,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(242,237,228,0.28); }
+
+/* Focus outline — accessibility */
+:focus-visible {
+  outline: 1.5px solid rgba(196, 30, 58, 0.7);
+  outline-offset: 2px;
+}
+
+button { font-family: inherit; }

@@ -7,6 +7,11 @@ import ServicePreviewModal from '../modals/ServicePreviewModal';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy, } from '@dnd-kit/sortable';
 import SortableItem from '../common/SortableItem';
+import { EyeIcon, PencilIcon, TrashIcon, PlusIcon } from '../common/icons.jsx';
+
+const CREAM = '#f4f0e8';
+const INK = '#1a1a1a';
+const RED = '#C41E3A';
 
 const AdminServices = () => {
   const [services, setServices] = useState([]);
@@ -133,11 +138,13 @@ const AdminServices = () => {
   return (
     <FormCard>
       <PanelTitle>Manage Services</PanelTitle>
-      <PreviewButton onClick={() => setPreviewMode(true)}>Preview Service Menu</PreviewButton>
+      <PreviewButton onClick={() => setPreviewMode(true)}>
+        <EyeIcon width={16} height={16} /> Preview Service Menu
+      </PreviewButton>
 
       {previewMode && (
         <ServicePreviewModal
-          services={services} 
+          services={services}
           onCancel={() => setPreviewMode(false)}
         />
       )}
@@ -192,7 +199,9 @@ const AdminServices = () => {
                     onChange={e => setNewService({ ...newService, imageUrl: e.target.value, type })}
                   />
                 </Label>
-                <SaveButton onClick={() => handleAddService(type)}>Add Service</SaveButton>
+                <SaveButton onClick={() => handleAddService(type)}>
+                  <PlusIcon width={14} height={14} /> Add Service
+                </SaveButton>
                 <DndContext
                   collisionDetection={closestCenter}
                   onDragEnd={(event) => handleDragEnd(event, type)}
@@ -227,8 +236,12 @@ const AdminServices = () => {
                             <>
                               <span>{s.name} {s.price && `(£${s.price})`}</span>
                               <div>
-                                <EditButton onClick={() => startEditing(s)}>Edit</EditButton>
-                                <DeleteButton onClick={() => setDeleteTarget(s)}>Delete</DeleteButton>
+                                <EditButton onClick={() => startEditing(s)}>
+                                  <PencilIcon width={14} height={14} /> Edit
+                                </EditButton>
+                                <DeleteButton onClick={() => setDeleteTarget(s)}>
+                                  <TrashIcon width={14} height={14} /> Delete
+                                </DeleteButton>
                               </div>
                             </>
                           )}
@@ -259,43 +272,53 @@ const AdminServices = () => {
 export default AdminServices;
 
 const FormCard = styled.div`
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.55);
   padding: 2rem;
-  border-radius: 14px;
+  border-radius: 0;
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  border: 1px solid rgba(26,26,26,0.1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
   width: 100%;
   max-width: 700px;
   margin: 0 auto 2rem auto;
 `;
 
-const PanelTitle = styled.h2` 
-  text-align: center; 
+const PanelTitle = styled.h2`
+  text-align: center;
   margin-bottom: 1.5rem;
   font-size: 1.6rem;
-  color: #f5f2ed;
-  text-shadow: 0 0 6px rgba(0,0,0,0.6);
+  color: ${INK};
+  font-family: 'Bebas Neue', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 `;
 
 
 const PreviewButton = styled.button`
-  background: #4cafef;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: ${INK};
+  border: 1px solid rgba(26,26,26,0.15);
+  border-radius: 0;
   padding: 0.6rem 1rem;
   margin-bottom: 1rem;
   cursor: pointer;
-  font-size: 1rem;
-  &:hover { background: #379ad1; }
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  &:hover { border-color: ${INK}; color: ${INK}; }
 `;
 
 
 const CategoryBlock = styled.div`
   margin-top: 1rem;
-  border-radius: 8px;
+  border-radius: 0;
   overflow: hidden;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(26,26,26,0.1);
 `;
 
 const CategoryHeader = styled.div`
@@ -304,12 +327,16 @@ const CategoryHeader = styled.div`
   align-items: center;
   padding: 1rem;
   cursor: pointer;
-  background: rgba(255,255,255,0.12);
-  font-weight: bold;
+  background: rgba(26,26,26,0.04);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+  color: ${INK};
+  font-weight: normal;
 `;
 
 const ToggleIcon = styled.span`
   font-size: 1.5rem;
+  color: ${RED};
 `;
 
 const CategoryContent = styled.div`
@@ -320,8 +347,8 @@ const Label = styled.label`
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
-  font-weight: bold;
-  color: #c8b88a;
+  font-family: 'Bebas Neue', sans-serif;
+  color: ${RED};
   font-size: 0.9rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -330,14 +357,19 @@ const Label = styled.label`
 const Input = styled.input`
   margin-top: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.1);
-  color: white;
+  border-radius: 0;
+  border: 1px solid rgba(26,26,26,0.15);
+  background: #ffffff;
+  color: ${INK};
+  font-family: 'Montserrat', sans-serif;
   outline: none;
 
   &:focus {
-    border-color: #4cafef;
+    border-color: ${RED};
+  }
+
+  &::placeholder {
+    color: rgba(26,26,26,0.35);
   }
 `;
 
@@ -350,51 +382,60 @@ const ServiceItem = styled.div`
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.55);
   padding: 0.75rem 1rem;
-  border-radius: 8px;
+  border-radius: 0;
+  border: 1px solid rgba(26,26,26,0.08);
   margin-bottom: 0.5rem;
+  color: ${INK};
+  font-family: 'Montserrat', sans-serif;
 `;
 
 const ButtonBase = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   margin-top: 1rem;
   padding: 0.5rem 1rem;
-  border-radius: 8px;
+  border-radius: 0;
   border: none;
   cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
   font-size: 0.9rem;
   line-height: 1.2;
   min-width: 90px;
   text-align: center;
-  transition: background 0.3s ease, transform 0.1s ease;
-
-  &:hover {
-    transform: scale(1.03);
-  }
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 `;
 
 const SaveButton = styled(ButtonBase)`
-  background: #c8b88a;
-  color: #000;
-  &:hover { background: #b2a072; }
+  background: ${RED};
+  color: #fff;
+  &:hover { background: #a91830; }
 `;
 
 const EditButton = styled(ButtonBase)`
-  background: #fbc02d;
-  color: #000;
-  &:hover { background: #f9a825; }
+  background: transparent;
+  border: 1px solid rgba(26,26,26,0.15);
+  color: rgba(26,26,26,0.55);
+  margin-right: 0.5rem;
+  &:hover { border-color: ${INK}; color: ${INK}; }
 `;
 
 const DeleteButton = styled(ButtonBase)`
-  background: #e57373;
-  color: #fff;
-  &:hover { background: #d15f5f; }
+  background: rgba(196,30,58,0.04);
+  border: 1px solid ${RED};
+  color: ${RED};
+  &:hover { background: rgba(196,30,58,0.08); }
 `;
 
 const CancelButton = styled(ButtonBase)`
-  background: #9e9e9e;
-  color: #fff;
-  &:hover { background: #7e7e7e; }
+  background: transparent;
+  border: 1px solid rgba(26,26,26,0.15);
+  color: rgba(26,26,26,0.55);
+  &:hover { border-color: ${INK}; color: ${INK}; }
 `;
 
 const SaveButtonSmall = styled(SaveButton)`
@@ -404,7 +445,9 @@ const SaveButtonSmall = styled(SaveButton)`
 
 const EmptyText = styled.div`
   text-align: center;
-  color: rgba(255,255,255,0.6);
+  color: rgba(26,26,26,0.55);
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
   font-style: italic;
   margin-top: 0.5rem;
 `;
