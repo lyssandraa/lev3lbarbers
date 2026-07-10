@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import styled from 'styled-components';
 import api from '../utils/api';
+import { ScanIcon, CheckIcon } from '../common/icons';
+
+const INK = '#1a1a1a';
+const RED = '#C41E3A';
 
 const VerifyClaim = () => {
   const [isScanning, setIsScanning]     = useState(false);
@@ -52,6 +56,7 @@ const VerifyClaim = () => {
             onClick={() => { reset(); setIsScanning((prev) => !prev); }}
             $active={isScanning}
           >
+            <ScanIcon width={16} height={16} />
             {isScanning ? 'Stop Scanning' : 'Start Scanning'}
           </ScanButton>
 
@@ -73,7 +78,7 @@ const VerifyClaim = () => {
 
       {result && (
         <ResultCard $success>
-          <ResultIcon>✓</ResultIcon>
+          <ResultIcon><CheckIcon width={40} height={40} /></ResultIcon>
           <ResultTitle>Reward Redeemed!</ResultTitle>
           {result.customerName && <Detail><strong>Customer:</strong> {result.customerName}</Detail>}
           {result.rewardValue   && <Detail><strong>Reward:</strong>   {result.rewardValue}</Detail>}
@@ -89,11 +94,11 @@ export default VerifyClaim;
 
 
 const FormCard = styled.div`
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.55);
   padding: 2rem;
-  border-radius: 14px;
+  border-radius: 0;
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  border: 1px solid rgba(26,26,26,0.1);
   width: 100%;
   max-width: 600px;
   margin: 0 auto 2rem auto;
@@ -103,73 +108,95 @@ const FormCard = styled.div`
 `;
 
 const PanelTitle = styled.h2`
+  font-family: 'Bebas Neue', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   text-align: center;
   margin-bottom: 1.5rem;
   font-size: 1.6rem;
-  color: #f5f2ed;
-  text-shadow: 0 0 6px rgba(0,0,0,0.6);
+  color: ${INK};
 `;
 
 const ScanButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: 0;
   border: none;
-  background: ${({ $active }) => $active ? '#e57373' : '#c8b88a'};
-  color: ${({ $active }) => $active ? '#fff' : '#000'};
+  background: ${({ $active }) => $active ? 'transparent' : RED};
+  color: ${({ $active }) => $active ? RED : '#fff'};
+  ${({ $active }) => $active && `border: 1px solid ${RED};`}
+  font-family: 'Bebas Neue', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   margin-bottom: 1.2rem;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
 
-  &:hover { background: ${({ $active }) => $active ? '#d15f5f' : '#b2a072'}; }
+  &:hover {
+    background: ${({ $active }) => $active ? 'rgba(196,30,58,0.08)' : '#a8172f'};
+  }
 `;
 
 const ScannerWrapper = styled.div`
   width: 100%;
   max-width: 400px;
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
-  border: 2px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(26,26,26,0.15);
 `;
 
 const StatusMsg = styled.p`
+  font-family: 'Montserrat', sans-serif;
   margin-top: 1rem;
-  color: #c8b88a;
+  color: ${RED};
+  font-weight: 600;
   font-size: 0.95rem;
 `;
 
 const ErrorMsg = styled.p`
+  font-family: 'Montserrat', sans-serif;
   margin-top: 0.75rem;
-  color: #e57373;
+  color: ${RED};
+  font-weight: 600;
   font-size: 0.9rem;
   text-align: center;
 `;
 
 const ResultCard = styled.div`
   text-align: center;
-  background: rgba(34, 197, 94, 0.1);
+  background: rgba(34, 197, 94, 0.08);
   border: 1px solid rgba(34, 197, 94, 0.4);
-  border-radius: 12px;
+  border-radius: 0;
   padding: 2rem 1.5rem;
   width: 100%;
   max-width: 360px;
 `;
 
 const ResultIcon = styled.div`
-  font-size: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #22c55e;
   margin-bottom: 0.5rem;
 `;
 
 const ResultTitle = styled.h3`
+  font-family: 'Bebas Neue', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
   color: #22c55e;
   font-size: 1.4rem;
   margin-bottom: 1rem;
 `;
 
 const Detail = styled.p`
-  color: #f5f2ed;
+  font-family: 'Montserrat', sans-serif;
+  color: ${INK};
   font-size: 0.95rem;
   margin-bottom: 0.4rem;
 `;
@@ -177,13 +204,16 @@ const Detail = styled.p`
 const DoneButton = styled.button`
   margin-top: 1.2rem;
   padding: 0.6rem 1.4rem;
-  border-radius: 8px;
+  border-radius: 0;
   border: none;
-  background: #c8b88a;
-  color: #000;
+  background: ${RED};
+  color: #fff;
+  font-family: 'Bebas Neue', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s;
 
-  &:hover { background: #b2a072; }
+  &:hover { background: #a8172f; }
 `;

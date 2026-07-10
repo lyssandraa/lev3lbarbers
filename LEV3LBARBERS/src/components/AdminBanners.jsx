@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import api from "../utils/api";
 import ConfirmModal from "../modals/ConfirmModal";
+import { ImageIcon, PencilIcon, TrashIcon, PlusIcon } from "../common/icons.jsx";
+
+const INK = "#1a1a1a";
+const RED = "#C41E3A";
 
 const AdminBanners = () => {
   const [banners, setBanners] = useState([]);
@@ -119,7 +123,9 @@ const AdminBanners = () => {
         </Label>
 
 
-        <SaveButton onClick={addBanner}>+ Add Banner</SaveButton>
+        <SaveButton onClick={addBanner}>
+          <PlusIcon width={14} height={14} /> Add Banner
+        </SaveButton>
       </CategoryContent>
 
       {/* Grouped lists */}
@@ -190,18 +196,22 @@ const AdminBanners = () => {
                       ) : (
                         <>
                           <BannerContent>
-                            {b.imageUrl && <img src={b.imageUrl} alt="banner logo" />}
+                            {b.imageUrl ? (
+                              <img src={b.imageUrl} alt="banner logo" />
+                            ) : (
+                              <ImageIcon width={18} height={18} style={{ flexShrink: 0, opacity: 0.45 }} />
+                            )}
                             <span>
                               {b.message}{" "}
-                              {b.page && <em style={{ color: "#c8b88a" }}>→ {b.page}</em>}
+                              {b.page && <em style={{ color: RED }}>→ {b.page}</em>}
                             </span>
                           </BannerContent>
                           <div>
                             <EditButton onClick={() => startEditing(b)}>
-                              Edit
+                              <PencilIcon width={14} height={14} /> Edit
                             </EditButton>
                             <DeleteButton onClick={() => setDeleteTarget(b)}>
-                              Delete
+                              <TrashIcon width={14} height={14} /> Delete
                             </DeleteButton>
                             <SaveButtonSmall
                               onClick={() => toggleActive(b.id, b.active)}
@@ -233,14 +243,13 @@ const AdminBanners = () => {
 
 export default AdminBanners;
 
-/* --- Styled Components (same theme as AdminRewards) --- */
+/* --- Styled Components (cream/ink/red theme) --- */
 
 const FormCard = styled.div`
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.55);
   padding: 2rem;
-  border-radius: 14px;
+  border: 1px solid rgba(26, 26, 26, 0.1);
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 600px;
   margin: 0 auto 2rem auto;
@@ -250,15 +259,17 @@ const PanelTitle = styled.h2`
   text-align: center;
   margin-bottom: 1.5rem;
   font-size: 1.6rem;
-  color: #f5f2ed;
-  text-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: ${INK};
 `;
 
 const CategoryBlock = styled.div`
   margin-top: 1rem;
-  border-radius: 8px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(26, 26, 26, 0.08);
 `;
 
 const CategoryHeader = styled.div`
@@ -267,12 +278,17 @@ const CategoryHeader = styled.div`
   align-items: center;
   padding: 1rem;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(26, 26, 26, 0.05);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: ${INK};
   font-weight: bold;
 `;
 
 const ToggleIcon = styled.span`
   font-size: 1.5rem;
+  color: ${INK};
 `;
 
 const CategoryContent = styled.div`
@@ -283,8 +299,9 @@ const Label = styled.label`
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
-  font-weight: bold;
-  color: #c8b88a;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: ${RED};
   font-size: 0.9rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -293,14 +310,19 @@ const Label = styled.label`
 const Input = styled.input`
   margin-top: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  border-radius: 0;
+  border: 1px solid rgba(26, 26, 26, 0.15);
+  background: #ffffff;
+  color: ${INK};
+  font-family: 'Montserrat', sans-serif;
   outline: none;
 
+  &::placeholder {
+    color: rgba(26, 26, 26, 0.35);
+  }
+
   &:focus {
-    border-color: #4cafef;
+    border-color: ${RED};
   }
 `;
 
@@ -312,9 +334,9 @@ const RewardItem = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(26, 26, 26, 0.08);
   padding: 0.75rem 1rem;
-  border-radius: 8px;
   margin-bottom: 0.5rem;
 
   div {
@@ -327,6 +349,8 @@ const BannerContent = styled.span`
   display: flex;
   align-items: center;
   gap: 8px;
+  font-family: 'Montserrat', sans-serif;
+  color: ${INK};
 
   img {
     height: 24px;
@@ -336,10 +360,16 @@ const BannerContent = styled.span`
 
 
 const ButtonBase = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   padding: 0.5rem 1rem;
-  border-radius: 8px;
+  border-radius: 0;
   border: none;
   cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
   font-size: 0.9rem;
   line-height: 1.2;
   text-align: center;
@@ -351,11 +381,11 @@ const ButtonBase = styled.button`
 `;
 
 const SaveButton = styled(ButtonBase)`
-  background: #c8b88a;
-  color: #000;
+  background: ${RED};
+  color: #fff;
 
   &:hover {
-    background: #b2a072;
+    background: #a8182f;
   }
 `;
 
@@ -365,35 +395,42 @@ const SaveButtonSmall = styled(SaveButton)`
 `;
 
 const EditButton = styled(ButtonBase)`
-  background: #fbc02d;
-  color: #000;
+  background: transparent;
+  border: 1px solid rgba(26, 26, 26, 0.15);
+  color: rgba(26, 26, 26, 0.55);
 
   &:hover {
-    background: #f9a825;
+    background: rgba(26, 26, 26, 0.05);
+    color: ${INK};
   }
 `;
 
 const DeleteButton = styled(ButtonBase)`
-  background: #e57373;
-  color: #fff;
+  background: transparent;
+  border: 1px solid ${RED};
+  color: ${RED};
 
   &:hover {
-    background: #d15f5f;
+    background: rgba(196, 30, 58, 0.08);
   }
 `;
 
 const CancelButton = styled(ButtonBase)`
-  background: #9e9e9e;
-  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(26, 26, 26, 0.15);
+  color: rgba(26, 26, 26, 0.55);
 
   &:hover {
-    background: #7e7e7e;
+    color: ${INK};
+    background: rgba(26, 26, 26, 0.05);
   }
 `;
 
 const EmptyText = styled.div`
   text-align: center;
-  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  color: rgba(26, 26, 26, 0.5);
   font-style: italic;
   margin-top: 0.5rem;
 `;

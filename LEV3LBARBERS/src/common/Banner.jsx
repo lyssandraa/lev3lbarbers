@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled, { keyframes, css } from "styled-components";
 import api from "../utils/api";
 
-const Banner = ({onFinish}) => {
+const Banner = ({ onFinish, lightMode = false }) => {
   const [messages, setMessages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [ready, setReady] = useState(false);
@@ -55,12 +55,13 @@ const Banner = ({onFinish}) => {
   const currentMessage = messages[currentIndex];
 
   return (
-    <BannerWrapper>
+    <BannerWrapper $lightMode={lightMode}>
       {ready && (
         <BannerItem
           key={currentIndex}
           ref={bannerRef}
-          duration={duration}
+          $duration={duration}
+          $lightMode={lightMode}
           onClick={() =>
             currentMessage.page && navigate(`/${currentMessage.page}`)
           }
@@ -91,28 +92,34 @@ const slide = keyframes`
 
 const BannerWrapper = styled.div`
   width: 100%;
-  height: 40px;
+  height: 44px;
   overflow: hidden;
-  background: #000;
-  color: #fff;
+  background: ${({ $lightMode }) => $lightMode ? '#f4f0e8' : '#C41E3A'};
+  color: ${({ $lightMode }) => $lightMode ? '#1a1a1a' : '#fff'};
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  transition: background 0.4s ease, color 0.4s ease;
 `;
 
 const BannerItem = styled.div`
   display: flex;
   align-items: center;
-  font-weight: bold;
-  font-size: 1.1rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
   white-space: nowrap;
+  color: ${({ $lightMode }) => $lightMode ? '#1a1a1a' : '#fff'};
   position: absolute;
   left: 0;
   will-change: transform;
+  transition: color 0.4s ease;
 
-  ${({ duration }) => css`
-    animation: ${slide} ${duration}s linear infinite;
+  ${({ $duration }) => css`
+    animation: ${slide} ${$duration}s linear infinite;
   `}
 `;
 

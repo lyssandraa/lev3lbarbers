@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0E1118"/>
+  <!-- Red accent bar -->
+  <rect x="0" y="0" width="6" height="630" fill="#C41E3A"/>
+  <!-- Gold accent -->
+  <rect x="100" y="290" width="52" height="2" fill="#C4922A"/>
+  <!-- Shop name -->
+  <text x="100" y="270" font-family="Arial Black, sans-serif" font-size="72" font-weight="900" letter-spacing="12" fill="#EAE0CA">LEV3L</text>
+  <text x="100" y="370" font-family="Arial Black, sans-serif" font-size="72" font-weight="900" letter-spacing="12" fill="#EAE0CA">BARBERS</text>
+  <!-- Tagline -->
+  <text x="102" y="430" font-family="Arial, sans-serif" font-size="20" letter-spacing="6" fill="#C4922A">PREMIUM BARBERSHOP</text>
+  <!-- Replace this file with a real 1200×630 photo for better social previews -->
+</svg>
