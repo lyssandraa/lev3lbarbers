@@ -164,15 +164,19 @@ const Header = ({ isOpen }) => {
           <StatusLabel $isOpen={isOpen}>{isOpen ? 'OPEN' : 'CLOSED'}</StatusLabel>
         </ShopStatus>
 
-        {/* Logo: shown when brand name is hidden (home, not scrolled) */}
-        <LogoBrand $lightMode={lightMode} onClick={() => { navigate('/'); setMenuOpen(false); }}>
-          <img src={lightMode || menuOpen ? logoColor : logoWhite} alt="LEV3L Barbers" />
-        </LogoBrand>
-
-        {/* Text brand: shown when scrolled or on other pages */}
-        <Brand $lightMode={lightMode} onClick={() => { navigate('/'); setMenuOpen(false); }}>
-          LEV3L BARBERS
-        </Brand>
+        {/* Logo shown at top of home; text brand shown once scrolled/elsewhere.
+            Only one is ever mounted — relying on opacity to hide the other one
+            was visually "ghosting" on some mobile WebKit browsers (position:fixed
+            + backdrop-filter compositing quirk), even with opacity correctly 0. */}
+        {lightMode ? (
+          <LogoBrand onClick={() => { navigate('/'); setMenuOpen(false); }}>
+            <img src={logoColor} alt="LEV3L Barbers" />
+          </LogoBrand>
+        ) : (
+          <Brand onClick={() => { navigate('/'); setMenuOpen(false); }}>
+            LEV3L BARBERS
+          </Brand>
+        )}
 
         <RightIcons>
           <CartIconBtn id="cart-icon" onClick={() => setCartOpen(true)} aria-label="Cart">
@@ -361,22 +365,19 @@ const Brand = styled.div`
   cursor: pointer;
   color: var(--h-text);
   white-space: nowrap;
-  opacity: ${({ $lightMode }) => $lightMode ? 0 : 1};
-  pointer-events: ${({ $lightMode }) => $lightMode ? 'none' : 'auto'};
   transition: color 0.4s ease;
   &:hover { opacity: 0.6; }
 `;
 
-/* Logo mark: visible only when text brand is hidden.
-   No opacity transition here — logo (image) and text are visually dissimilar,
-   so even a brief crossfade reads as "both showing at once"; a hard cut is cleaner. */
+/* Logo mark: only mounted when the text brand isn't (see JSX) — conditional
+   mounting instead of opacity toggling, since opacity:0 was visually
+   "ghosting" back into view on some mobile WebKit browsers when combined
+   with position:fixed + backdrop-filter. */
 const LogoBrand = styled.div`
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   cursor: pointer;
-  opacity: ${({ $lightMode }) => $lightMode ? 1 : 0};
-  pointer-events: ${({ $lightMode }) => $lightMode ? 'auto' : 'none'};
 
   img {
     height: 100px;
