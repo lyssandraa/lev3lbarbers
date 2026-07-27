@@ -17,7 +17,7 @@ import Services from "./pages/Services";
 import Contact from './pages/Contact';
 
 import Register from './pages/Signup';
-import Login from './pages/Login.Jsx';
+import Login from './pages/Login.jsx';
 import Profile from './pages/Profile'
 import ChangePassword from './pages/ChangePassword';
 import ResetPassword from './pages/ResetPassword';
