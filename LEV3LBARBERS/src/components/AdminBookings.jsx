@@ -760,6 +760,10 @@ const BarberRow = styled.div`
   border: 1px solid rgba(26,26,26,0.1);
   border-radius: 0;
   padding: 12px 16px;
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+  }
 `;
 
 const BarberImg = styled.img`
@@ -782,6 +786,11 @@ const BarberInfo = styled.div`
 
 const BarberActions = styled.div`
   display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+
+  @media (max-width: 640px) {
+    width: 100%;
+    padding-left: 62px; /* align under BarberInfo — 48px avatar + 14px gap */
+  }
 `;
 
 const RuleTypeBtn = styled.button`
