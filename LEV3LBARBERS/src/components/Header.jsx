@@ -363,7 +363,7 @@ const Brand = styled.div`
   white-space: nowrap;
   opacity: ${({ $lightMode }) => $lightMode ? 0 : 1};
   pointer-events: ${({ $lightMode }) => $lightMode ? 'none' : 'auto'};
-  transition: opacity 0.35s ease, color 0.4s ease;
+  transition: opacity 0.12s ease, color 0.4s ease;
   &:hover { opacity: 0.6; }
 `;
 
@@ -375,7 +375,7 @@ const LogoBrand = styled.div`
   cursor: pointer;
   opacity: ${({ $lightMode }) => $lightMode ? 1 : 0};
   pointer-events: ${({ $lightMode }) => $lightMode ? 'auto' : 'none'};
-  transition: opacity 0.35s ease;
+  transition: opacity 0.12s ease;
 
   img {
     height: 100px;
@@ -516,7 +516,7 @@ const MobileDrawer = styled(motion.nav)`
   @media (max-width: 768px) {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     position: fixed;
     inset: 0;
     background: #f4f0e8;
