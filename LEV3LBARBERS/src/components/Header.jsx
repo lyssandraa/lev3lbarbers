@@ -41,11 +41,23 @@ const Header = ({ isOpen }) => {
   const navigate  = useNavigate();
   const location  = useLocation();
   const navRef    = useRef();
+  const headerRef = useRef();
   const isHome    = location.pathname === '/';
 
   const { isLoggedIn, isShopUser } = useAuth();
   const [menuOpen,   setMenuOpen]   = useState(false);
   const [scrolled,   setScrolled]   = useState(false);
+  const [headerH,    setHeaderH]    = useState(140);
+
+  /* ── Measure the header's real height so the mobile drawer can clear it
+       exactly — a hardcoded value drifts between pages (banner/layout differ) ── */
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => setHeaderH(entry.target.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const lightMode = isHome && !scrolled;
   const [showBookmark, setShowBookmark] = useState(false);
   const [bookingsActive, setBookingsActive] = useState(false);
@@ -122,7 +134,7 @@ const Header = ({ isOpen }) => {
   };
 
   return (
-    <StyledHeader $scrolled={scrolled} $isHome={isHome} $lightMode={lightMode} $menuOpen={menuOpen}>
+    <StyledHeader ref={headerRef} $scrolled={scrolled} $isHome={isHome} $lightMode={lightMode} $menuOpen={menuOpen}>
       {/* ── Banner sits at the very top — above the nav ── */}
       <BannerRow>
         <Banner lightMode={lightMode} />
@@ -204,6 +216,7 @@ const Header = ({ isOpen }) => {
             <MobileDrawer
               ref={navRef}
               key="drawer"
+              $headerH={headerH}
               initial="hidden"
               animate="show"
               exit={{ opacity: 0, transition: { duration: 0.18 } }}
@@ -509,7 +522,7 @@ const MobileDrawer = styled(motion.nav)`
     background: #f4f0e8;
     z-index: 999;          /* portalled to body — just below the header (1000) so its
                                (now-transparent-background) TopRow still paints on top */
-    padding: 140px 8% 60px;
+    padding: ${({ $headerH }) => $headerH}px 8% 60px;
     overflow-y: auto;
   }
 `;
