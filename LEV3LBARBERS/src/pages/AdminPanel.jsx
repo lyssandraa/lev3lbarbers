@@ -129,15 +129,12 @@ const AdminPanel = ({ refreshShopStatus }) => {
     setActiveTab(id);
     setMenuOpen(false);
     const g = findGroupForTab(id);
-    if (g) setOpenGroups(prev => new Set(prev).add(g));
+    if (g) setOpenGroups(new Set([g]));
   };
 
+  /* Accordion: opening a group closes whichever one was open before it */
   const toggleGroup = (group) => {
-    setOpenGroups(prev => {
-      const next = new Set(prev);
-      if (next.has(group)) next.delete(group); else next.add(group);
-      return next;
-    });
+    setOpenGroups(prev => (prev.has(group) ? new Set() : new Set([group])));
   };
 
   return (
