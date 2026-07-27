@@ -363,11 +363,13 @@ const Brand = styled.div`
   white-space: nowrap;
   opacity: ${({ $lightMode }) => $lightMode ? 0 : 1};
   pointer-events: ${({ $lightMode }) => $lightMode ? 'none' : 'auto'};
-  transition: opacity 0.12s ease, color 0.4s ease;
+  transition: color 0.4s ease;
   &:hover { opacity: 0.6; }
 `;
 
-/* Logo mark: visible only when text brand is hidden */
+/* Logo mark: visible only when text brand is hidden.
+   No opacity transition here — logo (image) and text are visually dissimilar,
+   so even a brief crossfade reads as "both showing at once"; a hard cut is cleaner. */
 const LogoBrand = styled.div`
   position: absolute;
   left: 50%;
@@ -375,7 +377,6 @@ const LogoBrand = styled.div`
   cursor: pointer;
   opacity: ${({ $lightMode }) => $lightMode ? 1 : 0};
   pointer-events: ${({ $lightMode }) => $lightMode ? 'auto' : 'none'};
-  transition: opacity 0.12s ease;
 
   img {
     height: 100px;
