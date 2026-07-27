@@ -163,6 +163,15 @@ const ServiceMenu = () => {
   const [loading,   setLoading]   = useState(true);
   const [loggedIn,  setLoggedIn]  = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [intro,     setIntro]     = useState(
+    'Crafted for every man. We cater to all hair types — afro, curly, straight and more. Other services available upon request.'
+  );
+
+  useEffect(() => {
+    api.get('/shop-info').then(r => {
+      if (r.data?.servicesIntro) setIntro(r.data.servicesIntro);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -197,10 +206,7 @@ const ServiceMenu = () => {
       >
         <Eyebrow>The Menu</Eyebrow>
         <PageTitle>Our Services</PageTitle>
-        <PageSub>
-          Crafted for every man. We cater to all hair types — afro, curly,
-          straight and more. Other services available upon request.
-        </PageSub>
+        <PageSub>{intro}</PageSub>
       </PageHeader>
 
       <GridWrap>

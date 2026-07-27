@@ -27,7 +27,7 @@ const DEFAULT_HOURS = {
 const ShopSettings = ({ refreshShopStatus }) => {
   const [formData,     setFormData]     = useState({ isOpen: false, barbers: [], waitTime: 0, override: false });
   const [openingHours, setOpeningHours] = useState(DEFAULT_HOURS);
-  const [shopInfo,     setShopInfo]     = useState({ address: '', city: '', postcode: '', phone: '', email: '', instagram: '', mapEmbedUrl: '' });
+  const [shopInfo,     setShopInfo]     = useState({ address: '', city: '', postcode: '', phone: '', email: '', instagram: '', mapEmbedUrl: '', servicesIntro: '' });
   const [loading,      setLoading]      = useState(true);
   const [saving,       setSaving]       = useState(false);
   const [savingInfo,   setSavingInfo]   = useState(false);
@@ -42,13 +42,14 @@ const ShopSettings = ({ refreshShopStatus }) => {
         setOpeningHours({ ...DEFAULT_HOURS, ...statusRes.data.openingHours });
       }
       setShopInfo({
-        address:     infoRes.data.address     || '',
-        city:        infoRes.data.city        || '',
-        postcode:    infoRes.data.postcode    || '',
-        phone:       infoRes.data.phone       || '',
-        email:       infoRes.data.email       || '',
-        instagram:   infoRes.data.instagram   || '',
-        mapEmbedUrl: infoRes.data.mapEmbedUrl || '',
+        address:       infoRes.data.address       || '',
+        city:          infoRes.data.city          || '',
+        postcode:      infoRes.data.postcode      || '',
+        phone:         infoRes.data.phone         || '',
+        email:         infoRes.data.email         || '',
+        instagram:     infoRes.data.instagram     || '',
+        mapEmbedUrl:   infoRes.data.mapEmbedUrl   || '',
+        servicesIntro: infoRes.data.servicesIntro || '',
       });
     }).catch(err => {
       console.error(err);
@@ -233,6 +234,17 @@ const ShopSettings = ({ refreshShopStatus }) => {
         <MapHint>In Google Maps, click Share → Embed a map → copy the URL from inside the src="..." attribute.</MapHint>
       </FormGroup>
 
+      <FormGroup>
+        <Label>Services Page Intro</Label>
+        <Textarea
+          rows={3}
+          placeholder="Crafted for every man. We cater to all hair types — afro, curly, straight and more."
+          value={shopInfo.servicesIntro}
+          onChange={e => setInfo('servicesIntro', e.target.value)}
+        />
+        <MapHint>Shown under "Our Services" at the top of the services page.</MapHint>
+      </FormGroup>
+
       <SaveButton onClick={handleSaveInfo} disabled={savingInfo}>
         {savingInfo ? 'Saving...' : 'Save Contact Details'}
       </SaveButton>
@@ -273,6 +285,15 @@ const Input = styled.input`
   padding: 0.7rem; border-radius: 0; font-family: 'Montserrat', sans-serif;
   border: 1px solid rgba(26,26,26,0.15); background: #ffffff;
   color: ${INK}; font-size: 1rem;
+  &:focus { outline: none; border-color: ${RED}; }
+  &::placeholder { color: rgba(26,26,26,0.35); }
+`;
+
+const Textarea = styled.textarea`
+  width: 100%; min-width: 0; resize: vertical;
+  padding: 0.7rem; border-radius: 0; font-family: 'Montserrat', sans-serif;
+  border: 1px solid rgba(26,26,26,0.15); background: #ffffff;
+  color: ${INK}; font-size: 1rem; line-height: 1.5;
   &:focus { outline: none; border-color: ${RED}; }
   &::placeholder { color: rgba(26,26,26,0.35); }
 `;
