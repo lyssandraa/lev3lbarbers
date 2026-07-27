@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +22,11 @@ const CartDrawer = ({ open, onClose }) => {
     navigate('/checkout');
   };
 
-  return (
+  /* Portalled to document.body — this is rendered inside the header, which can get
+     `backdrop-filter` applied on scroll. That creates a new containing block for
+     `position: fixed` descendants and would trap this drawer inside the header's
+     own (short) box instead of covering the full viewport. */
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
@@ -118,7 +123,8 @@ const CartDrawer = ({ open, onClose }) => {
           </Drawer>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

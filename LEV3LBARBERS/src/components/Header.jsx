@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { T } from '../common/theme';
@@ -192,38 +193,45 @@ const Header = ({ isOpen }) => {
         )}
       </DesktopNav>
 
-      {/* ── Mobile drawer — full-screen cream overlay ── */}
-      <AnimatePresence>
-        {menuOpen && (
-          <MobileDrawer
-            ref={navRef}
-            key="drawer"
-            initial="hidden"
-            animate="show"
-            exit={{ opacity: 0, transition: { duration: 0.18 } }}
-            variants={drawerVariants}
-          >
-            {NAV.map((item) => (
-              <DrawerItem
-                key={item.label}
-                $active={activeRoute(item)}
-                variants={itemVariants}
-                onClick={() => handleNav(item)}
-              >
-                {item.label}
-              </DrawerItem>
-            ))}
-            {isLoggedIn && isShopUser && (
-              <DrawerItem
-                variants={itemVariants}
-                onClick={() => { navigate('/admin'); setMenuOpen(false); }}
-              >
-                Admin Panel
-              </DrawerItem>
-            )}
-          </MobileDrawer>
-        )}
-      </AnimatePresence>
+      {/* ── Mobile drawer — full-screen cream overlay ──
+          Portalled to document.body: the header can get `backdrop-filter`
+          applied to it on scroll, which creates a new containing block for
+          `position: fixed` descendants and would otherwise trap this drawer
+          inside the header's own (short) box instead of the full viewport. */}
+      {createPortal(
+        <AnimatePresence>
+          {menuOpen && (
+            <MobileDrawer
+              ref={navRef}
+              key="drawer"
+              initial="hidden"
+              animate="show"
+              exit={{ opacity: 0, transition: { duration: 0.18 } }}
+              variants={drawerVariants}
+            >
+              {NAV.map((item) => (
+                <DrawerItem
+                  key={item.label}
+                  $active={activeRoute(item)}
+                  variants={itemVariants}
+                  onClick={() => handleNav(item)}
+                >
+                  {item.label}
+                </DrawerItem>
+              ))}
+              {isLoggedIn && isShopUser && (
+                <DrawerItem
+                  variants={itemVariants}
+                  onClick={() => { navigate('/admin'); setMenuOpen(false); }}
+                >
+                  Admin Panel
+                </DrawerItem>
+              )}
+            </MobileDrawer>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </StyledHeader>
@@ -370,6 +378,10 @@ const RightIcons = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
+
+  @media (max-width: 768px) {
+    gap: 4px;
+  }
 `;
 
 const IconBtn = styled.button`
@@ -380,6 +392,10 @@ const IconBtn = styled.button`
   padding: 4px;
   transition: opacity 0.2s, transform 0.2s, color 0.4s;
   &:hover { opacity: 0.6; transform: scale(1.1); }
+
+  @media (max-width: 768px) {
+    padding: 2px;
+  }
 `;
 
 const CartIconBtn = styled(IconBtn)`
@@ -491,7 +507,8 @@ const MobileDrawer = styled(motion.nav)`
     position: fixed;
     inset: 0;
     background: #f4f0e8;
-    z-index: 1;           /* low within header stacking context — TopRow paints above */
+    z-index: 999;          /* portalled to body — just below the header (1000) so its
+                               (now-transparent-background) TopRow still paints on top */
     padding: 140px 8% 60px;
     overflow-y: auto;
   }
