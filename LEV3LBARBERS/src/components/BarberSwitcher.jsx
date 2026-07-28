@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled, { keyframes } from 'styled-components';
 import api from '../utils/api';
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 import { useAuth } from '../context/AuthContext';
 import { LockIcon } from '../common/icons';
 
@@ -72,7 +72,7 @@ export default function BarberSwitcher() {
                 {barbers.map(b => (
                   <BarberCard key={b.id} onClick={() => setSelected(b)} whileTap={{ scale: 0.96 }}>
                     {b.imageUrl
-                      ? <Avatar src={`${BACKEND}${b.imageUrl}`} alt={b.displayName} />
+                      ? <Avatar src={resolveImageUrl(b.imageUrl)} alt={b.displayName} />
                       : <AvatarFallback>{b.displayName[0]}</AvatarFallback>
                     }
                     <BarberName>{b.displayName}</BarberName>

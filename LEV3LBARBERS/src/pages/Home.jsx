@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Seo from '../common/Seo';
 import heroImg from '../assets/heroShop.jpeg';
 import api from '../utils/api';
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -58,7 +58,7 @@ const Home = () => {
   };
 
   const n = heroImages.length;
-  const getSrc = (idx) => n > 0 ? `${BACKEND}${heroImages[idx].imageUrl}` : heroImg;
+  const getSrc = (idx) => n > 0 ? resolveImageUrl(heroImages[idx].imageUrl) : heroImg;
   const currentSrc = n > 0 ? getSrc(slideIdx)               : heroImg;
   const prevSrc    = n > 1 ? getSrc((slideIdx - 1 + n) % n) : null;
   const nextSrc    = n > 1 ? getSrc((slideIdx + 1) % n)     : null;

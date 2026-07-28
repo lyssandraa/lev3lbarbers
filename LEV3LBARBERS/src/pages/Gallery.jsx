@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import Seo from '../common/Seo';
 import api from '../utils/api';
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -79,7 +79,7 @@ const Gallery = () => {
     const total = item.images.length;
     if (total < 2) return;
     [(index + 1) % total, (index - 1 + total) % total].forEach(i => {
-      preloadImage(`${BACKEND}${item.images[i].imageUrl}`);
+      preloadImage(resolveImageUrl(item.images[i].imageUrl));
     });
   }, [lightbox]);
 
@@ -104,7 +104,7 @@ const Gallery = () => {
             >
               {[...stripPhotos, ...stripPhotos].map((img, i) => (
                 <FilmFrame key={i}>
-                  <img src={`${BACKEND}${img.imageUrl}`} alt="" />
+                  <img src={resolveImageUrl(img.imageUrl)} alt="" />
                 </FilmFrame>
               ))}
             </FilmStripTrack>
@@ -113,7 +113,7 @@ const Gallery = () => {
           <StaticBgLayer>
             {stripPhotos.map((img, i) => (
               <StaticBgFrame key={i}>
-                <img src={`${BACKEND}${img.imageUrl}`} alt="" />
+                <img src={resolveImageUrl(img.imageUrl)} alt="" />
               </StaticBgFrame>
             ))}
           </StaticBgLayer>
@@ -188,7 +188,7 @@ const Gallery = () => {
                     <LightboxImg
                       key={lightbox.item.images[lightbox.index].id}
                       layoutId={`photo-${lightbox.item.images[lightbox.index].id}`}
-                      src={`${BACKEND}${lightbox.item.images[lightbox.index].imageUrl}`}
+                      src={resolveImageUrl(lightbox.item.images[lightbox.index].imageUrl)}
                       alt={lightbox.item.title}
                       draggable={false}
                       initial={{ opacity: 0 }}
@@ -241,7 +241,7 @@ const PhotoCard = ({ item, idx, onOpen }) => {
   useEffect(() => {
     if (total < 2) return;
     [(active + 1) % total, (active - 1 + total) % total].forEach(i => {
-      preloadImage(`${BACKEND}${item.images[i].imageUrl}`);
+      preloadImage(resolveImageUrl(item.images[i].imageUrl));
     });
   }, [active, total, item.images]);
 
@@ -259,7 +259,7 @@ const PhotoCard = ({ item, idx, onOpen }) => {
             <DevImg
               key={cover.id}
               layoutId={`photo-${cover.id}`}
-              src={`${BACKEND}${cover.imageUrl}`}
+              src={resolveImageUrl(cover.imageUrl)}
               alt={item.title}
               initial={{ opacity: 0, filter: 'brightness(2.2) saturate(0)' }}
               animate={{ opacity: 1, filter: visible ? 'brightness(1) saturate(1)' : 'brightness(2.2) saturate(0)' }}

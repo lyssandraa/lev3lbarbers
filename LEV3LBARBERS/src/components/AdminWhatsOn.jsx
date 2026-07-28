@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import api from '../utils/api';
 
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 import { ImageIcon, MegaphoneIcon, TagIcon, PenIcon } from '../common/icons';
 
 const INK = '#1a1a1a';
@@ -155,7 +155,7 @@ const AdminWhatsOn = () => {
 
   /* ── Form view ───────────────────────────────────────────────────────────── */
   if (view === 'form') {
-    const imgSrc = !removeImg && (preview || (existingImg ? `${BACKEND}${existingImg}` : null));
+    const imgSrc = !removeImg && (preview || (existingImg ? resolveImageUrl(existingImg) : null));
     return (
       <Card>
         <TitleRow>
@@ -283,7 +283,7 @@ const AdminWhatsOn = () => {
             <PostRow key={post.id}>
               <Thumb>
                 {post.imageUrl
-                  ? <ThumbImg src={`${BACKEND}${post.imageUrl}`} alt="" />
+                  ? <ThumbImg src={resolveImageUrl(post.imageUrl)} alt="" />
                   : <ThumbIcon $color={CAT_COLOR[post.category]}>
                       {post.category === 'ARTICLE'
                         ? <PenIcon size={20} />

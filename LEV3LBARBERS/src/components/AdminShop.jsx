@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import api from '../utils/api';
 
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 import { BoxIcon, LockIcon, StoreIcon, GlobeIcon, PencilIcon, TrashIcon, PlusIcon } from '../common/icons';
 
 const INK = '#1a1a1a';
@@ -88,7 +88,7 @@ const AdminShop = () => {
       stock:       p.stock !== null && p.stock !== undefined ? String(p.stock) : '',
     });
     setEditFile(null);
-    setEditPreview(p.imageUrl ? `${BACKEND}${p.imageUrl}` : null);
+    setEditPreview(p.imageUrl ? resolveImageUrl(p.imageUrl) : null);
   };
 
   const handleEditFileChange = (e) => {
@@ -242,7 +242,7 @@ const AdminShop = () => {
             {visible.map(p => (
               <ProductRow key={p.id} $inactive={!p.active}>
                 <Thumb
-                  src={p.imageUrl ? `${BACKEND}${p.imageUrl}` : undefined}
+                  src={p.imageUrl ? resolveImageUrl(p.imageUrl) : undefined}
                   $hasImg={Boolean(p.imageUrl)}
                 >
                   {!p.imageUrl && <BoxIcon size={22} />}

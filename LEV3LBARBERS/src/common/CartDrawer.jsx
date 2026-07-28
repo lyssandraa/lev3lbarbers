@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { GiftIcon, BagIcon } from './icons';
 
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -78,7 +78,7 @@ const CartDrawer = ({ open, onClose }) => {
                     >
                       <ItemThumb>
                         {item.imageUrl
-                          ? <img src={`${BACKEND}${item.imageUrl}`} alt={item.name} />
+                          ? <img src={resolveImageUrl(item.imageUrl)} alt={item.name} />
                           : <ThumbPlaceholder>
                               {item.type === 'gift-card' ? <GiftIcon width={22} height={22} /> : '✦'}
                             </ThumbPlaceholder>

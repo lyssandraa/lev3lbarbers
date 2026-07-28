@@ -7,7 +7,7 @@ import confetti from 'canvas-confetti';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { DiceIcon } from '../common/icons';
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -352,7 +352,7 @@ function BookingFlow({ settings }) {
               <ServiceGrid>
                 {services.map(svc => (
                   <TiltCard key={svc.id} onClick={() => pickService(svc)}>
-                    {svc.imageUrl && <ServiceImg src={`${BACKEND}${svc.imageUrl}`} alt={svc.name} />}
+                    {svc.imageUrl && <ServiceImg src={resolveImageUrl(svc.imageUrl)} alt={svc.name} />}
                     <ServiceName>{svc.name}</ServiceName>
                     {svc.price
                       ? <ServicePrice>£{(svc.price).toFixed(2)}</ServicePrice>
@@ -378,7 +378,7 @@ function BookingFlow({ settings }) {
                 {barbers.map(b => (
                   <TiltCard key={b.id} onClick={() => pickBarber(b)}>
                     {b.imageUrl
-                      ? <BarberImg src={`${BACKEND}${b.imageUrl}`} alt={b.displayName} />
+                      ? <BarberImg src={resolveImageUrl(b.imageUrl)} alt={b.displayName} />
                       : <BarberImgPlaceholder>{b.displayName[0]}</BarberImgPlaceholder>
                     }
                     <BarberName>{b.displayName}</BarberName>

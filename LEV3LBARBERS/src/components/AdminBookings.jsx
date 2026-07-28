@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import api from '../utils/api';
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 
 const CREAM = '#f4f0e8';
 const INK = '#1a1a1a';
@@ -247,7 +247,7 @@ function BarbersTab() {
         {barbers.map(b => (
           <BarberRow key={b.id}>
             {b.imageUrl
-              ? <BarberImg src={`${BACKEND}${b.imageUrl}`} alt={b.displayName} />
+              ? <BarberImg src={resolveImageUrl(b.imageUrl)} alt={b.displayName} />
               : <BarberAvatar>{b.displayName[0]}</BarberAvatar>
             }
             <BarberInfo>

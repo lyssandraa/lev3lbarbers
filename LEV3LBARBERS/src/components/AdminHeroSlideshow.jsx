@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import api from '../utils/api';
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 import { ImageIcon, UploadIcon, TrashIcon } from '../common/icons';
 
 const INK = '#1a1a1a';
@@ -108,7 +108,7 @@ const AdminHeroSlideshow = () => {
             <SlideCard key={img.id} $isDefault={img.isDefault}>
               <SlideNum>#{i + 1}</SlideNum>
               {img.isDefault && <DefaultBadge>★ Start</DefaultBadge>}
-              <SlideImg src={`${BACKEND}${img.imageUrl}`} alt={`Slide ${i + 1}`} />
+              <SlideImg src={resolveImageUrl(img.imageUrl)} alt={`Slide ${i + 1}`} />
               <CardActions>
                 {!img.isDefault && (
                   <SetDefaultBtn onClick={() => handleSetDefault(img.id)}>

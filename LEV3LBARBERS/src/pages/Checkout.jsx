@@ -8,7 +8,7 @@ import { useCart } from '../context/CartContext';
 import { GiftIcon, BagIcon, LockIcon } from '../common/icons';
 import api from '../utils/api';
 
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -186,7 +186,7 @@ const Checkout = () => {
             {items.map(item => (
               <SummaryItem key={item.cartId}>
                 <SummaryThumb>
-                  {item.imageUrl ? <img src={`${BACKEND}${item.imageUrl}`} alt={item.name} /> : <ThumbPh>{item.type === 'gift-card' ? <GiftIcon width={18} height={18} /> : '✦'}</ThumbPh>}
+                  {item.imageUrl ? <img src={resolveImageUrl(item.imageUrl)} alt={item.name} /> : <ThumbPh>{item.type === 'gift-card' ? <GiftIcon width={18} height={18} /> : '✦'}</ThumbPh>}
                   <QtyBadge>{item.quantity}</QtyBadge>
                 </SummaryThumb>
                 <SummaryName>
@@ -346,7 +346,7 @@ const PaymentStep = ({ total, subtotal, discount, promoCode, orderId, items, onB
             {items.map(item => (
               <SummaryItem key={item.cartId}>
                 <SummaryThumb>
-                  {item.imageUrl ? <img src={`${BACKEND}${item.imageUrl}`} alt={item.name} /> : <ThumbPh>{item.type === 'gift-card' ? <GiftIcon width={18} height={18} /> : '✦'}</ThumbPh>}
+                  {item.imageUrl ? <img src={resolveImageUrl(item.imageUrl)} alt={item.name} /> : <ThumbPh>{item.type === 'gift-card' ? <GiftIcon width={18} height={18} /> : '✦'}</ThumbPh>}
                   <QtyBadge>{item.quantity}</QtyBadge>
                 </SummaryThumb>
                 <SummaryName>{item.name}{item.type === 'gift-card' && <SummarySub>£{item.giftCardValue} Gift Card</SummarySub>}</SummaryName>

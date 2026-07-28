@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import api from '../utils/api';
 
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 import { CameraIcon as CameraGlyph, ImageIcon, UploadIcon, PencilIcon, TrashIcon } from '../common/icons';
 
 const INK = '#1a1a1a';
@@ -200,7 +200,7 @@ const AdminGallery = () => {
               <ThumbStrip>
                 {item.images.map(img => (
                   <ThumbWrap key={img.id}>
-                    <Thumb src={`${BACKEND}${img.imageUrl}`} alt={item.title} />
+                    <Thumb src={resolveImageUrl(img.imageUrl)} alt={item.title} />
                     {item.images.length > 1 && (
                       <RemoveImgBtn
                         onClick={() => setDeleteImageTarget({ itemId: item.id, imageId: img.id })}

@@ -5,7 +5,7 @@ import Seo from '../common/Seo';
 import api from '../utils/api';
 import { PenIcon, TagIcon, MegaphoneIcon, NewsIcon } from '../common/icons';
 
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -246,7 +246,7 @@ const ArticleCard = ({ post, index, featured, onOpen }) => {
         {post.imageUrl
           ? (
             <CardImg
-              src={`${BACKEND}${post.imageUrl}`}
+              src={resolveImageUrl(post.imageUrl)}
               alt={post.title}
               initial={{ clipPath: 'inset(100% 0 0 0)' }}
               animate={{ clipPath: 'inset(0% 0 0 0)' }}
@@ -313,7 +313,7 @@ const ArticleReader = ({ post, onClose }) => {
         {post.imageUrl && (
           <ReaderCoverWrap>
             <ReaderCover
-              src={`${BACKEND}${post.imageUrl}`}
+              src={resolveImageUrl(post.imageUrl)}
               alt={post.title}
               initial={{ clipPath: 'inset(100% 0 0 0)' }}
               animate={{ clipPath: 'inset(0% 0 0 0)' }}

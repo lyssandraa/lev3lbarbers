@@ -6,7 +6,7 @@ import api from '../utils/api';
 import { useCart } from '../context/CartContext';
 import { GiftIcon, PencilIcon } from '../common/icons';
 
-import { BACKEND } from '../config';
+import { resolveImageUrl } from '../config';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -278,7 +278,7 @@ const Shop = () => {
             }}
           >
             {flyItem.imgUrl
-              ? <img src={`${BACKEND}${flyItem.imgUrl}`} alt="" />
+              ? <img src={resolveImageUrl(flyItem.imgUrl)} alt="" />
               : flyItem.kind === 'gift'
                 ? <GiftIcon width={16} height={16} style={{ color: RED }} />
                 : <span>✦</span>}
@@ -304,7 +304,7 @@ const Shop = () => {
               {lightbox.imageUrl && (
                 <LightboxImgWrap>
                   <LightboxImg
-                    src={`${BACKEND}${lightbox.imageUrl}`}
+                    src={resolveImageUrl(lightbox.imageUrl)}
                     alt={lightbox.name}
                     initial={{ clipPath: 'inset(100% 0 0 0)' }}
                     animate={{ clipPath: 'inset(0% 0 0 0)' }}
@@ -364,7 +364,7 @@ const ProductCard = ({ product, index, isLoggedIn, onExpand, onAddToCart, outOfS
     >
       <ImgWrap onClick={() => onExpand(product)}>
         {product.imageUrl ? (
-          <img src={`${BACKEND}${product.imageUrl}`} alt={product.name} />
+          <img src={resolveImageUrl(product.imageUrl)} alt={product.name} />
         ) : (
           <ImgPlaceholder>✦</ImgPlaceholder>
         )}
