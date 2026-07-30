@@ -22,6 +22,7 @@ import Profile from './pages/Profile'
 import ChangePassword from './pages/ChangePassword';
 import ResetPassword from './pages/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword';
+import VerifyEmail from './pages/VerifyEmail';
 
 import AdminPanel from './pages/AdminPanel';
 import RequireAdmin from './common/RequireAdmin';
@@ -77,6 +78,7 @@ function App() {
       <Route path='/profile' element={<Profile/>}/>
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/admin" element={<RequireAdmin><AdminPanel refreshShopStatus={shopStatus.refresh} /></RequireAdmin>} />
       <Route path="/gallery" element={<Gallery />} />
