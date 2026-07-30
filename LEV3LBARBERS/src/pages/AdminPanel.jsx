@@ -17,6 +17,7 @@ import AdminReferrals   from '../components/AdminReferrals';
 import AdminBirthday    from '../components/AdminBirthday';
 import AdminExpiry      from '../components/AdminExpiry';
 import AdminTerms       from '../components/AdminTerms';
+import AdminLegalDocument   from '../components/AdminLegalDocument';
 import AdminLoyaltySettings  from '../components/AdminLoyaltySettings';
 import AdminCreateAccounts   from '../components/AdminCreateAccounts';
 import AdminWhatsOn          from '../components/AdminWhatsOn';
@@ -95,6 +96,8 @@ const MENU = [
       { id: 'loyalty',       label: 'Loyalty Settings', minRole: 'ADMIN' },
       { id: 'expiry',        label: 'Reward Expiry',    minRole: 'ADMIN' },
       { id: 'terms',         label: 'Reward T&C',       minRole: 'ADMIN' },
+      { id: 'generalTerms',  label: 'Terms & Conditions', minRole: 'ADMIN' },
+      { id: 'privacyNotice', label: 'Privacy Notice',   minRole: 'ADMIN' },
       { id: 'createStaff',   label: 'Create Staff',     minRole: 'ADMIN' },
       { id: 'createAdmin',   label: 'Create Admin',     minRole: 'DEVELOPER' },
     ],
@@ -213,6 +216,24 @@ const AdminPanel = ({ refreshShopStatus }) => {
             {activeTab === 'loyalty'      && <AdminLoyaltySettings />}
             {activeTab === 'expiry'       && <AdminExpiry />}
             {activeTab === 'terms'        && <AdminTerms />}
+            {activeTab === 'generalTerms' && (
+              <AdminLegalDocument
+                title="Terms & Conditions"
+                endpoint="/general-terms"
+                dataKey="terms"
+                infoText='Shown in the footer as "Terms & Conditions", visible to all visitors.'
+                placeholder="e.g. These Terms & Conditions govern your use of the LEV3L Barbers website…"
+              />
+            )}
+            {activeTab === 'privacyNotice' && (
+              <AdminLegalDocument
+                title="Privacy Notice"
+                endpoint="/privacy-notice"
+                dataKey="notice"
+                infoText='Shown in the footer as "Privacy", visible to all visitors.'
+                placeholder="e.g. LEV3L Barbers respects your privacy. This notice explains what personal data we collect…"
+              />
+            )}
             {(activeTab === 'createStaff' || activeTab === 'createAdmin') && (
               <AdminCreateAccounts view={activeTab} />
             )}

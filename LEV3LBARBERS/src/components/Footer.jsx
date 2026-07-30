@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import styled, { keyframes, css } from 'styled-components';
 import { FaFacebookF, FaTiktok, FaInstagram } from 'react-icons/fa';
-import privacyPolicyText from '../common/privacyPolicy';
+import RichContent from '../common/RichContent';
 import { BACKEND } from '../config';
 
 const CREAM = '#f4f0e8';
@@ -11,10 +11,13 @@ const INK   = '#1a1a1a';
 const RED   = '#C41E3A';
 
 const Footer = ({ fixed = false }) => {
-  const [showModal,      setShowModal]      = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
-  const [termsContent,   setTermsContent]   = useState('');
-  const [termsActive,    setTermsActive]    = useState(false);
+  const [showModal,        setShowModal]        = useState(false);
+  const [showTermsModal,   setShowTermsModal]   = useState(false);
+  const [showGeneralModal, setShowGeneralModal] = useState(false);
+  const [termsContent,     setTermsContent]     = useState('');
+  const [termsActive,      setTermsActive]      = useState(false);
+  const [privacyContent,   setPrivacyContent]   = useState('');
+  const [generalContent,   setGeneralContent]   = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +27,16 @@ const Footer = ({ fixed = false }) => {
         setTermsContent(data.terms?.content || '');
         setTermsActive(data.terms?.isActive || false);
       })
+      .catch(() => {});
+
+    fetch(`${BACKEND}/privacy-notice`)
+      .then(r => r.json())
+      .then(data => setPrivacyContent(data.notice?.content || ''))
+      .catch(() => {});
+
+    fetch(`${BACKEND}/general-terms`)
+      .then(r => r.json())
+      .then(data => setGeneralContent(data.terms?.content || ''))
       .catch(() => {});
   }, []);
 
@@ -92,6 +105,14 @@ const Footer = ({ fixed = false }) => {
                 viewport={{ once: true }}
                 transition={{ delay: (NAV_LINKS.length + 1) * 0.07, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               >
+                <NavButton onClick={() => setShowGeneralModal(true)}>Terms &amp; Conditions</NavButton>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: (NAV_LINKS.length + 2) * 0.07, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              >
                 <NavButton onClick={() => setShowTermsModal(true)}>
                   Rewards T&amp;C
                   <RewardsDot $active={termsActive} />
@@ -135,9 +156,22 @@ const Footer = ({ fixed = false }) => {
         <ModalOverlay onClick={() => setShowModal(false)}>
           <ModalBox onClick={e => e.stopPropagation()}>
             <ModalClose onClick={() => setShowModal(false)}>×</ModalClose>
-            <ModalTitle>Privacy Policy</ModalTitle>
+            <ModalTitle>Privacy Notice</ModalTitle>
             <ModalBody>
-              {privacyPolicyText.split('\n\n').map((p, i) => <p key={i}>{p}</p>)}
+              <RichContent html={privacyContent} emptyText="No privacy notice published yet." />
+            </ModalBody>
+          </ModalBox>
+        </ModalOverlay>
+      )}
+
+      {/* General Terms & Conditions modal */}
+      {showGeneralModal && (
+        <ModalOverlay onClick={() => setShowGeneralModal(false)}>
+          <ModalBox onClick={e => e.stopPropagation()}>
+            <ModalClose onClick={() => setShowGeneralModal(false)}>×</ModalClose>
+            <ModalTitle>Terms &amp; Conditions</ModalTitle>
+            <ModalBody>
+              <RichContent html={generalContent} emptyText="No terms published yet." />
             </ModalBody>
           </ModalBox>
         </ModalOverlay>
@@ -153,12 +187,7 @@ const Footer = ({ fixed = false }) => {
               {termsActive && <ActiveBadge>✦ Active</ActiveBadge>}
             </ModalTitle>
             <ModalBody>
-              {termsContent
-                ? termsContent.split('\n').map((line, i) =>
-                    line.trim() ? <p key={i}>{line}</p> : <br key={i} />
-                  )
-                : <p style={{ opacity: 0.4, fontStyle: 'italic' }}>No terms published yet.</p>
-              }
+              <RichContent html={termsContent} emptyText="No terms published yet." />
             </ModalBody>
           </ModalBox>
         </ModalOverlay>

@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import styled from 'styled-components';
 import api from '../utils/api';
+
+// Lazy-loaded: Tiptap is sizeable and only needed on this admin screen, not by
+// every visitor of the site.
+const RichTextEditor = lazy(() => import('../common/RichTextEditor'));
 
 const INK = '#1a1a1a';
 const RED = '#C41E3A';
@@ -36,7 +40,7 @@ const AdminTerms = () => {
     <FormCard>
       <PanelTitle>Reward Terms &amp; Conditions</PanelTitle>
       <InfoBox>
-        These terms appear in the footer for all visitors. Use plain text — one clause per line works well.
+        These terms appear in the footer for all visitors.
         Toggle "Active Promotion" to show a visible asterisk badge next to the T&amp;C link so anyone browsing the site notices it.
       </InfoBox>
 
@@ -54,12 +58,15 @@ const AdminTerms = () => {
         </PromoNote>
       )}
 
-      <Textarea
-        rows={16}
-        placeholder={PLACEHOLDER}
-        value={content}
-        onChange={e => setContent(e.target.value)}
-      />
+      <EditorWrap>
+        <Suspense fallback={<EditorLoading>Loading editor…</EditorLoading>}>
+          <RichTextEditor
+            content={content}
+            onChange={setContent}
+            placeholder="e.g. Rewards are issued as part of the LEV3L BARBERS loyalty programme and are subject to change…"
+          />
+        </Suspense>
+      </EditorWrap>
 
       {msg   && <StatusMsg $ok>{msg}</StatusMsg>}
       {error && <StatusMsg>{error}</StatusMsg>}
@@ -72,18 +79,6 @@ const AdminTerms = () => {
 };
 
 export default AdminTerms;
-
-const PLACEHOLDER = `Example:
-
-1. Rewards are issued as part of the LEV3L BARBERS loyalty programme and are subject to change.
-2. Rewards must be presented and claimed in-shop at the time of your visit.
-3. Rewards have no cash value and cannot be exchanged for money.
-4. Unclaimed rewards expire after the period stated at the time of issue. Expired rewards cannot be reinstated.
-5. Each reward can only be claimed once and is non-transferable.
-6. The shop reserves the right to refuse or revoke a reward if misuse or fraud is suspected.
-7. Birthday rewards are only issued during the 7-day window around your registered birthday (up to 7 days before or after).
-8. Referral rewards are issued only once the referred friend has verified their email and visited the shop.
-9. LEV3L BARBERS reserves the right to modify or discontinue the rewards programme at any time.`;
 
 /* ─────────── Styles ─────────── */
 
@@ -174,22 +169,16 @@ const PromoNote = styled.p`
   margin: 0 0 1rem;
 `;
 
-const Textarea = styled.textarea`
-  width: 100%;
-  padding: 0.9rem 1rem;
-  border-radius: 0;
-  border: 1px solid rgba(26,26,26,0.15);
-  background: #ffffff;
-  color: ${INK};
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.84rem;
-  line-height: 1.65;
-  resize: vertical;
-  outline: none;
-  box-sizing: border-box;
+const EditorWrap = styled.div`
   margin-bottom: 0.8rem;
-  &::placeholder { color: rgba(26,26,26,0.35); }
-  &:focus { border-color: ${RED}; }
+`;
+
+const EditorLoading = styled.div`
+  padding: 2rem; text-align: center;
+  border: 1px solid rgba(26,26,26,0.15);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  color: rgba(26,26,26,0.5);
 `;
 
 const StatusMsg = styled.p`
