@@ -140,7 +140,7 @@ const AdminRewards = () => {
     try {
       await api.post('/reward-pool/create-reward-pool', {
         reward: '__BONUS_STAMP__',
-        weight: 50,
+        weight: newReward.weight,
         tier:   isMystery ? null : tierKey,
         type:   isMystery ? 'Mystery box' : tierKey,
       });
@@ -269,7 +269,7 @@ const AdminRewards = () => {
                   <AddBtn onClick={() => addReward(tier.key)}>Add</AddBtn>
                 </AddRow>
                 <BonusStampBtn onClick={() => addBonusStamp(tier.key)}>
-                  + Add Bonus Stamp option (weight: 50)
+                  + Add Bonus Stamp option (weight: {newReward.weight})
                 </BonusStampBtn>
 
                 <RewardList>
@@ -433,7 +433,13 @@ const SaveMilestonesBtn = styled.button`
 
 const Divider = styled.hr`border:none; border-top:1px solid rgba(26,26,26,0.1); margin: 0.9rem 0 0.7rem;`;
 
-const AddRow = styled.div`display: flex; gap: 0.5rem; margin-bottom: 0.3rem;`;
+const AddRow = styled.div`
+  display: flex; gap: 0.5rem; margin-bottom: 0.3rem; flex-wrap: wrap;
+
+  @media (max-width: 480px) {
+    & > input:first-child { flex-basis: 100%; }
+  }
+`;
 
 const Input = styled.input`
   flex: 1; padding: 0.48rem 0.7rem; border-radius: 0;

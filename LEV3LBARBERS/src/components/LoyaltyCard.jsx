@@ -408,6 +408,7 @@ const DotsRow = styled.div`
   margin-top: 1.2rem;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   position: relative; z-index: 1;
 `;
 

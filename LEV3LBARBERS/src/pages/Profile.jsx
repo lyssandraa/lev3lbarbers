@@ -62,6 +62,7 @@ const UserProfile = () => {
   const [activeRewardId, setActiveRewardId] = useState(null);
   const [showMysteryBox, setShowMysteryBox] = useState(false);
   const [claimError, setClaimError]         = useState('');
+  const [resendingVerification, setResendingVerification] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showLogoutPopup, setShowLogoutPopup]     = useState(false);
   const [referralSettings, setReferralSettings]   = useState(null);
@@ -193,6 +194,21 @@ const UserProfile = () => {
       const msg = err.response?.data?.message || 'Could not generate QR code. Please try again.';
       setClaimError(msg);
       setTimeout(() => setClaimError(''), 4000);
+    }
+  };
+
+  const resendVerificationEmail = async () => {
+    setResendingVerification(true);
+    try {
+      const res = await api.post('/auth/resend-verification');
+      setMessage(res.data.message || 'Verification email resent — check your inbox.');
+      setTimeout(() => setMessage(''), 5000);
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Could not resend verification email. Please try again.';
+      setClaimError(msg);
+      setTimeout(() => setClaimError(''), 4000);
+    } finally {
+      setResendingVerification(false);
     }
   };
 
@@ -436,7 +452,14 @@ const UserProfile = () => {
                           <RewardInfo>
                             <RewardType>{reward.rewardValue || reward.rewardType}</RewardType>
                             <RewardStatus $status={reward.status}>
-                              {reward.status === 'LOCKED'    && (<><LockIcon width={11} height={11} /> Verify your email to unlock</>)}
+                              {reward.status === 'LOCKED'    && (
+                                <>
+                                  <LockIcon width={11} height={11} /> Verify your email to unlock —{' '}
+                                  <ResendLink type="button" onClick={resendVerificationEmail} disabled={resendingVerification}>
+                                    {resendingVerification ? 'sending…' : 'resend email'}
+                                  </ResendLink>
+                                </>
+                              )}
                               {reward.status === 'UNCLAIMED' && (<><GiftIcon width={11} height={11} /> Bring this to your next visit</>)}
                               {reward.status === 'CLAIMED'   && '✓ Collected'}
                               {reward.status === 'EXPIRED'   && (<><ClockIcon width={11} height={11} /> Expired</>)}
@@ -956,6 +979,15 @@ const RewardStatus = styled.p`
     $status === 'UNCLAIMED' ? RED :
     $status === 'EXPIRED'   ? RED :
     '#2e7d32'};
+`;
+
+const ResendLink = styled.button`
+  background: none; border: none; padding: 0; margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem; font-weight: 700;
+  color: ${RED}; text-decoration: underline;
+  cursor: pointer;
+  &:disabled { opacity: 0.5; cursor: default; }
 `;
 
 const ExpiryWarnInline = styled.p`
