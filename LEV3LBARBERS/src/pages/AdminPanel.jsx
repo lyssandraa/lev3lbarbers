@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { MenuIcon, GridIcon, ScanIcon, GiftIcon, CalendarIcon, LayersIcon, GearIcon } from '../common/icons';
+import { MenuIcon, GridIcon, ScanIcon, GiftIcon, CalendarIcon, LayersIcon, GearIcon, UsersIcon } from '../common/icons';
 
 import ShopSettings     from '../components/ShopSettings';
 import AdminRewards     from '../components/AdminRewards';
@@ -18,6 +18,7 @@ import AdminBirthday    from '../components/AdminBirthday';
 import AdminExpiry      from '../components/AdminExpiry';
 import AdminTerms       from '../components/AdminTerms';
 import AdminLegalDocument   from '../components/AdminLegalDocument';
+import AdminUsers           from '../components/AdminUsers';
 import AdminLoyaltySettings  from '../components/AdminLoyaltySettings';
 import AdminCreateAccounts   from '../components/AdminCreateAccounts';
 import AdminWhatsOn          from '../components/AdminWhatsOn';
@@ -61,6 +62,14 @@ const MENU = [
       { id: 'rewardPool', label: 'Reward Pool',      minRole: 'ADMIN' },
       { id: 'referrals',  label: 'Referral System',  minRole: 'ADMIN' },
       { id: 'birthday',   label: 'Birthday Rewards', minRole: 'ADMIN' },
+    ],
+  },
+  {
+    group: 'Customers',
+    minRole: 'ADMIN',
+    Icon: UsersIcon,
+    items: [
+      { id: 'customers', label: 'Customer Accounts', minRole: 'ADMIN' },
     ],
   },
   {
@@ -212,6 +221,7 @@ const AdminPanel = ({ refreshShopStatus }) => {
             {activeTab === 'giftCards'    && <AdminGiftCards />}
             {activeTab === 'promos'       && <AdminPromos />}
             {activeTab === 'bookings'     && <AdminBookings />}
+            {activeTab === 'customers'    && <AdminUsers />}
             {activeTab === 'shop'         && <ShopSettings refreshShopStatus={refreshShopStatus} />}
             {activeTab === 'loyalty'      && <AdminLoyaltySettings />}
             {activeTab === 'expiry'       && <AdminExpiry />}
