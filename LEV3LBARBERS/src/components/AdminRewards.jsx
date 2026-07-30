@@ -278,8 +278,12 @@ const AdminRewards = () => {
                     <RewardItem key={r.id}>
                       {editingId === r.id ? (
                         <>
-                          <Input value={editValues.reward} onChange={e => setEditValues(v => ({ ...v, reward: e.target.value }))} />
-                          <WeightInput type="number" value={editValues.weight} onChange={e => setEditValues(v => ({ ...v, weight: Number(e.target.value) }))} />
+                          {r.reward === '__BONUS_STAMP__' ? (
+                            <BonusStampTag><TargetIcon width={14} height={14} style={{ marginRight: '0.35rem', verticalAlign: 'middle' }} />Bonus Stamp</BonusStampTag>
+                          ) : (
+                            <Input value={editValues.reward} onChange={e => setEditValues(v => ({ ...v, reward: e.target.value }))} />
+                          )}
+                          <WeightInput type="number" min="1" value={editValues.weight} onChange={e => setEditValues(v => ({ ...v, weight: Number(e.target.value) }))} />
                           <SmallBtn $save onClick={() => saveEdit(r.id)}>Save</SmallBtn>
                           <SmallBtn onClick={() => setEditingId(null)}>Cancel</SmallBtn>
                         </>
@@ -291,9 +295,7 @@ const AdminRewards = () => {
                             <RewardName>{r.reward}</RewardName>
                           )}
                           <WeightTag>w:{r.weight}</WeightTag>
-                          {r.reward !== '__BONUS_STAMP__' && (
-                            <SmallBtn $edit onClick={() => { setEditingId(r.id); setEditValues({ reward: r.reward, weight: r.weight }); }}>Edit</SmallBtn>
-                          )}
+                          <SmallBtn $edit onClick={() => { setEditingId(r.id); setEditValues({ reward: r.reward, weight: r.weight }); }}>Edit</SmallBtn>
                           <SmallBtn $del onClick={() => setDeleteTarget(r)}>Delete</SmallBtn>
                         </>
                       )}
