@@ -25,7 +25,7 @@ const DEFAULT_HOURS = {
 };
 
 const ShopSettings = ({ refreshShopStatus }) => {
-  const [formData,     setFormData]     = useState({ isOpen: false, barbers: [], waitTime: 0, override: false });
+  const [formData,     setFormData]     = useState({ isOpen: false, waitTime: 0, override: false });
   const [openingHours, setOpeningHours] = useState(DEFAULT_HOURS);
   const [shopInfo,     setShopInfo]     = useState({ address: '', city: '', postcode: '', phone: '', email: '', instagram: '', mapEmbedUrl: '', servicesIntro: '' });
   const [loading,      setLoading]      = useState(true);
@@ -62,7 +62,6 @@ const ShopSettings = ({ refreshShopStatus }) => {
 
   const handleChange = (field) => (e) => {
     let value = e.target.value;
-    if (field === 'barbers') value = value.split(',').map(n => n.trim());
     if (field === 'waitTime') value = Number(value);
     if (field === 'isOpen')   value = e.target.value === 'open';
     if (field === 'override') value = e.target.checked;
@@ -162,16 +161,6 @@ const ShopSettings = ({ refreshShopStatus }) => {
             );
           })}
         </HoursGrid>
-      </FormGroup>
-
-      {/* Barbers */}
-      <FormGroup>
-        <Label>Barbers on Today</Label>
-        <Input
-          placeholder="Enter barbers separated by commas"
-          value={formData.barbers.join(', ')}
-          onChange={handleChange('barbers')}
-        />
       </FormGroup>
 
       {/* Wait time */}

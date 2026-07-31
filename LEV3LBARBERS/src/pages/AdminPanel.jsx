@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { MenuIcon, GridIcon, ScanIcon, GiftIcon, CalendarIcon, LayersIcon, GearIcon, UsersIcon } from '../common/icons';
+import { MenuIcon, GridIcon, ScanIcon, GiftIcon, CalendarIcon, LayersIcon, GearIcon, UsersIcon, StoreIcon } from '../common/icons';
 
 import ShopSettings     from '../components/ShopSettings';
 import AdminRewards     from '../components/AdminRewards';
@@ -19,6 +19,7 @@ import AdminExpiry      from '../components/AdminExpiry';
 import AdminTerms       from '../components/AdminTerms';
 import AdminLegalDocument   from '../components/AdminLegalDocument';
 import AdminUsers           from '../components/AdminUsers';
+import AdminBarbers         from '../components/AdminBarbers';
 import AdminLoyaltySettings  from '../components/AdminLoyaltySettings';
 import AdminCreateAccounts   from '../components/AdminCreateAccounts';
 import AdminWhatsOn          from '../components/AdminWhatsOn';
@@ -70,6 +71,14 @@ const MENU = [
     Icon: UsersIcon,
     items: [
       { id: 'customers', label: 'Customer Accounts', minRole: 'ADMIN' },
+    ],
+  },
+  {
+    group: 'Barbers',
+    minRole: 'ADMIN',
+    Icon: StoreIcon,
+    items: [
+      { id: 'barbers', label: 'Barbers', minRole: 'ADMIN' },
     ],
   },
   {
@@ -222,6 +231,7 @@ const AdminPanel = ({ refreshShopStatus }) => {
             {activeTab === 'promos'       && <AdminPromos />}
             {activeTab === 'bookings'     && <AdminBookings />}
             {activeTab === 'customers'    && <AdminUsers />}
+            {activeTab === 'barbers'      && <AdminBarbers />}
             {activeTab === 'shop'         && <ShopSettings refreshShopStatus={refreshShopStatus} />}
             {activeTab === 'loyalty'      && <AdminLoyaltySettings />}
             {activeTab === 'expiry'       && <AdminExpiry />}
