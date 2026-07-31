@@ -9,7 +9,7 @@ const RED = '#C41E3A';
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const fmtDate = (s) => { const d = new Date(s); return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; };
 
-const empty = () => ({ code: '', type: 'PERCENT', value: '', description: '', maxUses: '', minOrderAmount: '', expiresAt: '' });
+const empty = () => ({ code: '', type: 'PERCENT', value: '', description: '', maxUses: '', minOrderAmount: '', expiresAt: '', bannerMessage: '' });
 
 const AdminPromos = () => {
   const [promos,   setPromos]   = useState([]);
@@ -38,6 +38,7 @@ const AdminPromos = () => {
         maxUses:        form.maxUses      ? parseInt(form.maxUses, 10)          : undefined,
         minOrderAmount: form.minOrderAmount ? parseFloat(form.minOrderAmount)  : undefined,
         expiresAt:      form.expiresAt    || undefined,
+        bannerMessage:  form.bannerMessage.trim() || undefined,
       });
       setForm(empty());
       load();
@@ -113,6 +114,11 @@ const AdminPromos = () => {
             <FLabel>Description <Hint>shown to customer when applied</Hint></FLabel>
             <FInput placeholder="e.g. 20% off summer promotion" value={form.description} onChange={e => set('description', e.target.value)} />
           </FullField>
+
+          <FullField>
+            <FLabel>Banner Announcement <Hint>optional — auto-rotates into the site's header banner while this code is live, disappears when it's paused, deleted, expired, or used up</Hint></FLabel>
+            <FInput placeholder="e.g. Use code SUMMER20 for 20% off this week!" value={form.bannerMessage} onChange={e => set('bannerMessage', e.target.value)} />
+          </FullField>
         </FormGrid>
         <CreateBtn onClick={handleCreate} disabled={saving}>
           {saving ? 'Creating…' : <><PlusIcon size={14} /> Create Code</>}
@@ -134,6 +140,11 @@ const AdminPromos = () => {
                   {p.minOrderAmount ? ` · min £${p.minOrderAmount.toFixed(2)}` : ''}
                 </PromoValue>
                 {p.description && <PromoDesc>{p.description}</PromoDesc>}
+                {p.bannerMessage && (
+                  <BannerTag $live={p.active}>
+                    {p.active ? '📣 Live on site banner' : '📣 Banner set (paused while inactive)'}: "{p.bannerMessage}"
+                  </BannerTag>
+                )}
                 <PromoMeta>
                   Used: {p.usedCount}{p.maxUses !== null ? ` / ${p.maxUses}` : ''}{' '}
                   {p.expiresAt && `· Expires ${fmtDate(p.expiresAt)}`}
@@ -208,6 +219,11 @@ const PromoCode = styled.p`font-family: monospace; font-size: 1rem; font-weight:
 const PromoValue = styled.p`font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 700; color: ${RED}; margin: 0 0 0.15rem;`;
 const PromoDesc = styled.p`font-family: 'Montserrat', sans-serif; font-size: 0.76rem; font-weight: 600; color: rgba(26,26,26,0.6); margin: 0 0 0.15rem;`;
 const PromoMeta = styled.p`font-family: 'Montserrat', sans-serif; font-size: 0.72rem; font-weight: 600; color: rgba(26,26,26,0.45); margin: 0;`;
+const BannerTag = styled.p`
+  font-family: 'Montserrat', sans-serif; font-size: 0.74rem; font-weight: 700;
+  color: ${({ $live }) => $live ? '#2e7d32' : 'rgba(26,26,26,0.45)'};
+  margin: 0 0 0.25rem;
+`;
 const PromoActions = styled.div`display: flex; flex-direction: column; gap: 0.35rem; flex-shrink: 0;`;
 const btn = css`padding: 0.28rem 0.65rem; border-radius: 0; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 0.76rem; font-weight: 700; border: 1px solid; transition: all 0.15s;`;
 const ToggleBtn = styled.button`

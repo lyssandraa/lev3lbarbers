@@ -365,6 +365,13 @@ const UserProfile = () => {
             {/* ── Overview ── */}
             {activeTab === 'overview' && (
               <>
+                {!isShopUser && stampData && (
+                  <Card $pad="loose">
+                    <SectionTitle>Loyalty Card</SectionTitle>
+                    <LoyaltyCard data={stampData} email={profile.email} walletQrCode={profile.qrCode} />
+                  </Card>
+                )}
+
                 <Card>
                   <Field>
                     <Label>Name</Label>
@@ -396,13 +403,6 @@ const UserProfile = () => {
                   })()}
                   <LogoutBtn onClick={handleLogout}>Log Out</LogoutBtn>
                 </Card>
-
-                {!isShopUser && stampData && (
-                  <Card $pad="loose">
-                    <SectionTitle>Loyalty Card</SectionTitle>
-                    <LoyaltyCard data={stampData} email={profile.email} walletQrCode={profile.qrCode} />
-                  </Card>
-                )}
               </>
             )}
 

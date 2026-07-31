@@ -38,6 +38,9 @@ function WhosInTab() {
   const [barbers, setBarbers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busyId,  setBusyId]  = useState(null);
+  const [newName, setNewName] = useState('');
+  const [adding,  setAdding]   = useState(false);
+  const [msg,     setMsg]      = useState('');
 
   const load = () => {
     setLoading(true);
@@ -54,10 +57,42 @@ function WhosInTab() {
     finally { setBusyId(null); }
   };
 
+  const addBarber = async () => {
+    if (!newName.trim()) return;
+    setAdding(true); setMsg('');
+    try {
+      const fd = new FormData();
+      fd.append('displayName', newName.trim());
+      await api.post('/barber-profiles', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setNewName('');
+      load();
+    } catch (e) {
+      setMsg(e.response?.data?.message || 'Failed to add barber.');
+    } finally {
+      setAdding(false);
+    }
+  };
+
   return (
     <Card>
       <SectionTitle>Who's In Today</SectionTitle>
-      <SubHint>Tick who's actually working today — this feeds the "Who's In Today" section on the homepage.</SubHint>
+      <SubHint>
+        Add barbers to the general roster below, then tick who's actually working today —
+        this feeds the "Who's In Today" section on the homepage. Quick-added barbers don't need
+        a login account; add photo/price/bio for them later under Profiles if you want them
+        bookable online.
+      </SubHint>
+
+      <AddRow>
+        <Input
+          placeholder="Barber's name"
+          value={newName}
+          onChange={e => setNewName(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && addBarber()}
+        />
+        <SaveBtn onClick={addBarber} disabled={adding}>{adding ? 'Adding…' : 'Add Barber'}</SaveBtn>
+      </AddRow>
+      {msg && <Feedback>{msg}</Feedback>}
 
       {loading ? (
         <Loading>Loading…</Loading>
@@ -117,7 +152,6 @@ function ProfilesTab() {
   };
 
   const submit = async () => {
-    if (!editId && !form.userId) return setMsg('Select a staff member.');
     if (!form.displayName.trim()) return setMsg('Display name required.');
     setSaving(true); setMsg('');
     try {
@@ -171,9 +205,9 @@ function ProfilesTab() {
 
         {!editId && (
           <Field>
-            <Label>Staff Member</Label>
+            <Label>Linked Login Account <Hint>optional — only needed if they'll log in / use quick-PIN</Hint></Label>
             <Select value={form.userId} onChange={e => setForm(s => ({ ...s, userId: e.target.value }))}>
-              <option value="">— Select staff member —</option>
+              <option value="">— None (roster/display only) —</option>
               {staffUsers.filter(u => !u.barberProfile).map(u => (
                 <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
               ))}
@@ -226,7 +260,9 @@ function ProfilesTab() {
             }
             <BarberInfo>
               <strong>{b.displayName}</strong>
-              <span style={{ color: 'rgba(26,26,26,0.6)', fontWeight: 600, fontSize:'0.8rem' }}>{b.user?.name} · {b.user?.email}</span>
+              <span style={{ color: 'rgba(26,26,26,0.6)', fontWeight: 600, fontSize:'0.8rem' }}>
+                {b.user ? `${b.user.name} · ${b.user.email}` : 'No login account (roster/display only)'}
+              </span>
               {b.priceFrom && <span style={{ color: RED, fontSize:'0.8rem' }}>From £{b.priceFrom}</span>}
             </BarberInfo>
             <BarberActions>
@@ -234,7 +270,7 @@ function ProfilesTab() {
                 <ToggleKnob $on={b.isBookable} />
               </Toggle>
               <SmBtn onClick={() => startEdit(b)}>Edit</SmBtn>
-              <SmBtn onClick={() => resetPin(b)}>Reset PIN</SmBtn>
+              {b.userId && <SmBtn onClick={() => resetPin(b)}>Reset PIN</SmBtn>}
               <DangerBtn onClick={() => del(b.id)}>Delete</DangerBtn>
             </BarberActions>
           </BarberRow>
@@ -468,9 +504,22 @@ const Label = styled.label`
   margin-bottom: 6px;
 `;
 
+const Hint = styled.span`
+  color: rgba(26,26,26,0.4);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+`;
+
 const Field = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+const AddRow = styled.div`
+  display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;
+
+  & > input { flex: 1; min-width: 160px; }
 `;
 
 const Input = styled.input`
