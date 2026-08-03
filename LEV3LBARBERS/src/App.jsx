@@ -33,6 +33,7 @@ import OrderSuccess from './pages/OrderSuccess';
 import GiftCardVerify from './pages/GiftCardVerify';
 import MemberPay from './pages/MemberPay';
 import Bookings from './pages/Bookings';
+import LegalPage from './pages/LegalPage';
 import CookieBanner from './common/CookieBanner';
 import shopOpen from './common/shopOpen';
 
@@ -88,6 +89,8 @@ function App() {
       <Route path="/gc/:code" element={<GiftCardVerify />} />
       <Route path="/pay/:qrCode" element={<MemberPay />} />
       <Route path="/bookings" element={<Bookings />} />
+      <Route path="/privacy-notice" element={<LegalPage endpoint="/privacy-notice" dataKey="notice" title="Privacy Notice" emptyText="No privacy notice published yet." />} />
+      <Route path="/general-terms" element={<LegalPage endpoint="/general-terms" dataKey="terms" title="Terms & Conditions" emptyText="No terms published yet." />} />
 
     </Routes>
 
