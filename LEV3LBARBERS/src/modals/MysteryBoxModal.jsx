@@ -15,6 +15,8 @@ const MysteryBoxModal = ({ isOpen, onClose }) => {
   const [showConfetti, setShowConfetti]   = useState(false);
   const [qrCode, setQrCode]               = useState(null);
   const [claiming, setClaiming]           = useState(false);
+  const [resending, setResending]         = useState(false);
+  const [resendMsg, setResendMsg]         = useState('');
 
   // Keep a stable ref to onClose so the timer effect never needs it as a dep.
   // Without this, every parent re-render recreates the inline onClose arrow and
@@ -39,6 +41,8 @@ const MysteryBoxModal = ({ isOpen, onClose }) => {
       setShowConfetti(false);
       setQrCode(null);
       setClaiming(false);
+      setResending(false);
+      setResendMsg('');
     }
   }, [isOpen]);
 
@@ -67,6 +71,19 @@ const MysteryBoxModal = ({ isOpen, onClose }) => {
       }
     } catch {
       setRewardValue("Mystery reward unlocked!");
+    }
+  };
+
+  const handleResend = async () => {
+    setResending(true);
+    setResendMsg('');
+    try {
+      const res = await api.post('/auth/resend-verification');
+      setResendMsg(res.data.message || 'Check your inbox for the verification email.');
+    } catch (e) {
+      setResendMsg(e.response?.data?.message || 'Could not send email. Try again.');
+    } finally {
+      setResending(false);
     }
   };
 
@@ -158,6 +175,13 @@ const MysteryBoxModal = ({ isOpen, onClose }) => {
                     <LockedRow>
                       <LockIcon>🔒</LockIcon>
                       <LockedText>Verify your email to claim this reward</LockedText>
+                      {resendMsg ? (
+                        <ResendMsg>{resendMsg}</ResendMsg>
+                      ) : (
+                        <ResendLink onClick={handleResend} disabled={resending}>
+                          {resending ? "sending…" : "Resend verification email"}
+                        </ResendLink>
+                      )}
                       <ActionButton onClick={onClose}>Got it!</ActionButton>
                     </LockedRow>
                   )}
@@ -353,6 +377,24 @@ const LockedText = styled.p`
   color: rgba(255,255,255,0.65);
   font-size: 0.95rem;
   max-width: 220px;
+`;
+
+const ResendLink = styled.button`
+  background: none;
+  border: none;
+  padding: 0;
+  color: #c8b88a;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  &:disabled { opacity: 0.6; cursor: default; }
+`;
+
+const ResendMsg = styled.p`
+  color: #8fce9a;
+  font-size: 0.85rem;
+  max-width: 220px;
+  text-align: center;
 `;
 
 /* Sparkles burst */
