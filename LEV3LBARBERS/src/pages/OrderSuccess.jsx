@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import QRCode from 'react-qr-code';
 import { useCart } from '../context/CartContext';
 import { GiftIcon } from '../common/icons';
+import QRCodeWithLogo from '../common/QRCodeWithLogo';
 import api from '../utils/api';
 
 const CREAM = '#f4f0e8';
@@ -117,12 +117,11 @@ const OrderSuccess = () => {
                     <CodeValue>£{gc.value} Gift Card</CodeValue>
                     <CodeStr>{gc.code}</CodeStr>
                     <QRWrap>
-                      <QRCode
+                      <QRCodeWithLogo
                         value={verifyUrl}
                         size={140}
                         bgColor="transparent"
                         fgColor={INK}
-                        level="M"
                       />
                     </QRWrap>
                     <QRNote>Staff scan this at the counter to redeem</QRNote>

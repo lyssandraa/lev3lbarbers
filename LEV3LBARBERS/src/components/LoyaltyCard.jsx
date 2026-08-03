@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { motion, useMotionValue, useSpring, useTransform, animate } from 'framer-motion';
-import QRCode from 'react-qr-code';
 import confetti from 'canvas-confetti';
+import QRCodeWithLogo from '../common/QRCodeWithLogo';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -197,7 +197,7 @@ const LoyaltyCard = ({ data, email, walletQrCode }) => {
             {email && (
               <QRBlock>
                 <QRSmallLabel>Stamps / Check-in</QRSmallLabel>
-                <QRWrap><QRCode value={email} size={128} bgColor="#ffffff" fgColor={INK} /></QRWrap>
+                <QRWrap><QRCodeWithLogo value={email} size={128} bgColor="#ffffff" fgColor={INK} /></QRWrap>
               </QRBlock>
             )}
 
@@ -205,7 +205,7 @@ const LoyaltyCard = ({ data, email, walletQrCode }) => {
               <QRBlock>
                 <QRSmallLabel>Wallet Payment</QRSmallLabel>
                 <QRWrap>
-                  <QRCode
+                  <QRCodeWithLogo
                     value={`${window.location.origin}/pay/${encodeURIComponent(walletQrCode)}`}
                     size={128}
                     bgColor="#ffffff"
