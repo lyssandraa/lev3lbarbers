@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
-import logo from '../assets/logoWhite.png';
 
 const EASE = [0.76, 0, 0.24, 1];
+const RED = '#C41E3A';
 
 const IntroReveal = () => {
   const [phase, setPhase] = useState('brand'); // brand | split | done
@@ -40,14 +40,16 @@ const IntroReveal = () => {
         animate={{ opacity: splitting ? 0 : 1, y: splitting ? -10 : 0 }}
         transition={{ duration: 0.35, ease: 'easeIn' }}
       >
-        <motion.img
-          src={logo}
-          alt="LEV3L Barbers"
+        <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.7, ease: 'easeOut' }}
-          style={{ width: 'min(220px, 50vw)', height: 'auto', display: 'block' }}
-        />
+        >
+          <Wordmark>
+            LEV<span style={{ color: RED }}>3</span>L
+          </Wordmark>
+          <SubMark>Barbers</SubMark>
+        </motion.div>
         <motion.span
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.4 }}
@@ -121,4 +123,22 @@ const Seam = styled(motion.div)`
   height: 100%;
   background: rgba(255,255,255,0.06);
   z-index: 1;
+`;
+
+const Wordmark = styled.h1`
+  margin: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.4rem, 9vw, 3.4rem);
+  letter-spacing: 2px;
+  color: #F2EDE4;
+  text-align: center;
+`;
+
+const SubMark = styled.div`
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 8px;
+  color: #F2EDE4;
+  text-align: center;
+  margin-top: 2px;
 `;

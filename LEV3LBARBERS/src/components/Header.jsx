@@ -13,7 +13,6 @@ import CartDrawer from '../common/CartDrawer';
 import Banner from '../common/Banner';
 import api from '../utils/api';
 import logoColor from '../assets/logo.png';
-import logoWhite from '../assets/logoWhite.png';
 
 const drawerVariants = {
   hidden: { opacity: 0 },
