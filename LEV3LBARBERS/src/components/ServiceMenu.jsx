@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import styled from 'styled-components';
 import api from '../utils/api';
+import { useAuth } from '../context/AuthContext';
+import AdminDrawer from '../common/AdminDrawer';
+import AdminServices from './AdminServices';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -159,42 +162,45 @@ const ServiceCard = ({ svc, idx, loggedIn, setActiveIdx }) => {
 /* ── Main component ── */
 const ServiceMenu = () => {
   const navigate   = useNavigate();
+  const { isAdmin } = useAuth();
   const [services,  setServices]  = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [loggedIn,  setLoggedIn]  = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [manageOpen, setManageOpen] = useState(false);
+  const [title,      setTitle]      = useState('Our Services');
   const [intro,     setIntro]     = useState(
     'Crafted for every man. We cater to all hair types — afro, curly, straight and more. Other services available upon request.'
   );
 
   useEffect(() => {
     api.get('/shop-info').then(r => {
+      if (r.data?.servicesTitle) setTitle(r.data.servicesTitle);
       if (r.data?.servicesIntro) setIntro(r.data.servicesIntro);
     }).catch(() => {});
   }, []);
 
-  useEffect(() => {
+  const loadServices = async () => {
     const token = localStorage.getItem('token');
     setLoggedIn(!!token);
-    const load = async () => {
-      setLoading(true);
-      try {
-        if (token) {
-          try {
-            const r = await api.get('/services/all-services');
-            setServices(r.data.allServices || []);
-            return;
-          } catch (err) {
-            if (!err.response || (err.response.status !== 401 && err.response.status !== 403)) throw err;
-          }
+    setLoading(true);
+    try {
+      if (token) {
+        try {
+          const r = await api.get('/services/all-services');
+          setServices(r.data.allServices || []);
+          return;
+        } catch (err) {
+          if (!err.response || (err.response.status !== 401 && err.response.status !== 403)) throw err;
         }
-        const r = await api.get('/services/public-services');
-        setServices(r.data.services || []);
-      } catch { setServices([]); }
-      finally   { setLoading(false); }
-    };
-    load();
-  }, []);
+      }
+      const r = await api.get('/services/public-services');
+      setServices(r.data.services || []);
+    } catch { setServices([]); }
+    finally   { setLoading(false); }
+  };
+
+  useEffect(() => { loadServices(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <PageWrap>
@@ -204,8 +210,15 @@ const ServiceMenu = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, ease: EASE }}
       >
-        <Eyebrow>The Menu</Eyebrow>
-        <PageTitle>Our Services</PageTitle>
+        <TitleRow>
+          <div>
+            <Eyebrow>The Menu</Eyebrow>
+            <PageTitle>{title}</PageTitle>
+          </div>
+          {isAdmin && (
+            <ManageBtn onClick={() => setManageOpen(true)}>+ Manage Services</ManageBtn>
+          )}
+        </TitleRow>
         <PageSub>{intro}</PageSub>
       </PageHeader>
 
@@ -289,6 +302,12 @@ const ServiceMenu = () => {
           <CounterTotal>{String(services.length).padStart(2, '0')}</CounterTotal>
         </StickyCounter>
       )}
+
+      {isAdmin && (
+        <AdminDrawer open={manageOpen} onClose={() => { setManageOpen(false); loadServices(); }} title="Manage Services">
+          {manageOpen && <AdminServices />}
+        </AdminDrawer>
+      )}
     </PageWrap>
   );
 };
@@ -307,6 +326,20 @@ const PageWrap = styled.div`
 const PageHeader = styled.div`
   padding: 6rem 8% 4.5rem;
   @media (max-width: 768px) { padding: 4rem 6% 3rem; }
+`;
+
+const TitleRow = styled.div`
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+`;
+
+const ManageBtn = styled.button`
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.9rem; letter-spacing: 2px;
+  background: ${RED}; color: #fff; border: none;
+  padding: 0.6rem 1.3rem; cursor: pointer; margin-bottom: 1.2rem;
+  transition: background 0.2s, transform 0.1s;
+  &:hover { background: #a51830; transform: scale(1.02); }
 `;
 
 const Eyebrow = styled.p`
