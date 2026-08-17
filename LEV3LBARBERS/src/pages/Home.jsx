@@ -86,14 +86,6 @@ const Home = () => {
           ))}
         </TagRow>
 
-        <HeroName
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.85, ease: EASE }}
-        >
-          LEV<Three>3</Three>L BARBERS
-        </HeroName>
-
         <CarouselOuter
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -205,27 +197,6 @@ const TagRow = styled.div`
   @media (max-width: 600px) {
     padding-bottom: 10px;
   }
-`;
-
-const HeroName = styled(motion.div)`
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(32px, 10vw, 108px);
-  font-weight: 600;
-  letter-spacing: 1px;
-  line-height: 1;
-  color: ${INK};
-  text-align: center;
-  white-space: nowrap;
-
-  @media (max-width: 600px) {
-    letter-spacing: 2px;
-    padding-bottom: 15px;
-
-  }
-`;
-
-const Three = styled.span`
-  color: ${RED};
 `;
 
 const CarouselOuter = styled(motion.div)`
