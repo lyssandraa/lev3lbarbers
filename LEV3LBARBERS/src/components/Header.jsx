@@ -14,7 +14,6 @@ import AdminDrawer from '../common/AdminDrawer';
 import Banner from '../common/Banner';
 import ShopSettings from './ShopSettings';
 import api from '../utils/api';
-import logoColor from '../assets/logo.png';
 
 const drawerVariants = {
   hidden: { opacity: 0 },
@@ -175,19 +174,9 @@ const Header = ({ isOpen, refreshShopStatus }) => {
           )}
         </ShopStatus>
 
-        {/* Logo shown at top of home; text brand shown once scrolled/elsewhere.
-            Only one is ever mounted — relying on opacity to hide the other one
-            was visually "ghosting" on some mobile WebKit browsers (position:fixed
-            + backdrop-filter compositing quirk), even with opacity correctly 0. */}
-        {lightMode ? (
-          <LogoBrand onClick={() => { navigate('/'); setMenuOpen(false); }}>
-            <img src={logoColor} alt="LEV3L Barbers" />
-          </LogoBrand>
-        ) : (
-          <Brand onClick={() => { navigate('/'); setMenuOpen(false); }}>
-            LEV3L BARBERS
-          </Brand>
-        )}
+        <Brand onClick={() => { navigate('/'); setMenuOpen(false); }}>
+          LEV<BrandThree>3</BrandThree>L BARBERS
+        </Brand>
 
         <RightIcons>
           <CartIconBtn id="cart-icon" onClick={() => setCartOpen(true)} aria-label="Cart">
@@ -399,24 +388,8 @@ const Brand = styled.div`
   &:hover { opacity: 0.6; }
 `;
 
-/* Logo mark: only mounted when the text brand isn't (see JSX) — conditional
-   mounting instead of opacity toggling, since opacity:0 was visually
-   "ghosting" back into view on some mobile WebKit browsers when combined
-   with position:fixed + backdrop-filter. */
-const LogoBrand = styled.div`
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  cursor: pointer;
-
-  img {
-    height: 100px;
-    width: 100px;
-    display: block;
-    margin-top: 5px;
-  }
-
-  &:hover { opacity: 0.7; }
+const BrandThree = styled.span`
+  color: #C41E3A;
 `;
 
 const RightIcons = styled.div`
