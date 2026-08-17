@@ -24,10 +24,10 @@ const DEFAULT_HOURS = {
   6: { closed: false, open: '09:00', close: '19:00' },
 };
 
-const ShopSettings = ({ refreshShopStatus }) => {
+const ShopSettings = ({ refreshShopStatus, statusOnly }) => {
   const [formData,     setFormData]     = useState({ isOpen: false, waitTime: 0, override: false });
   const [openingHours, setOpeningHours] = useState(DEFAULT_HOURS);
-  const [shopInfo,     setShopInfo]     = useState({ address: '', city: '', postcode: '', phone: '', email: '', instagram: '', mapEmbedUrl: '', servicesIntro: '' });
+  const [shopInfo,     setShopInfo]     = useState({ address: '', city: '', postcode: '', phone: '', email: '', instagram: '', mapEmbedUrl: '', servicesTitle: '', servicesIntro: '' });
   const [loading,      setLoading]      = useState(true);
   const [saving,       setSaving]       = useState(false);
   const [savingInfo,   setSavingInfo]   = useState(false);
@@ -49,6 +49,7 @@ const ShopSettings = ({ refreshShopStatus }) => {
         email:         infoRes.data.email         || '',
         instagram:     infoRes.data.instagram     || '',
         mapEmbedUrl:   infoRes.data.mapEmbedUrl   || '',
+        servicesTitle: infoRes.data.servicesTitle || '',
         servicesIntro: infoRes.data.servicesIntro || '',
       });
     }).catch(err => {
@@ -126,42 +127,46 @@ const ShopSettings = ({ refreshShopStatus }) => {
         </FormGroup>
       )}
 
-      {/* Opening hours editor */}
-      <FormGroup>
-        <Label>Opening Hours</Label>
-        <HoursGrid>
-          <HoursHeader>
-            <span>Day</span><span>Closed</span><span>Opens</span><span>Closes</span>
-          </HoursHeader>
-          {DAY_NAMES.map((day, i) => {
-            const dh = openingHours[i] || DEFAULT_HOURS[i];
-            return (
-              <HoursRow key={i}>
-                <DayName>{day}</DayName>
-                <ClosedCell>
-                  <Checkbox
-                    type="checkbox"
-                    checked={!!dh.closed}
-                    onChange={e => setHour(i, 'closed', e.target.checked)}
+      {/* Opening hours editor — skipped in the quick status-only view (Header's
+          inline editor); this is a set-once-and-forget setting, not something
+          worth surfacing in the fast path alongside open/closed + wait time. */}
+      {!statusOnly && (
+        <FormGroup>
+          <Label>Opening Hours</Label>
+          <HoursGrid>
+            <HoursHeader>
+              <span>Day</span><span>Closed</span><span>Opens</span><span>Closes</span>
+            </HoursHeader>
+            {DAY_NAMES.map((day, i) => {
+              const dh = openingHours[i] || DEFAULT_HOURS[i];
+              return (
+                <HoursRow key={i}>
+                  <DayName>{day}</DayName>
+                  <ClosedCell>
+                    <Checkbox
+                      type="checkbox"
+                      checked={!!dh.closed}
+                      onChange={e => setHour(i, 'closed', e.target.checked)}
+                    />
+                  </ClosedCell>
+                  <TimeInput
+                    type="time"
+                    value={dh.open || '09:00'}
+                    disabled={dh.closed}
+                    onChange={e => setHour(i, 'open', e.target.value)}
                   />
-                </ClosedCell>
-                <TimeInput
-                  type="time"
-                  value={dh.open || '09:00'}
-                  disabled={dh.closed}
-                  onChange={e => setHour(i, 'open', e.target.value)}
-                />
-                <TimeInput
-                  type="time"
-                  value={dh.close || '18:00'}
-                  disabled={dh.closed}
-                  onChange={e => setHour(i, 'close', e.target.value)}
-                />
-              </HoursRow>
-            );
-          })}
-        </HoursGrid>
-      </FormGroup>
+                  <TimeInput
+                    type="time"
+                    value={dh.close || '18:00'}
+                    disabled={dh.closed}
+                    onChange={e => setHour(i, 'close', e.target.value)}
+                  />
+                </HoursRow>
+              );
+            })}
+          </HoursGrid>
+        </FormGroup>
+      )}
 
       {/* Wait time */}
       <FormGroup>
@@ -179,6 +184,7 @@ const ShopSettings = ({ refreshShopStatus }) => {
     </FormCard>
 
     {/* ── Contact Details card ── */}
+    {!statusOnly && (
     <FormCard>
       <PanelTitle><StoreIcon width={20} height={20} /> Contact Details</PanelTitle>
 
@@ -224,6 +230,15 @@ const ShopSettings = ({ refreshShopStatus }) => {
       </FormGroup>
 
       <FormGroup>
+        <Label>Services Page Title</Label>
+        <Input
+          placeholder="Our Services"
+          value={shopInfo.servicesTitle}
+          onChange={e => setInfo('servicesTitle', e.target.value)}
+        />
+      </FormGroup>
+
+      <FormGroup>
         <Label>Services Page Intro</Label>
         <Textarea
           rows={3}
@@ -238,6 +253,7 @@ const ShopSettings = ({ refreshShopStatus }) => {
         {savingInfo ? 'Saving...' : 'Save Contact Details'}
       </SaveButton>
     </FormCard>
+    )}
   </>
   );
 };

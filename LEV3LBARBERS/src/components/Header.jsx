@@ -6,11 +6,13 @@ import { T } from '../common/theme';
 import styled, { keyframes, css } from 'styled-components';
 import '@fontsource/montserrat';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FiX, FiMenu, FiShoppingBag } from 'react-icons/fi';
+import { FiX, FiMenu, FiShoppingBag, FiEdit2 } from 'react-icons/fi';
 import { FaUser } from 'react-icons/fa';
 import { useCart } from '../context/CartContext';
 import CartDrawer from '../common/CartDrawer';
+import AdminDrawer from '../common/AdminDrawer';
 import Banner from '../common/Banner';
+import ShopSettings from './ShopSettings';
 import api from '../utils/api';
 import logoColor from '../assets/logo.png';
 
@@ -36,7 +38,7 @@ const BASE_NAV = [
   { label: 'HOURS',       path: '/contact#hours',    action: 'contact', id: 'hours' },
 ];
 
-const Header = ({ isOpen }) => {
+const Header = ({ isOpen, refreshShopStatus }) => {
   const navigate  = useNavigate();
   const location  = useLocation();
   const navRef    = useRef();
@@ -72,6 +74,7 @@ const Header = ({ isOpen }) => {
   const { count: cartCount } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [cartBump, setCartBump] = useState(false);
+  const [statusEditOpen, setStatusEditOpen] = useState(false);
 
   /* ── Cart icon bounces when Shop's "fly to cart" animation lands ── */
   useEffect(() => {
@@ -161,6 +164,15 @@ const Header = ({ isOpen }) => {
         >
           <BarberPole $isOpen={isOpen} />
           <StatusLabel $isOpen={isOpen}>{isOpen ? 'OPEN' : 'CLOSED'}</StatusLabel>
+          {isShopUser && (
+            <StatusEditBtn
+              onClick={(e) => { e.stopPropagation(); setMenuOpen(false); setStatusEditOpen(true); }}
+              title="Edit shop status"
+              aria-label="Edit shop status"
+            >
+              <FiEdit2 size={11} />
+            </StatusEditBtn>
+          )}
         </ShopStatus>
 
         {/* Logo shown at top of home; text brand shown once scrolled/elsewhere.
@@ -250,6 +262,16 @@ const Header = ({ isOpen }) => {
       )}
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+
+      {isShopUser && (
+        <AdminDrawer
+          open={statusEditOpen}
+          onClose={() => { setStatusEditOpen(false); refreshShopStatus?.(); }}
+          title="Shop Status"
+        >
+          {statusEditOpen && <ShopSettings refreshShopStatus={refreshShopStatus} statusOnly />}
+        </AdminDrawer>
+      )}
     </StyledHeader>
   );
 };
@@ -327,6 +349,15 @@ const ShopStatus = styled.button`
   cursor: pointer;
   padding: 0;
   color: inherit;
+`;
+
+const StatusEditBtn = styled.button`
+  display: flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(196,30,58,0.1); border: 1px solid rgba(196,30,58,0.3);
+  color: #C41E3A; cursor: pointer; padding: 0;
+  transition: background 0.18s;
+  &:hover { background: rgba(196,30,58,0.22); }
 `;
 
 const BarberPole = styled.div`

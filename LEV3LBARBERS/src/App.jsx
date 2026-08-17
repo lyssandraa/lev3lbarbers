@@ -67,7 +67,7 @@ function App() {
   return (
     <>
     <IntroReveal />
-    <Header isOpen={shopStatus.isOpen}/>
+    <Header isOpen={shopStatus.isOpen} refreshShopStatus={shopStatus.refresh}/>
     <ScrollToTop/>
     <Routes>
       <Route path="/" element={<Home />}/>
