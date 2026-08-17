@@ -200,7 +200,7 @@ const ServiceMenu = () => {
     finally   { setLoading(false); }
   };
 
-  useEffect(() => { loadServices(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { loadServices(); }, []);
 
   return (
     <PageWrap>

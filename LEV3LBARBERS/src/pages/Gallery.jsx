@@ -248,18 +248,21 @@ const PhotoCard = ({ item, idx, onOpen }) => {
   const tilt  = idx % 2 === 0 ? 3.5 : -3.5;
   const total = item.images.length;
   const cover = item.images[active];
-  if (!cover) return null;
 
   const prev = (e) => { e.stopPropagation(); setActive(a => (a - 1 + total) % total); };
   const next = (e) => { e.stopPropagation(); setActive(a => (a + 1) % total); };
 
-  /* Preload neighbouring angles so card-level browsing never shows a flash */
+  /* Preload neighbouring angles so card-level browsing never shows a flash.
+     Runs unconditionally (guarded internally) — an early return before this
+     hook would violate the Rules of Hooks if `cover` were ever falsy. */
   useEffect(() => {
     if (total < 2) return;
     [(active + 1) % total, (active - 1 + total) % total].forEach(i => {
       preloadImage(resolveImageUrl(item.images[i].imageUrl));
     });
   }, [active, total, item.images]);
+
+  if (!cover) return null;
 
   return (
     <div ref={ref}>

@@ -5,6 +5,9 @@ import Seo from '../common/Seo';
 import api from '../utils/api';
 import { useCart } from '../context/CartContext';
 import { GiftIcon, PencilIcon } from '../common/icons';
+import { useAuth } from '../context/AuthContext';
+import AdminDrawer from '../common/AdminDrawer';
+import AdminShop from '../components/AdminShop';
 
 import { resolveImageUrl } from '../config';
 
@@ -14,6 +17,7 @@ const RED   = '#C41E3A';
 const EASE  = [0.22, 1, 0.36, 1];
 
 const Shop = () => {
+  const { isAdmin } = useAuth();
   const [products,     setProducts]     = useState([]);
   const [denominations,setDenominations]= useState([]);
   const [loading,      setLoading]      = useState(true);
@@ -22,12 +26,15 @@ const Shop = () => {
   const [customAmount, setCustomAmount] = useState('');
   const [tab,           setTab]          = useState('online');
   const [flyItem,       setFlyItem]      = useState(null);
+  const [manageOpen,    setManageOpen]   = useState(false);
   const isLoggedIn = Boolean(localStorage.getItem('token'));
   const { addItem } = useCart();
 
-  useEffect(() => {
+  // Admins see inactive products too (via /shop-products/all), so a
+  // disabled/hidden product can be found and fixed here, not just active ones.
+  const loadProducts = () => {
     Promise.all([
-      api.get('/shop-products/public'),
+      api.get(isAdmin ? '/shop-products/all' : '/shop-products/public'),
       api.get('/gift-cards/denominations'),
     ])
       .then(([prodRes, gcRes]) => {
@@ -36,7 +43,9 @@ const Shop = () => {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { loadProducts(); }, [isAdmin]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isOutOfStock = (p) => p.trackStock && p.stock !== null && p.stock !== undefined && p.stock <= 0;
   const isLowStock  = (p) => p.trackStock && p.stock !== null && p.stock !== undefined && p.stock > 0 && p.stock <= 5;
@@ -117,6 +126,9 @@ const Shop = () => {
         <Eyebrow>LEV3L Barbers</Eyebrow>
         <Title>The Shop</Title>
         <Rule />
+        {isAdmin && (
+          <ManageBtn onClick={() => setManageOpen(true)}>+ Manage Products</ManageBtn>
+        )}
       </Hero>
 
       {loading ? (
@@ -324,6 +336,12 @@ const Shop = () => {
           </LightboxBackdrop>
         )}
       </AnimatePresence>
+
+      {isAdmin && (
+        <AdminDrawer open={manageOpen} onClose={() => { setManageOpen(false); loadProducts(); }} title="Manage Shop Products">
+          {manageOpen && <AdminShop />}
+        </AdminDrawer>
+      )}
     </Wrap>
   );
 };
@@ -501,6 +519,17 @@ const Rule = styled.div`
   height: 2px;
   background: ${RED};
   margin: 1.4rem auto 0;
+`;
+
+const ManageBtn = styled.button`
+  margin: 1.3rem auto 0;
+  display: block;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.85rem; letter-spacing: 2px;
+  background: ${RED}; color: #fff; border: none;
+  padding: 0.55rem 1.2rem; cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  &:hover { background: #a51830; transform: scale(1.02); }
 `;
 
 /* ─── Sections ─── */
