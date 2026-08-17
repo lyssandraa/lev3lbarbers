@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Seo from '../common/Seo';
 import api from '../utils/api';
 import { PenIcon, TagIcon, MegaphoneIcon, NewsIcon } from '../common/icons';
+import { useAuth } from '../context/AuthContext';
+import AdminDrawer from '../common/AdminDrawer';
+import AdminWhatsOn from '../components/AdminWhatsOn';
 
 import { resolveImageUrl } from '../config';
 
@@ -100,18 +103,22 @@ const renderInline = (text) =>
 /* ─── Main page ─────────────────────────────────────────────────────────────── */
 
 const WhatsOn = () => {
+  const { isAdmin } = useAuth();
   const [posts,   setPosts]   = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter,  setFilter]  = useState('ALL');
   const [search,  setSearch]  = useState('');
   const [reading, setReading] = useState(null);
+  const [manageOpen, setManageOpen] = useState(false);
 
-  useEffect(() => {
+  const loadPosts = useCallback(() => {
     api.get('/whats-on/posts')
       .then(res => setPosts(res.data.posts || []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => { loadPosts(); }, [loadPosts]);
 
   const q = search.trim().toLowerCase();
   const filtered = posts
@@ -138,6 +145,9 @@ const WhatsOn = () => {
         <Title>What's On</Title>
         <Divider />
         <Sub>Articles · Promotions · Shop News</Sub>
+        {isAdmin && (
+          <ManageBtn onClick={() => setManageOpen(true)}>+ Manage Posts</ManageBtn>
+        )}
       </Hero>
 
       {/* ── Filters + search ── */}
@@ -204,6 +214,12 @@ const WhatsOn = () => {
       <AnimatePresence>
         {reading && <ArticleReader post={reading} onClose={() => setReading(null)} />}
       </AnimatePresence>
+
+      {isAdmin && (
+        <AdminDrawer open={manageOpen} onClose={() => { setManageOpen(false); loadPosts(); }} title="Manage What's On">
+          {manageOpen && <AdminWhatsOn />}
+        </AdminDrawer>
+      )}
     </Page>
   );
 };
@@ -424,6 +440,14 @@ const Sub = styled.p`
   color: rgba(26, 26, 26, 0.55);
   letter-spacing: 2px;
   margin: 0;
+`;
+const ManageBtn = styled.button`
+  margin-top: 1.4rem;
+  background: ${RED}; border: none; color: #fff;
+  padding: 0.6rem 1.3rem; cursor: pointer;
+  font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; font-size: 0.9rem;
+  transition: background 0.2s, transform 0.1s;
+  &:hover { background: #a51830; transform: scale(1.02); }
 `;
 
 /* Controls */
