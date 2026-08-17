@@ -4,6 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Seo from '../common/Seo';
 import api from '../utils/api';
 import { resolveImageUrl } from '../config';
+import { useAuth } from '../context/AuthContext';
+import AdminDrawer from '../common/AdminDrawer';
+import AdminGallery from '../components/AdminGallery';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -42,16 +45,20 @@ const usePhotoReveal = (idx) => {
 };
 
 const Gallery = () => {
+  const { isAdmin } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState(null); // { item, index }
+  const [manageOpen, setManageOpen] = useState(false);
 
-  useEffect(() => {
+  const loadItems = () => {
     api.get('/gallery/photos')
       .then(res => setItems(res.data.items || []))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { loadItems(); }, []);
 
   /* Keyboard nav while lightbox is open */
   useEffect(() => {
@@ -129,6 +136,9 @@ const Gallery = () => {
           <Title>Gallery</Title>
           <Divider />
           <Sub>Every cut tells a story.</Sub>
+          {isAdmin && (
+            <ManageBtn onClick={() => setManageOpen(true)}>+ Manage Photos</ManageBtn>
+          )}
         </HeroContent>
       </Hero>
 
@@ -221,6 +231,12 @@ const Gallery = () => {
           </LightboxBackdrop>
         )}
       </AnimatePresence>
+
+      {isAdmin && (
+        <AdminDrawer open={manageOpen} onClose={() => { setManageOpen(false); loadItems(); }} title="Manage Gallery">
+          {manageOpen && <AdminGallery />}
+        </AdminDrawer>
+      )}
     </Page>
   );
 };
@@ -407,6 +423,16 @@ const Sub = styled.p`
   color: rgba(26, 26, 26, 0.55);
   letter-spacing: 1px;
   margin: 0;
+`;
+
+const ManageBtn = styled.button`
+  margin-top: 1.3rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.85rem; letter-spacing: 2px;
+  background: ${RED}; color: #fff; border: none;
+  padding: 0.55rem 1.2rem; cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  &:hover { background: #a51830; transform: scale(1.02); }
 `;
 
 /* ─── Grid ─── */
