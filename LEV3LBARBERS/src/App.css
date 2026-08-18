@@ -9,7 +9,14 @@ body, html {
   color: #EAE0CA;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+  /* Every intentional smooth scroll in this app already passes
+     behavior: 'smooth' explicitly in JS (see scrollIntoView calls in
+     App.jsx/Header.jsx/Home.jsx). A global scroll-behavior: smooth here
+     silently turned every OTHER scroll call — anything using 'auto' or
+     no option, like ScrollToTop's route-change reset and the mobile nav
+     drawer's scroll-lock restore — into an animated scroll too, since
+     'auto' defers to this CSS value. That caused those resets to land
+     mid-animation instead of snapping instantly. */
 }
 
 /* Thin custom scrollbar */
