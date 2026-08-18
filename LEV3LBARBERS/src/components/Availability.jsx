@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
-import barberChair from '../assets/barberChair.png';
+import barberChair from '../assets/barberChair.webp';
 import shopOpen from '../common/shopOpen';
 
 const DARK  = '#0c0c0c';

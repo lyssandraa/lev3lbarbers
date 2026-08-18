@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import ServiceMenu from "../components/ServiceMenu";
-import background from '../assets/servicesBackground.png';
+import background from '../assets/servicesBackground.jpg';
 
 const ServicePreviewModal = ({ services, onCancel, onConfirm }) => {
   return (

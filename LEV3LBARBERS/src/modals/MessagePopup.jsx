@@ -1,6 +1,6 @@
 import React from "react";
 import styled, { keyframes, css } from "styled-components";
-import defaultIcon from "../assets/loading.png";
+import defaultIcon from "../assets/loading.webp";
 
 const MessagePopup = ({
   show,

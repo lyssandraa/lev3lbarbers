@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
-import Confetti from "react-confetti";
+import confetti from "canvas-confetti";
 import api from "../utils/api";
 
-import giftBox from "../assets/giftBox.png";
-import giftLid from "../assets/giftLid.png";
+import giftBox from "../assets/giftBox.webp";
+import giftLid from "../assets/giftLid.webp";
 
 const MysteryBoxModal = ({ isOpen, onClose }) => {
   const [rewardValue, setRewardValue]     = useState(null);
   const [rewardId, setRewardId]           = useState(null);
   const [status, setStatus]               = useState(null); // 'LOCKED' | 'UNCLAIMED'
   const [opened, setOpened]               = useState(false);
-  const [showConfetti, setShowConfetti]   = useState(false);
   const [qrCode, setQrCode]               = useState(null);
   const [claiming, setClaiming]           = useState(false);
   const [resending, setResending]         = useState(false);
@@ -38,7 +37,6 @@ const MysteryBoxModal = ({ isOpen, onClose }) => {
       setRewardId(null);
       setStatus(null);
       setOpened(false);
-      setShowConfetti(false);
       setQrCode(null);
       setClaiming(false);
       setResending(false);
@@ -55,8 +53,9 @@ const MysteryBoxModal = ({ isOpen, onClose }) => {
       const revealRes = await api.post("/rewards/reveal-reward", { rewardType: "Mystery box" });
       setRewardValue(revealRes.data.rewardValue);
 
-      setTimeout(() => setShowConfetti(true), 1200);
-      setTimeout(() => setShowConfetti(false), 7000);
+      setTimeout(() => {
+        confetti({ particleCount: 180, spread: 100, origin: { y: 0.5 } });
+      }, 1200);
 
       // Check whether the reward is claimable yet
       const rewardsRes = await api.get("/rewards/user-rewards");
@@ -201,15 +200,6 @@ const MysteryBoxModal = ({ isOpen, onClose }) => {
             </ModalContent>
           )}
 
-          {showConfetti && (
-            <Confetti
-              width={window.innerWidth}
-              height={window.innerHeight}
-              numberOfPieces={400}
-              recycle={false}
-              gravity={0.3}
-            />
-          )}
         </Overlay>
       )}
     </AnimatePresence>
