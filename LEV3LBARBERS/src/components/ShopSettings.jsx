@@ -318,41 +318,57 @@ const CheckboxWrapper = styled.div`
 
 const Checkbox = styled.input`transform: scale(1.3); cursor: pointer; accent-color: ${RED};`;
 
-/* Hours grid */
+/* Hours grid — horizontally scrollable as a fallback so a device that
+   refuses to shrink the native time picker below its own minimum content
+   width (mobile Safari does this) scrolls within the card instead of
+   blowing out the whole page's width. */
 const HoursGrid = styled.div`
-  border: 1px solid rgba(26,26,26,0.1); border-radius: 0; overflow: hidden;
+  border: 1px solid rgba(26,26,26,0.1); border-radius: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 `;
 
 const HoursHeader = styled.div`
   display: grid; grid-template-columns: minmax(90px, 1fr) 60px 100px 100px;
+  min-width: 380px;
   padding: 0.5rem 0.85rem;
   background: rgba(26,26,26,0.05);
   font-family: 'Bebas Neue', sans-serif;
   font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase; color: ${RED};
   gap: 0.5rem;
 
-  @media (max-width: 480px) { grid-template-columns: minmax(80px, 1fr) 50px 80px 80px; }
+  @media (max-width: 480px) { grid-template-columns: minmax(80px, 1fr) 50px 80px 80px; min-width: 330px; }
 `;
 
 const HoursRow = styled.div`
   display: grid; grid-template-columns: minmax(90px, 1fr) 60px 100px 100px;
+  min-width: 380px;
   padding: 0.6rem 0.85rem;
   border-top: 1px solid rgba(26,26,26,0.08);
   align-items: center; gap: 0.5rem;
   transition: background 0.15s;
   &:hover { background: rgba(26,26,26,0.03); }
 
-  @media (max-width: 480px) { grid-template-columns: minmax(80px, 1fr) 50px 80px 80px; }
+  @media (max-width: 480px) { grid-template-columns: minmax(80px, 1fr) 50px 80px 80px; min-width: 330px; }
 `;
 
-const DayName = styled.span`font-size: 0.88rem; font-family: 'Montserrat', sans-serif; font-weight: 600; color: ${INK};`;
+const DayName = styled.span`
+  font-size: 0.88rem; font-family: 'Montserrat', sans-serif; font-weight: 600; color: ${INK};
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+`;
 
-const ClosedCell = styled.div`display: flex; justify-content: center;`;
+const ClosedCell = styled.div`display: flex; justify-content: center; min-width: 0;`;
 
+/* min-width: 0 is the fix — without it, a grid item won't shrink below its
+   content's own intrinsic minimum size, and mobile Safari's native time
+   picker refuses to go below ~90-100px regardless of the track width,
+   which was forcing these columns (and the whole row) wider than their
+   80-100px track and pushing the table past the screen edge. */
 const TimeInput = styled.input`
-  padding: 0.35rem 0.5rem; border-radius: 0; font-family: 'Montserrat', sans-serif;
+  min-width: 0;
+  padding: 0.35rem 0.4rem; border-radius: 0; font-family: 'Montserrat', sans-serif;
   border: 1px solid rgba(26,26,26,0.15); background: #ffffff;
-  color: ${INK}; font-size: 0.85rem; width: 100%;
+  color: ${INK}; font-size: 0.8rem; width: 100%;
   &:focus { outline: none; border-color: ${RED}; }
   &:disabled { opacity: 0.3; cursor: not-allowed; }
   color-scheme: light;
