@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import styled, { keyframes, css } from 'styled-components';
 import Seo from '../common/Seo';
@@ -8,6 +9,7 @@ import { GiftIcon, PencilIcon } from '../common/icons';
 import { useAuth } from '../context/AuthContext';
 import AdminDrawer from '../common/AdminDrawer';
 import AdminShop from '../components/AdminShop';
+import AdminGiftCards from '../components/AdminGiftCards';
 
 import { resolveImageUrl } from '../config';
 
@@ -27,6 +29,7 @@ const Shop = () => {
   const [tab,           setTab]          = useState('online');
   const [flyItem,       setFlyItem]      = useState(null);
   const [manageOpen,    setManageOpen]   = useState(false);
+  const [manageGcOpen,  setManageGcOpen] = useState(false);
   const isLoggedIn = Boolean(localStorage.getItem('token'));
   const { addItem } = useCart();
 
@@ -215,38 +218,41 @@ const Shop = () => {
               <SectionHead>
                 <SectionTitle>Gift Cards</SectionTitle>
                 <SectionSub>Give the gift of a fresh cut</SectionSub>
+                {isAdmin && (
+                  <ManageGcBtn onClick={() => setManageGcOpen(true)}>+ Manage Gift Cards</ManageGcBtn>
+                )}
               </SectionHead>
-              <GiftCardGrid>
-                {/* Custom amount tile */}
-                <GiftCardTile
-                  initial={{ opacity: 0, rotateY: -90 }}
-                  animate={{ opacity: 1, rotateY: 0 }}
-                  transition={{ duration: 0.5, ease: EASE }}
-                  style={{ transformPerspective: 800 }}
-                >
-                  <GiftIconWrap><PencilIcon width={26} height={26} /></GiftIconWrap>
-                  <GiftValue style={{ fontSize: '1.2rem', letterSpacing: 1 }}>Custom</GiftValue>
-                  <GiftSub>Choose your own amount</GiftSub>
-                  <CustomAmountRow>
-                    <CustomInput
-                      type="number" min="1" step="1"
-                      placeholder="£ Amount"
-                      value={customAmount}
-                      onChange={e => setCustomAmount(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleAddCustomGiftCard(e.target)}
-                    />
-                  </CustomAmountRow>
-                  <AddToCartBtn
-                    $added={addedId === 'gc-custom'}
-                    $wide
-                    whileTap={{ scale: 0.97 }}
-                    onClick={(e) => handleAddCustomGiftCard(e.currentTarget)}
-                    disabled={!customAmount || parseFloat(customAmount) < 1}
-                  >
-                    {addedId === 'gc-custom' ? '✓ Added' : '+ Add to Cart'}
-                  </AddToCartBtn>
-                </GiftCardTile>
 
+              <CustomGiftCardBar
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: EASE }}
+              >
+                <GiftIconWrap><PencilIcon width={26} height={26} /></GiftIconWrap>
+                <CustomBarBody>
+                  <GiftValue style={{ fontSize: '1.2rem', letterSpacing: 1 }}>Custom Amount</GiftValue>
+                  <GiftSub>Choose your own amount</GiftSub>
+                </CustomBarBody>
+                <CustomAmountRow style={{ marginTop: 0, width: 'auto', flex: '0 1 140px' }}>
+                  <CustomInput
+                    type="number" min="1" step="1"
+                    placeholder="£ Amount"
+                    value={customAmount}
+                    onChange={e => setCustomAmount(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleAddCustomGiftCard(e.target)}
+                  />
+                </CustomAmountRow>
+                <AddToCartBtn
+                  $added={addedId === 'gc-custom'}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={(e) => handleAddCustomGiftCard(e.currentTarget)}
+                  disabled={!customAmount || parseFloat(customAmount) < 1}
+                >
+                  {addedId === 'gc-custom' ? '✓ Added' : '+ Add to Cart'}
+                </AddToCartBtn>
+              </CustomGiftCardBar>
+
+              <GiftCardGrid>
                 {denominations.map((d, i) => (
                   <GiftCardTile
                     key={d.id}
@@ -313,17 +319,7 @@ const Shop = () => {
               transition={{ duration: 0.22, ease: EASE }}
               onClick={e => e.stopPropagation()}
             >
-              {lightbox.imageUrl && (
-                <LightboxImgWrap>
-                  <LightboxImg
-                    src={resolveImageUrl(lightbox.imageUrl)}
-                    alt={lightbox.name}
-                    initial={{ clipPath: 'inset(100% 0 0 0)' }}
-                    animate={{ clipPath: 'inset(0% 0 0 0)' }}
-                    transition={{ duration: 0.5, ease: EASE, delay: 0.05 }}
-                  />
-                </LightboxImgWrap>
-              )}
+              <LightboxImages product={lightbox} />
               <LightboxBody>
                 <LightboxName>{lightbox.name}</LightboxName>
                 {lightbox.description && <LightboxDesc>{lightbox.description}</LightboxDesc>}
@@ -342,6 +338,12 @@ const Shop = () => {
           {manageOpen && <AdminShop />}
         </AdminDrawer>
       )}
+
+      {isAdmin && (
+        <AdminDrawer open={manageGcOpen} onClose={() => { setManageGcOpen(false); loadProducts(); }} title="Manage Gift Cards">
+          {manageGcOpen && <AdminGiftCards />}
+        </AdminDrawer>
+      )}
     </Wrap>
   );
 };
@@ -350,10 +352,15 @@ const Shop = () => {
 
 const ProductCard = ({ product, index, isLoggedIn, onExpand, onAddToCart, outOfStock, lowStock, stockCount }) => {
   const [hovered, setHovered] = useState(false);
+  const [imgIdx, setImgIdx] = useState(0);
   const { items, setQty } = useCart();
   const cartItem = items.find(i => i.cartId === `product-${product.id}`);
   const qty = cartItem?.quantity || 0;
   const numStr = String(index + 1).padStart(2, '0');
+
+  const images = [product.imageUrl, ...(product.images || []).map(i => i.imageUrl)].filter(Boolean);
+  const prevImg = (e) => { e.stopPropagation(); setImgIdx(i => (i - 1 + images.length) % images.length); };
+  const nextImg = (e) => { e.stopPropagation(); setImgIdx(i => (i + 1) % images.length); };
 
   const rawX    = useMotionValue(0);
   const rawY    = useMotionValue(0);
@@ -381,8 +388,8 @@ const ProductCard = ({ product, index, isLoggedIn, onExpand, onAddToCart, outOfS
       onMouseLeave={onMouseLeave}
     >
       <ImgWrap onClick={() => onExpand(product)}>
-        {product.imageUrl ? (
-          <img src={resolveImageUrl(product.imageUrl)} alt={product.name} />
+        {images.length > 0 ? (
+          <img src={resolveImageUrl(images[imgIdx])} alt={product.name} />
         ) : (
           <ImgPlaceholder>✦</ImgPlaceholder>
         )}
@@ -399,6 +406,15 @@ const ProductCard = ({ product, index, isLoggedIn, onExpand, onAddToCart, outOfS
         <CardOverlay className="overlay">
           <OverlayText>View</OverlayText>
         </CardOverlay>
+        {images.length > 1 && (
+          <>
+            <ImgNavBtn $side="left" onClick={prevImg} aria-label="Previous photo">‹</ImgNavBtn>
+            <ImgNavBtn $side="right" onClick={nextImg} aria-label="Next photo">›</ImgNavBtn>
+            <ImgDots>
+              {images.map((_, i) => <ImgDot key={i} $active={i === imgIdx} />)}
+            </ImgDots>
+          </>
+        )}
       </ImgWrap>
       <CardBody>
         <GhostNum>{numStr}</GhostNum>
@@ -429,13 +445,48 @@ const ProductCard = ({ product, index, isLoggedIn, onExpand, onAddToCart, outOfS
   );
 };
 
+/* ─── Lightbox image carousel ─── */
+
+const LightboxImages = ({ product }) => {
+  const [idx, setIdx] = useState(0);
+  const images = [product.imageUrl, ...(product.images || []).map(i => i.imageUrl)].filter(Boolean);
+  if (images.length === 0) return null;
+
+  return (
+    <LightboxImgWrap>
+      <LightboxImg
+        key={idx}
+        src={resolveImageUrl(images[idx])}
+        alt={product.name}
+        initial={{ clipPath: 'inset(100% 0 0 0)' }}
+        animate={{ clipPath: 'inset(0% 0 0 0)' }}
+        transition={{ duration: 0.5, ease: EASE, delay: 0.05 }}
+      />
+      {images.length > 1 && (
+        <>
+          <ImgNavBtn $side="left" onClick={() => setIdx(i => (i - 1 + images.length) % images.length)} aria-label="Previous photo">‹</ImgNavBtn>
+          <ImgNavBtn $side="right" onClick={() => setIdx(i => (i + 1) % images.length)} aria-label="Next photo">›</ImgNavBtn>
+          <ImgDots>
+            {images.map((_, i) => <ImgDot key={i} $active={i === idx} />)}
+          </ImgDots>
+        </>
+      )}
+    </LightboxImgWrap>
+  );
+};
+
 /* ─── Price display logic ─── */
 
 const PriceDisplay = ({ product, isLoggedIn, large }) => {
+  const navigate = useNavigate();
   if (product.price === null || product.price === undefined) return null;
 
   if (product.priceHidden && !isLoggedIn) {
-    return <MembersOnly $large={large}>Members only</MembersOnly>;
+    return (
+      <MembersOnly $large={large} onClick={(e) => { e.stopPropagation(); navigate('/login'); }}>
+        Sign in to see price
+      </MembersOnly>
+    );
   }
 
   return (
@@ -533,6 +584,17 @@ const ManageBtn = styled.button`
   &:hover { background: #a51830; transform: scale(1.02); }
 `;
 
+const ManageGcBtn = styled.button`
+  margin-left: auto;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.75rem; letter-spacing: 1.5px;
+  background: transparent; color: ${RED};
+  border: 1px solid rgba(196, 30, 58, 0.4);
+  padding: 0.4rem 0.85rem; cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  &:hover { background: ${RED}; color: #fff; }
+`;
+
 /* ─── Sections ─── */
 
 const Sections = styled.div`
@@ -548,7 +610,9 @@ const Section = styled(motion.div)``;
 
 const SectionHead = styled.div`
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 0.35rem;
   gap: 1rem;
   margin-bottom: 1.5rem;
   border-bottom: 1px solid rgba(26, 26, 26, 0.1);
@@ -556,10 +620,15 @@ const SectionHead = styled.div`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 1.6rem;
-  letter-spacing: 4px;
+  font-size: clamp(1.2rem, 5.5vw, 1.6rem);
+  letter-spacing: 2px;
+  white-space: nowrap;
   margin: 0;
   color: ${INK};
+
+  @media (min-width: 500px) {
+    letter-spacing: 4px;
+  }
 `;
 
 const SectionSub = styled.span`
@@ -687,6 +756,46 @@ const OverlayText = styled.span`
   color: ${CREAM};
 `;
 
+const ImgNavBtn = styled.button`
+  position: absolute;
+  top: 50%;
+  ${({ $side }) => $side}: 6px;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(26, 26, 26, 0.45);
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover { background: rgba(26, 26, 26, 0.75); }
+`;
+
+const ImgDots = styled.div`
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+`;
+
+const ImgDot = styled.span`
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: ${({ $active }) => $active ? '#fff' : 'rgba(255,255,255,0.5)'};
+  box-shadow: 0 0 2px rgba(0,0,0,0.4);
+`;
+
 const CardBody = styled.div`
   padding: 0.85rem 1rem 0.95rem;
   position: relative;
@@ -749,15 +858,18 @@ const UnitLabel = styled.span`
   margin-left: 3px;
 `;
 
-const MembersOnly = styled.span`
+const MembersOnly = styled.button`
   font-family: 'Montserrat', sans-serif;
   font-size: ${({ $large }) => $large ? '0.78rem' : '0.66rem'};
   font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  letter-spacing: 0.5px;
   color: ${RED};
+  background: transparent;
   border: 1px solid rgba(196, 30, 58, 0.35);
   padding: ${({ $large }) => $large ? '4px 10px' : '2px 7px'};
+  cursor: pointer;
+  transition: background 0.18s;
+  &:hover { background: rgba(196, 30, 58, 0.08); }
 `;
 
 /* ─── Stamped stock badge ─── */
@@ -908,6 +1020,7 @@ const LightboxInner = styled(motion.div)`
 `;
 
 const LightboxImgWrap = styled.div`
+  position: relative;
   width: 100%;
   max-height: 380px;
   overflow: hidden;
@@ -1000,6 +1113,27 @@ const GiftCardGrid = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1.1rem;
   @media (max-width: 500px) { grid-template-columns: repeat(2, 1fr); }
+`;
+
+const CustomGiftCardBar = styled(motion.div)`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border: 1px solid rgba(196, 30, 58, 0.3);
+  background: rgba(196, 30, 58, 0.04);
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 1.75rem;
+  transition: border-color 0.25s;
+  &:hover { border-color: rgba(196, 30, 58, 0.5); }
+`;
+
+const CustomBarBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+  flex: 1 1 160px;
 `;
 
 const GiftCardTile = styled(motion.div)`

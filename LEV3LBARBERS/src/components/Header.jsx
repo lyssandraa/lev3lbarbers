@@ -438,11 +438,13 @@ const Brand = styled.div`
   left: 50%;
   transform: translateX(-50%);
   font-size: clamp(2rem, 3vw, 2rem);
-  font-weight: 700;
   letter-spacing: 1.5px;
-  /* Bebas Neue only ships one (regular) weight, so browsers can't render a
-     real bold — a thin text-stroke fakes the extra thickness instead. */
-  -webkit-text-stroke: 0.6px currentColor;
+  /* Bebas Neue only ships one (regular) weight, so font-weight:700 does
+     nothing and -webkit-text-stroke rendered as a hollow/dim outline on
+     some devices instead of solid extra weight. Four offset solid copies
+     via text-shadow reliably read as bolder without that artifact. */
+  text-shadow: 0.5px 0 0 currentColor, -0.5px 0 0 currentColor,
+               0 0.5px 0 currentColor, 0 -0.5px 0 currentColor;
   cursor: pointer;
   color: var(--h-text);
   white-space: nowrap;

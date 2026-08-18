@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import api from '../utils/api';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import SortableItem from '../common/SortableItem';
 
 import { resolveImageUrl } from '../config';
 import { BoxIcon, LockIcon, StoreIcon, GlobeIcon, PencilIcon, TrashIcon, PlusIcon } from '../common/icons';
@@ -21,9 +24,12 @@ const AdminShop = () => {
   const [editFile, setEditFile] = useState(null);
   const [editPreview, setEditPreview] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteImageTarget, setDeleteImageTarget] = useState(null); // { productId, imageId }
+  const [addingImagesFor, setAddingImagesFor] = useState(null); // productId currently uploading extra images
   const [section, setSection] = useState('all');
   const fileRef = useRef();
   const editFileRef = useRef();
+  const addImagesRef = useRef();
 
   useEffect(() => { fetchProducts(); }, []);
 
@@ -142,10 +148,67 @@ const AdminShop = () => {
     }
   };
 
+  /* ── Extra images (e.g. other colours/fragrances of the same product) ── */
+  const triggerAddImages = (productId) => {
+    setAddingImagesFor(productId);
+    addImagesRef.current?.click();
+  };
+
+  const handleAddImages = async (e) => {
+    const picked = Array.from(e.target.files || []);
+    const productId = addingImagesFor;
+    if (picked.length === 0 || !productId) return;
+    try {
+      const fd = new FormData();
+      picked.forEach(f => fd.append('photos', f));
+      await api.post(`/shop-products/${productId}/images`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      fetchProducts();
+    } catch {
+      alert('Could not add images. Try again.');
+    } finally {
+      setAddingImagesFor(null);
+      if (addImagesRef.current) addImagesRef.current.value = '';
+    }
+  };
+
+  const confirmDeleteImage = async () => {
+    const { productId, imageId } = deleteImageTarget;
+    try {
+      await api.delete(`/shop-products/${productId}/images/${imageId}`);
+      setDeleteImageTarget(null);
+      fetchProducts();
+    } catch {
+      alert('Delete failed.');
+    }
+  };
+
   /* ── Filter ── */
   const visible = section === 'all'
     ? products
     : products.filter(p => p.category === section);
+
+  /* ── Reorder (drag & drop, scoped to the current filter) ── */
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = visible.findIndex(p => p.id === active.id);
+    const newIndex = visible.findIndex(p => p.id === over.id);
+    const reordered = arrayMove(visible, oldIndex, newIndex);
+
+    const orderMap = new Map(reordered.map((p, idx) => [p.id, idx]));
+    setProducts(prev => prev.map(p => orderMap.has(p.id) ? { ...p, order: orderMap.get(p.id) } : p));
+
+    try {
+      await api.put('/shop-products/reorder', {
+        products: reordered.map((p, idx) => ({ id: p.id, order: idx })),
+      });
+    } catch {
+      fetchProducts();
+    }
+  };
 
   return (
     <Card>
@@ -257,15 +320,38 @@ const AdminShop = () => {
         {visible.length === 0 ? (
           <EmptyText>No products here yet.</EmptyText>
         ) : (
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={visible.map(p => p.id)} strategy={verticalListSortingStrategy}>
           <ProductList>
             {visible.map(p => (
-              <ProductRow key={p.id} $inactive={!p.active}>
-                <Thumb
-                  src={p.imageUrl ? resolveImageUrl(p.imageUrl) : undefined}
-                  $hasImg={Boolean(p.imageUrl)}
-                >
-                  {!p.imageUrl && <BoxIcon size={22} />}
-                </Thumb>
+              <SortableItem key={p.id} id={p.id}>
+              <ProductRow $inactive={!p.active}>
+                <ThumbCol>
+                  <Thumb
+                    src={p.imageUrl ? resolveImageUrl(p.imageUrl) : undefined}
+                    $hasImg={Boolean(p.imageUrl)}
+                  >
+                    {!p.imageUrl && <BoxIcon size={22} />}
+                  </Thumb>
+                  {p.images?.length > 0 && (
+                    <ExtraThumbRow>
+                      {p.images.map(img => (
+                        <ExtraThumbWrap key={img.id}>
+                          <ExtraThumb src={resolveImageUrl(img.imageUrl)} alt="" />
+                          <RemoveImgBtn
+                            onClick={() => setDeleteImageTarget({ productId: p.id, imageId: img.id })}
+                            title="Remove this image"
+                          >
+                            ×
+                          </RemoveImgBtn>
+                        </ExtraThumbWrap>
+                      ))}
+                    </ExtraThumbRow>
+                  )}
+                  <AddImgBtn onClick={() => triggerAddImages(p.id)} title="Add another image (e.g. different colour/fragrance)">
+                    <PlusIcon size={11} /> Add photo
+                  </AddImgBtn>
+                </ThumbCol>
 
                 {editingId === p.id ? (
                   <EditBlock>
@@ -351,8 +437,11 @@ const AdminShop = () => {
                   </ProductInfo>
                 )}
               </ProductRow>
+              </SortableItem>
             ))}
           </ProductList>
+            </SortableContext>
+          </DndContext>
         )}
       </Section>
 
@@ -367,6 +456,26 @@ const AdminShop = () => {
           </ConfirmBox>
         </ConfirmOverlay>
       )}
+
+      {deleteImageTarget && (
+        <ConfirmOverlay>
+          <ConfirmBox>
+            <p>Remove this image?</p>
+            <BtnRow>
+              <DeleteBtn onClick={confirmDeleteImage}>Yes, remove</DeleteBtn>
+              <CancelBtn onClick={() => setDeleteImageTarget(null)}>Cancel</CancelBtn>
+            </BtnRow>
+          </ConfirmBox>
+        </ConfirmOverlay>
+      )}
+
+      <HiddenInput
+        ref={addImagesRef}
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleAddImages}
+      />
     </Card>
   );
 };
@@ -612,6 +721,70 @@ const Thumb = styled.div`
   background-image: ${({ $hasImg, src }) => $hasImg ? `url(${src})` : 'none'};
   background-size: cover;
   background-position: center;
+`;
+
+const ThumbCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex-shrink: 0;
+`;
+
+const ExtraThumbRow = styled.div`
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  max-width: 64px;
+`;
+
+const ExtraThumbWrap = styled.div`
+  position: relative;
+`;
+
+const ExtraThumb = styled.img`
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 0;
+  display: block;
+`;
+
+const RemoveImgBtn = styled.button`
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: none;
+  background: ${RED};
+  color: #fff;
+  font-size: 0.65rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover { background: #a3172e; }
+`;
+
+const AddImgBtn = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  width: 64px;
+  padding: 3px 0;
+  border-radius: 0;
+  border: 1px dashed rgba(26,26,26,0.25);
+  background: transparent;
+  color: rgba(26,26,26,0.55);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  &:hover { border-color: ${RED}; color: ${RED}; }
 `;
 
 const ProductInfo = styled.div`
