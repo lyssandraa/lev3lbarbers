@@ -104,6 +104,18 @@ const Header = ({ isOpen, refreshShopStatus }) => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  /* ── Re-sync `scrolled` on every route change ──
+     SPA navigation doesn't reset window.scrollY on its own, so if you were
+     scrolled down on the previous page, `scrolled` stayed stale/true for a
+     render or two after landing on a fresh page — showing the "scrolled"
+     dark header briefly before self-correcting, which read as dimming/
+     flashing. ScrollToTop (rendered below, a child) resets the actual
+     scroll position first; this recomputes from that corrected value
+     instead of waiting on the next native scroll event to catch up. */
+  useEffect(() => {
+    setScrolled(window.scrollY > 40);
+  }, [location.pathname]);
+
   /* ── Bookmark: unfolds after the intro animation finishes (~3.9s) ── */
   useEffect(() => {
     const t1 = setTimeout(() => setShowBookmark(true),  4200);
