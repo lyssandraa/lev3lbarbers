@@ -201,6 +201,8 @@ const Gallery = () => {
                       src={resolveImageUrl(lightbox.item.images[lightbox.index].imageUrl)}
                       alt={lightbox.item.title}
                       draggable={false}
+                      onClick={() => setLightbox(null)}
+                      style={{ cursor: 'zoom-out' }}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}

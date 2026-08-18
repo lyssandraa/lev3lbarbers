@@ -319,7 +319,7 @@ const Shop = () => {
               transition={{ duration: 0.22, ease: EASE }}
               onClick={e => e.stopPropagation()}
             >
-              <LightboxImages product={lightbox} />
+              <LightboxImages product={lightbox} onClose={() => setLightbox(null)} />
               <LightboxBody>
                 <LightboxName>{lightbox.name}</LightboxName>
                 {lightbox.description && <LightboxDesc>{lightbox.description}</LightboxDesc>}
@@ -447,7 +447,7 @@ const ProductCard = ({ product, index, isLoggedIn, onExpand, onAddToCart, outOfS
 
 /* ─── Lightbox image carousel ─── */
 
-const LightboxImages = ({ product }) => {
+const LightboxImages = ({ product, onClose }) => {
   const [idx, setIdx] = useState(0);
   const images = [product.imageUrl, ...(product.images || []).map(i => i.imageUrl)].filter(Boolean);
   if (images.length === 0) return null;
@@ -458,6 +458,8 @@ const LightboxImages = ({ product }) => {
         key={idx}
         src={resolveImageUrl(images[idx])}
         alt={product.name}
+        onClick={onClose}
+        style={{ cursor: 'zoom-out' }}
         initial={{ clipPath: 'inset(100% 0 0 0)' }}
         animate={{ clipPath: 'inset(0% 0 0 0)' }}
         transition={{ duration: 0.5, ease: EASE, delay: 0.05 }}
