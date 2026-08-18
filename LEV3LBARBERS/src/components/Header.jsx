@@ -15,6 +15,11 @@ import Banner from '../common/Banner';
 import ShopSettings from './ShopSettings';
 import api from '../utils/api';
 
+// Shared with AdminPanel.jsx's own sidebar toggle: only one full-screen nav
+// drawer should ever be open at a time, since both are portalled full-height
+// overlays and stacking them looks broken.
+const NAV_OPEN_EVENT = 'lev3l:nav-open';
+
 const drawerVariants = {
   hidden: { opacity: 0 },
   show:   { opacity: 1, transition: { duration: 0.2, staggerChildren: 0.05, delayChildren: 0.05 } },
@@ -54,7 +59,14 @@ const Header = ({ isOpen, refreshShopStatus }) => {
   useEffect(() => {
     const el = headerRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(([entry]) => setHeaderH(entry.target.offsetHeight));
+    const ro = new ResizeObserver(([entry]) => {
+      const h = entry.target.offsetHeight;
+      setHeaderH(h);
+      // Exposed so AdminPanel's own sidebar/toggle (rendered below this
+      // header on every page, including /admin) can dock itself against the
+      // header's real height instead of a hardcoded guess.
+      document.documentElement.style.setProperty('--site-header-h', `${h}px`);
+    });
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
@@ -107,6 +119,28 @@ const Header = ({ isOpen, refreshShopStatus }) => {
     if (menuOpen) document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [menuOpen]);
+
+  /* ── Lock body scroll while the full-screen drawer is open — without this,
+       the page keeps scrolling underneath the (fixed-position) drawer and
+       page content can bleed through around the header on mobile ── */
+  useEffect(() => {
+    if (!menuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [menuOpen]);
+
+  /* ── Only one full-screen nav drawer at a time — closes this one if
+       AdminPanel's own sidebar (or any other) reports opening ── */
+  useEffect(() => {
+    if (menuOpen) window.dispatchEvent(new CustomEvent(NAV_OPEN_EVENT, { detail: 'site' }));
+  }, [menuOpen]);
+
+  useEffect(() => {
+    const onOtherNavOpen = (e) => { if (e.detail !== 'site') setMenuOpen(false); };
+    window.addEventListener(NAV_OPEN_EVENT, onOtherNavOpen);
+    return () => window.removeEventListener(NAV_OPEN_EVENT, onOtherNavOpen);
+  }, []);
 
 
   /* ── Nav handlers ── */

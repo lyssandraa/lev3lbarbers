@@ -8,7 +8,7 @@ import { BoxIcon, LockIcon, StoreIcon, GlobeIcon, PencilIcon, TrashIcon, PlusIco
 const INK = '#1a1a1a';
 const RED = '#C41E3A';
 
-const EMPTY_FORM = { name: '', description: '', price: '', priceHidden: false, category: 'online', trackStock: false, stock: '' };
+const EMPTY_FORM = { name: '', description: '', price: '', priceHidden: false, priceUnit: 'item', category: 'online', trackStock: false, stock: '' };
 
 const AdminShop = () => {
   const [products, setProducts] = useState([]);
@@ -53,6 +53,7 @@ const AdminShop = () => {
       if (form.description.trim()) fd.append('description', form.description.trim());
       if (form.price !== '') fd.append('price', form.price);
       fd.append('priceHidden', String(form.priceHidden));
+      fd.append('priceUnit', form.priceUnit);
       fd.append('category', form.category);
       fd.append('trackStock', String(form.trackStock));
       if (form.trackStock && form.stock !== '') fd.append('stock', form.stock);
@@ -82,6 +83,7 @@ const AdminShop = () => {
       description: p.description || '',
       price:       p.price !== null && p.price !== undefined ? String(p.price) : '',
       priceHidden: p.priceHidden,
+      priceUnit:   p.priceUnit || 'item',
       category:    p.category,
       active:      p.active,
       trackStock:  p.trackStock  || false,
@@ -107,6 +109,7 @@ const AdminShop = () => {
       if (editForm.description.trim()) fd.append('description', editForm.description.trim());
       if (editForm.price !== '') fd.append('price', editForm.price);
       fd.append('priceHidden', String(editForm.priceHidden));
+      fd.append('priceUnit', editForm.priceUnit);
       fd.append('category', editForm.category);
       fd.append('active', String(editForm.active));
       fd.append('trackStock', String(editForm.trackStock));
@@ -178,6 +181,13 @@ const AdminShop = () => {
             <FieldLabel>Price (£)</FieldLabel>
             <Input type="number" min="0" step="0.01" placeholder="0.00" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
           </Field>
+          <Field style={{ flex: '0 0 150px' }}>
+            <FieldLabel>Price is per</FieldLabel>
+            <Select value={form.priceUnit} onChange={e => setForm({ ...form, priceUnit: e.target.value })}>
+              <option value="item">Single item</option>
+              <option value="bundle">Bundle shown in photo</option>
+            </Select>
+          </Field>
         </Row>
 
         <Field>
@@ -188,7 +198,14 @@ const AdminShop = () => {
         <Row>
           <Field>
             <FieldLabel>Category</FieldLabel>
-            <Select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
+            <Select
+              value={form.category}
+              onChange={e => setForm({
+                ...form,
+                category: e.target.value,
+                ...(e.target.value === 'in-shop' ? { trackStock: false, stock: '' } : {}),
+              })}
+            >
               <option value="online">Online</option>
               <option value="in-shop">In Shop</option>
             </Select>
@@ -201,20 +218,22 @@ const AdminShop = () => {
           </CheckField>
         </Row>
 
-        <Row>
-          <CheckField>
-            <CheckLabel>
-              <input type="checkbox" checked={form.trackStock} onChange={e => setForm({ ...form, trackStock: e.target.checked, stock: e.target.checked ? form.stock : '' })} />
-              Track stock
-            </CheckLabel>
-          </CheckField>
-          {form.trackStock && (
-            <Field style={{ flex: '0 0 110px' }}>
-              <FieldLabel>Stock qty</FieldLabel>
-              <Input type="number" min="0" step="1" placeholder="0" value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
-            </Field>
-          )}
-        </Row>
+        {form.category === 'online' && (
+          <Row>
+            <CheckField>
+              <CheckLabel>
+                <input type="checkbox" checked={form.trackStock} onChange={e => setForm({ ...form, trackStock: e.target.checked, stock: e.target.checked ? form.stock : '' })} />
+                Track stock
+              </CheckLabel>
+            </CheckField>
+            {form.trackStock && (
+              <Field style={{ flex: '0 0 110px' }}>
+                <FieldLabel>Stock qty</FieldLabel>
+                <Input type="number" min="0" step="1" placeholder="0" value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
+              </Field>
+            )}
+          </Row>
+        )}
 
         <AddBtn onClick={handleAdd} disabled={saving}>
           {saving ? 'Saving…' : (<><PlusIcon size={16} /> Add Product</>)}
@@ -270,10 +289,23 @@ const AdminShop = () => {
                       <Field style={{ flex: '0 0 100px' }}>
                         <Input type="number" min="0" step="0.01" placeholder="Price" value={editForm.price} onChange={e => setEditForm({ ...editForm, price: e.target.value })} />
                       </Field>
+                      <Field style={{ flex: '0 0 130px' }}>
+                        <Select value={editForm.priceUnit || 'item'} onChange={e => setEditForm({ ...editForm, priceUnit: e.target.value })}>
+                          <option value="item">Single item</option>
+                          <option value="bundle">Bundle in photo</option>
+                        </Select>
+                      </Field>
                     </Row>
                     <Input placeholder="Description" value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} />
                     <Row>
-                      <Select value={editForm.category} onChange={e => setEditForm({ ...editForm, category: e.target.value })}>
+                      <Select
+                        value={editForm.category}
+                        onChange={e => setEditForm({
+                          ...editForm,
+                          category: e.target.value,
+                          ...(e.target.value === 'in-shop' ? { trackStock: false, stock: '' } : {}),
+                        })}
+                      >
                         <option value="online">Online</option>
                         <option value="in-shop">In Shop</option>
                       </Select>
@@ -285,11 +317,13 @@ const AdminShop = () => {
                         <input type="checkbox" checked={editForm.active} onChange={e => setEditForm({ ...editForm, active: e.target.checked })} />
                         Active
                       </CheckLabel>
-                      <CheckLabel style={{ fontSize: '0.8rem' }}>
-                        <input type="checkbox" checked={editForm.trackStock||false} onChange={e => setEditForm({ ...editForm, trackStock: e.target.checked })} />
-                        Track stock
-                      </CheckLabel>
-                      {editForm.trackStock && (
+                      {editForm.category === 'online' && (
+                        <CheckLabel style={{ fontSize: '0.8rem' }}>
+                          <input type="checkbox" checked={editForm.trackStock||false} onChange={e => setEditForm({ ...editForm, trackStock: e.target.checked })} />
+                          Track stock
+                        </CheckLabel>
+                      )}
+                      {editForm.category === 'online' && editForm.trackStock && (
                         <Input type="number" min="0" step="1" placeholder="Qty" style={{ width: '70px' }} value={editForm.stock||''} onChange={e => setEditForm({ ...editForm, stock: e.target.value })} />
                       )}
                     </Row>
@@ -304,7 +338,10 @@ const AdminShop = () => {
                     <ProductMeta>
                       <span>{p.category === 'online' ? (<><GlobeIcon size={13} /> Online</>) : (<><StoreIcon size={13} /> In Shop</>)}</span>
                       {p.price !== null && p.price !== undefined && (
-                        <span>£{Number(p.price).toFixed(2)}{p.priceHidden && (<> <LockIcon size={12} /></>)}</span>
+                        <span>
+                          £{Number(p.price).toFixed(2)}{p.priceUnit === 'bundle' ? ' /bundle' : ' /item'}
+                          {p.priceHidden && (<> <LockIcon size={12} /></>)}
+                        </span>
                       )}
                     </ProductMeta>
                     {p.description && <ProductDesc>{p.description}</ProductDesc>}

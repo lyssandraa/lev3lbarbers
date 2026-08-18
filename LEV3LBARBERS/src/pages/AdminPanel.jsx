@@ -122,6 +122,10 @@ const MENU = [
   },
 ];
 
+// Shared with Header.jsx's mobile nav drawer — only one full-screen nav
+// overlay should be open at a time.
+const NAV_OPEN_EVENT = 'lev3l:nav-open';
+
 const ROLE_LEVELS = { USER: 1, STAFF: 2, ADMIN: 3, DEVELOPER: 4 };
 
 function canSee(userRole, minRole) {
@@ -145,6 +149,16 @@ const AdminPanel = ({ refreshShopStatus }) => {
   useEffect(() => {
     if (!isLoggedIn || !isShopUser) navigate('/login');
   }, [isLoggedIn, isShopUser, navigate]);
+
+  useEffect(() => {
+    if (menuOpen) window.dispatchEvent(new CustomEvent(NAV_OPEN_EVENT, { detail: 'admin' }));
+  }, [menuOpen]);
+
+  useEffect(() => {
+    const onOtherNavOpen = (e) => { if (e.detail !== 'admin') setMenuOpen(false); };
+    window.addEventListener(NAV_OPEN_EVENT, onOtherNavOpen);
+    return () => window.removeEventListener(NAV_OPEN_EVENT, onOtherNavOpen);
+  }, []);
 
   const selectTab = (id) => {
     setActiveTab(id);
@@ -282,7 +296,7 @@ const PanelWrapper = styled.div`
 
 const BurgerButton = styled.button`
   position: fixed;
-  top: 9rem;
+  top: calc(var(--site-header-h, 140px) + 8px);
   left: 0.5rem;
   z-index: 1001;
   width: 38px;
@@ -296,13 +310,8 @@ const BurgerButton = styled.button`
   cursor: pointer;
   color: ${INK};
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, top 0.3s ease;
   &:hover { border-color: rgba(26,26,26,0.35); }
-
-  /* Header gains an extra desktop-nav row at this width — push below it */
-  @media (min-width: 769px) {
-    top: 11.3rem;
-  }
 
   /* Sidebar is forced open at this width (see SideMenu) — toggle button has nothing to do */
   @media (min-width: 901px) {
@@ -312,7 +321,7 @@ const BurgerButton = styled.button`
 
 const SideMenu = styled.div`
   position: fixed;
-  top: 8.5rem;
+  top: var(--site-header-h, 140px);
   left: 0;
   bottom: 0;
   width: 250px;
@@ -324,12 +333,8 @@ const SideMenu = styled.div`
   gap: 0.1rem;
   overflow-y: auto;
   transform: ${({ $open }) => $open ? 'translateX(0)' : 'translateX(-260px)'};
-  transition: transform 0.28s ease;
+  transition: transform 0.28s ease, top 0.3s ease;
   z-index: 1000;
-
-  @media (min-width: 769px) {
-    top: 10.8rem;
-  }
 
   @media (min-width: 901px) {
     transform: translateX(0);

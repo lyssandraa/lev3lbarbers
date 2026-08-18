@@ -441,6 +441,7 @@ const PriceDisplay = ({ product, isLoggedIn, large }) => {
   return (
     <PriceTag $large={large}>
       <CountUp value={Number(product.price)} />
+      <UnitLabel $large={large}>{product.priceUnit === 'bundle' ? '/bundle' : '/item'}</UnitLabel>
     </PriceTag>
   );
 };
@@ -737,6 +738,15 @@ const PriceTag = styled.span`
   font-size: ${({ $large }) => $large ? '1.6rem' : '1rem'};
   letter-spacing: 1px;
   color: ${INK};
+`;
+
+const UnitLabel = styled.span`
+  font-family: 'Montserrat', sans-serif;
+  font-size: ${({ $large }) => $large ? '0.7rem' : '0.6rem'};
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: rgba(26, 26, 26, 0.45);
+  margin-left: 3px;
 `;
 
 const MembersOnly = styled.span`
