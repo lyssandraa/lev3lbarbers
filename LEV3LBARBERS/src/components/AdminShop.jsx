@@ -172,11 +172,17 @@ const AdminShop = () => {
           />
         </ImageLabel>
 
+        <Field>
+          <FieldLabel>Name *</FieldLabel>
+          <Input placeholder="e.g. LEV3L Cap" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+        </Field>
+
+        <Field>
+          <FieldLabel>Description</FieldLabel>
+          <Input placeholder="Short product description..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+        </Field>
+
         <Row>
-          <Field>
-            <FieldLabel>Name *</FieldLabel>
-            <Input placeholder="e.g. LEV3L Cap" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-          </Field>
           <Field style={{ flex: '0 0 110px' }}>
             <FieldLabel>Price (£)</FieldLabel>
             <Input type="number" min="0" step="0.01" placeholder="0.00" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
@@ -189,11 +195,6 @@ const AdminShop = () => {
             </Select>
           </Field>
         </Row>
-
-        <Field>
-          <FieldLabel>Description</FieldLabel>
-          <Input placeholder="Short product description..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
-        </Field>
 
         <Row>
           <Field>
@@ -282,10 +283,9 @@ const AdminShop = () => {
                       />
                     </EditImageLabel>
 
+                    <Input placeholder="Name" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
+                    <Input placeholder="Description" value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} />
                     <Row>
-                      <Field>
-                        <Input placeholder="Name" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
-                      </Field>
                       <Field style={{ flex: '0 0 100px' }}>
                         <Input type="number" min="0" step="0.01" placeholder="Price" value={editForm.price} onChange={e => setEditForm({ ...editForm, price: e.target.value })} />
                       </Field>
@@ -296,7 +296,6 @@ const AdminShop = () => {
                         </Select>
                       </Field>
                     </Row>
-                    <Input placeholder="Description" value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} />
                     <Row>
                       <Select
                         value={editForm.category}
