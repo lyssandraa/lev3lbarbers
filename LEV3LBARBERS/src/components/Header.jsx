@@ -120,14 +120,38 @@ const Header = ({ isOpen, refreshShopStatus }) => {
     return () => document.removeEventListener('mousedown', handler);
   }, [menuOpen]);
 
-  /* ── Lock body scroll while the full-screen drawer is open — without this,
-       the page keeps scrolling underneath the (fixed-position) drawer and
-       page content can bleed through around the header on mobile ── */
+  /* ── Lock scroll while the full-screen drawer is open. `overflow: hidden`
+       on its own isn't enough on iOS Safari — it still allows touch-driven
+       rubber-band scrolling underneath fixed-position content, which is
+       exactly what let the page bleed through around the header. Pinning
+       the body at its current offset via `position: fixed` blocks that. ── */
   useEffect(() => {
     if (!menuOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    const scrollY = window.scrollY;
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBody = {
+      overflow: body.style.overflow,
+      position: body.style.position,
+      top:      body.style.top,
+      width:    body.style.width,
+    };
+
+    html.style.overflow = 'hidden';
+    body.style.overflow  = 'hidden';
+    body.style.position  = 'fixed';
+    body.style.top        = `-${scrollY}px`;
+    body.style.width      = '100%';
+
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBody.overflow;
+      body.style.position = prevBody.position;
+      body.style.top       = prevBody.top;
+      body.style.width     = prevBody.width;
+      window.scrollTo(0, scrollY);
+    };
   }, [menuOpen]);
 
   /* ── Only one full-screen nav drawer at a time — closes this one if
@@ -414,7 +438,11 @@ const Brand = styled.div`
   left: 50%;
   transform: translateX(-50%);
   font-size: clamp(2rem, 3vw, 2rem);
-  letter-spacing: 3px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  /* Bebas Neue only ships one (regular) weight, so browsers can't render a
+     real bold — a thin text-stroke fakes the extra thickness instead. */
+  -webkit-text-stroke: 0.6px currentColor;
   cursor: pointer;
   color: var(--h-text);
   white-space: nowrap;
