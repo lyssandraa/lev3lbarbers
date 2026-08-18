@@ -165,7 +165,6 @@ const AdminShop = () => {
             ref={fileRef}
             type="file"
             accept="image/*"
-            capture="environment"
             onChange={handleFileChange}
           />
         </ImageLabel>
@@ -260,7 +259,6 @@ const AdminShop = () => {
                         ref={editFileRef}
                         type="file"
                         accept="image/*"
-                        capture="environment"
                         onChange={handleEditFileChange}
                       />
                     </EditImageLabel>
