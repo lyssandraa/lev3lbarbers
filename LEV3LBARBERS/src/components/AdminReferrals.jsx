@@ -113,26 +113,28 @@ const AdminReferrals = () => {
       </StatsRow>
 
       {referrals.length > 0 ? (
-        <ReferralTable>
-          <thead>
-            <tr>
-              <Th>Referrer</Th>
-              <Th>Referred Email</Th>
-              <Th>Status</Th>
-              <Th>Date</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {referrals.map(r => (
-              <tr key={r.id}>
-                <Td>{r.referrer?.name} <Email>({r.referrer?.email})</Email></Td>
-                <Td>{r.refereeEmail}</Td>
-                <Td><Badge $completed={r.status === 'COMPLETED'}>{r.status}</Badge></Td>
-                <Td>{new Date(r.createdAt).toLocaleDateString()}</Td>
+        <TableScroll>
+          <ReferralTable>
+            <thead>
+              <tr>
+                <Th>Referrer</Th>
+                <Th>Referred Email</Th>
+                <Th>Status</Th>
+                <Th>Date</Th>
               </tr>
-            ))}
-          </tbody>
-        </ReferralTable>
+            </thead>
+            <tbody>
+              {referrals.map(r => (
+                <tr key={r.id}>
+                  <Td>{r.referrer?.name} <Email>({r.referrer?.email})</Email></Td>
+                  <Td>{r.refereeEmail}</Td>
+                  <Td><Badge $completed={r.status === 'COMPLETED'}>{r.status}</Badge></Td>
+                  <Td>{new Date(r.createdAt).toLocaleDateString()}</Td>
+                </tr>
+              ))}
+            </tbody>
+          </ReferralTable>
+        </TableScroll>
       ) : (
         <EmptyText>No referrals yet.</EmptyText>
       )}
@@ -301,8 +303,14 @@ const StatLab = styled.p`
   margin: 0;
 `;
 
+const TableScroll = styled.div`
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+`;
+
 const ReferralTable = styled.table`
   width: 100%;
+  min-width: 480px;
   border-collapse: collapse;
   font-family: 'Montserrat', sans-serif;
   font-size: 0.83rem;

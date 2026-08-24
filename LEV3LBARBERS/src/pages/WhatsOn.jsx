@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Seo from '../common/Seo';
@@ -102,11 +103,18 @@ const renderInline = (text) =>
 
 /* ─── Main page ─────────────────────────────────────────────────────────────── */
 
+const VALID_FILTERS = FILTERS.map(f => f.id);
+
 const WhatsOn = () => {
   const { isAdmin } = useAuth();
+  const [searchParams] = useSearchParams();
   const [posts,   setPosts]   = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter,  setFilter]  = useState('ALL');
+  // Supports linking straight to a category, e.g. /whats-on?filter=PROMOTION
+  const [filter,  setFilter]  = useState(() => {
+    const fromUrl = searchParams.get('filter')?.toUpperCase();
+    return VALID_FILTERS.includes(fromUrl) ? fromUrl : 'ALL';
+  });
   const [search,  setSearch]  = useState('');
   const [reading, setReading] = useState(null);
   const [manageOpen, setManageOpen] = useState(false);

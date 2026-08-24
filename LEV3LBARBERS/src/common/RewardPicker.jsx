@@ -92,6 +92,7 @@ const FieldLabel = styled.p`
 
 const TypeRow = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
   margin-bottom: 0.5rem;
 `;
@@ -102,6 +103,8 @@ const TypeBtn = styled.button`
   border: 1px solid;
   font-size: 0.78rem;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
   cursor: pointer;
   transition: background 0.18s, color 0.18s;
 

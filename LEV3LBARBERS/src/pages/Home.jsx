@@ -142,7 +142,7 @@ const Home = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.05, duration: 0.55, ease: EASE }}
-          onClick={() => navigate('/whats-on')}
+          onClick={() => navigate('/whats-on?filter=PROMOTION')}
         >
           Fresh Drops <span>→</span>
         </WhatsOnLink>
