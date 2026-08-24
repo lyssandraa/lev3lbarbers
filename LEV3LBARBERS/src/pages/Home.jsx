@@ -137,6 +137,15 @@ const Home = () => {
           <PrimaryBtn onClick={scrollToAvailability}>Who's In Today</PrimaryBtn>
           <GhostBtn onClick={() => navigate('/services')}>Our Services</GhostBtn>
         </BtnRow>
+
+        <WhatsOnLink
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.05, duration: 0.55, ease: EASE }}
+          onClick={() => navigate('/whats-on')}
+        >
+          Fresh Drops <span>→</span>
+        </WhatsOnLink>
       </Hero>
     </PageWrap>
   );
@@ -318,4 +327,23 @@ const GhostBtn = styled.button`
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s;
   &:hover { background: rgba(26,26,26,0.06); border-color: ${INK}; }
+`;
+
+const WhatsOnLink = styled(motion.button)`
+  display: block;
+  margin: 14px auto 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: ${RED};
+  transition: opacity 0.2s;
+
+  span { display: inline-block; transition: transform 0.2s; }
+  &:hover { opacity: 0.75; }
+  &:hover span { transform: translateX(3px); }
 `;
