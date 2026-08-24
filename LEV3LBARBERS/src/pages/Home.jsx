@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import Seo from '../common/Seo';
 import heroImg from '../assets/heroShop.jpeg';
 import api from '../utils/api';
@@ -144,7 +144,7 @@ const Home = () => {
           transition={{ delay: 1.05, duration: 0.55, ease: EASE }}
           onClick={() => navigate('/whats-on?filter=PROMOTION')}
         >
-          Fresh Drops <span>→</span>
+          <FlameIcon>🔥</FlameIcon> Fresh Drops <span>→</span>
         </WhatsOnLink>
       </Hero>
     </PageWrap>
@@ -329,11 +329,20 @@ const GhostBtn = styled.button`
   &:hover { background: rgba(26,26,26,0.06); border-color: ${INK}; }
 `;
 
+const pulseGlow = keyframes`
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 30, 58, 0.28); }
+  50%      { box-shadow: 0 0 0 6px rgba(196, 30, 58, 0); }
+`;
+
 const WhatsOnLink = styled(motion.button)`
-  display: block;
-  margin: 14px auto 0;
-  background: none;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 16px;
+  background: rgba(196, 30, 58, 0.06);
+  border: 1.5px solid ${RED};
+  border-radius: 999px;
+  padding: 10px 22px;
   cursor: pointer;
   font-family: 'Montserrat', sans-serif;
   font-size: 11px;
@@ -341,9 +350,15 @@ const WhatsOnLink = styled(motion.button)`
   letter-spacing: 2px;
   text-transform: uppercase;
   color: ${RED};
-  transition: opacity 0.2s;
+  animation: ${pulseGlow} 2.6s ease-in-out infinite;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease;
 
   span { display: inline-block; transition: transform 0.2s; }
-  &:hover { opacity: 0.75; }
+  &:hover { background: ${RED}; color: #fff; transform: scale(1.04); }
   &:hover span { transform: translateX(3px); }
+`;
+
+const FlameIcon = styled.span`
+  font-size: 13px;
+  line-height: 1;
 `;
