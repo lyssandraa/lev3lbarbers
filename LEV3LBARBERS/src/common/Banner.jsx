@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import styled, { keyframes, css } from "styled-components";
 import api from "../utils/api";
 
-const Banner = ({ onFinish, lightMode = false }) => {
+const DURATION = 12;
+
+const Banner = ({ lightMode = false }) => {
   const [messages, setMessages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [ready, setReady] = useState(false);
-  const [duration, setDuration] = useState(12); 
   const navigate = useNavigate();
   const bannerRef = useRef(null);
 
@@ -27,24 +28,13 @@ const Banner = ({ onFinish, lightMode = false }) => {
   // cycle messages
   useEffect(() => {
     if (!messages.length) return;
-  
+
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % messages.length);
-    }, duration * 1000); 
-  
+    }, DURATION * 1000);
+
     return () => clearInterval(interval);
-  }, [messages, duration]);
-
-  // const interval = setInterval(() => {
-  //   setCurrentIndex((prev) => {
-  //     const next = (prev + 1) % messages.length;
-  //     if (onFinish) onFinish(messages[prev]); // pass message to vertical
-  //     return next;
-  //   });
-//   // }, duration * 1000);
-
-//   return () => clearInterval(interval);
-// }, [messages, duration, onFinish]);
+  }, [messages]);
 
   useEffect(() => {
     if (messages.length > 0) setReady(true);
@@ -60,7 +50,7 @@ const Banner = ({ onFinish, lightMode = false }) => {
         <BannerItem
           key={currentIndex}
           ref={bannerRef}
-          $duration={duration}
+          $duration={DURATION}
           $lightMode={lightMode}
           onClick={() =>
             currentMessage.page && navigate(`/${currentMessage.page}`)
@@ -83,11 +73,20 @@ const Banner = ({ onFinish, lightMode = false }) => {
 export default Banner;
 
 // --- styles ---
+// Centering must be based on the wrapper's own width (a % of its containing
+// block), not vw — vw is measured against the full viewport including any
+// scrollbar gutter, while a %-width wrapper is not, so on a device that
+// shows a layout scrollbar (e.g. iPad landscape) the two diverge and the
+// "centered" position lands slightly off. `left: 50%` + `translateX(-50%)`
+// centers using only the wrapper's own box, so it stays exact regardless.
+// The off-screen start/end points just need to clear the viewport, so an
+// approximate vw distance there is fine — only the centered point needs to
+// be precise.
 const slide = keyframes`
-  0%   { transform: translateX(-100%); }              
-  30%  { transform: translateX(calc(50vw - 50%)); }   
-  60%  { transform: translateX(calc(50vw - 50%)); }   
-  100% { transform: translateX(calc(100vw + 100%));} 
+  0%   { transform: translateX(calc(-50% - 100vw)); }
+  30%  { transform: translateX(-50%); }
+  60%  { transform: translateX(-50%); }
+  100% { transform: translateX(calc(-50% + 100vw)); }
 `;
 
 const BannerWrapper = styled.div`
@@ -114,7 +113,7 @@ const BannerItem = styled.div`
   white-space: nowrap;
   color: ${({ $lightMode }) => $lightMode ? '#1a1a1a' : '#fff'};
   position: absolute;
-  left: 0;
+  left: 50%;
   will-change: transform;
   transition: color 0.4s ease;
 
