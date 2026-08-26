@@ -439,7 +439,7 @@ const BookingDetail = styled.div`
 `;
 
 const ActionRow = styled.div`
-  display: flex; gap: 8px;
+  display: flex; flex-wrap: wrap; gap: 8px;
   padding: 10px 16px;
   border-top: 1px solid rgba(26,26,26,0.1);
   background: rgba(255,255,255,0.25);

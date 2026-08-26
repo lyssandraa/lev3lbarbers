@@ -444,7 +444,7 @@ const AddRow = styled.div`
 `;
 
 const Input = styled.input`
-  flex: 1; padding: 0.48rem 0.7rem; border-radius: 0;
+  flex: 1; min-width: 0; padding: 0.48rem 0.7rem; border-radius: 0;
   border: 1px solid rgba(26,26,26,0.15); background: #ffffff;
   font-family: 'Montserrat', sans-serif;
   color: ${INK}; font-size: 0.88rem; outline: none;
@@ -475,14 +475,15 @@ const AddBtn = styled.button`
 const RewardList = styled.div`display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.4rem;`;
 
 const RewardItem = styled.div`
-  display: flex; align-items: center; gap: 0.4rem;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem;
   background: rgba(255,255,255,0.5); border: 1px solid rgba(26,26,26,0.08);
   padding: 0.5rem 0.7rem; border-radius: 0;
 `;
 
 const RewardName = styled.span`
-  flex:1; font-family: 'Montserrat', sans-serif;
+  flex:1; min-width: 0; font-family: 'Montserrat', sans-serif;
   font-size:0.86rem; color: ${INK};
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 `;
 const WeightTag  = styled.span`
   font-family: 'Montserrat', sans-serif;

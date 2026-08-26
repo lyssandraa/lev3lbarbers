@@ -318,12 +318,15 @@ const PanelTitle = styled.h2`
   text-transform: uppercase; color: ${INK}; margin: 0;
 `;
 
-const TabBar = styled.div`display: flex; gap: 0; border-bottom: 1px solid rgba(26,26,26,0.1); margin-bottom: 1.4rem;`;
+const TabBar = styled.div`
+  display: flex; gap: 0; border-bottom: 1px solid rgba(26,26,26,0.1); margin-bottom: 1.4rem;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+`;
 const Tab = styled.button`
   background: none; border: none; border-bottom: 2px solid ${({ $active }) => $active ? RED : 'transparent'};
   color: ${({ $active }) => $active ? RED : 'rgba(26,26,26,0.55)'};
   padding: 0.6rem 1rem 0.5rem; cursor: pointer; font-family: 'Montserrat', sans-serif;
-  font-size: 0.84rem; font-weight: 700;
+  font-size: 0.84rem; font-weight: 700; white-space: nowrap; flex-shrink: 0;
   letter-spacing: 1px; margin-bottom: -1px; transition: color 0.18s, border-color 0.18s;
 `;
 

@@ -253,11 +253,11 @@ const QRImage = styled.img`
 const Title = styled.h1`
   position: absolute;
   top: -250px;
-  width: 500px;
+  width: min(500px, 90vw);
   left: 50%;
   transform: translateX(-50%);
   color: #fff;
-  font-size: 1.8rem;
+  font-size: clamp(1.3rem, 5.5vw, 1.8rem);
   text-align: center;
   z-index: 5;
 `;
