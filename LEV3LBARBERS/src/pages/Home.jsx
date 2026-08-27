@@ -219,8 +219,13 @@ const Hero = styled.section`
   padding: 200px 6% 0;
   overflow: hidden;
 
+  /* Header.jsx tracks its own real rendered height (banner + nav rows) via
+     ResizeObserver and exposes it as --site-header-h — using that instead
+     of a flat guess is what keeps this correctly clear of the header
+     regardless of banner state/breakpoint, instead of the hardcoded 20px
+     that was overlapping the header on mobile. */
   @media (max-width: 600px) {
-    padding: 20px 6% 0;
+    padding: calc(var(--site-header-h, 160px) + 16px) 6% 0;
     gap: 12px;
   }
 `;
