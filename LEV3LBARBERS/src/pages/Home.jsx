@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 // Site-wide Montserrat import (Header.jsx) only loads weight 400 — every
 // font-weight:600+ elsewhere on the site has actually been rendering as a
 // synthetic/faux bold this whole time (no real bold file to use), which
@@ -365,6 +365,16 @@ const GhostBtn = styled.button`
   &:hover { background: rgba(26,26,26,0.06); border-color: ${INK}; }
 `;
 
+/* Animates `filter: drop-shadow` rather than `box-shadow` — drop-shadow
+   follows the actual rendered (alpha) shape of the SVG content, so the
+   glow hugs the scalloped seal + ribbon outline. box-shadow would just
+   glow around the button's rectangular bounding box instead, which
+   wouldn't match the irregular badge shape at all. */
+const pulseGlow = keyframes`
+  0%, 100% { filter: drop-shadow(0 4px 10px rgba(196, 30, 58, 0.32)); }
+  50%      { filter: drop-shadow(0 4px 20px rgba(196, 30, 58, 0.68)); }
+`;
+
 const OfferBtn = styled(motion.button)`
   position: relative;
   display: block;
@@ -375,7 +385,7 @@ const OfferBtn = styled(motion.button)`
   border: none;
   padding: 0;
   cursor: pointer;
-  filter: drop-shadow(0 6px 14px rgba(26, 26, 26, 0.28));
+  animation: ${pulseGlow} 2.4s ease-in-out infinite;
   transition: transform 0.15s ease;
 
   /* Direct-child combinator, not a bare descendant selector — this must
