@@ -413,8 +413,8 @@ const OfferLabel = styled.span`
 
 const OfferText = styled.span`
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 25px;
+  font-weight: 800;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: ${RED};
