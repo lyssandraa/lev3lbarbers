@@ -175,7 +175,7 @@ const Home = () => {
             />
           </svg>
           <OfferLabel>
-            <TagIcon width={14} height={14} />
+            <TagIcon width={16} height={16} />
             <OfferText>Special</OfferText>
             <OfferText>Offers</OfferText>
           </OfferLabel>
@@ -400,21 +400,28 @@ const OfferBtn = styled(motion.button)`
    the circle's inner (valley) radius regardless. */
 const OfferLabel = styled.span`
   position: absolute;
-  left: 25%;
-  right: 25%;
+  left: 20%;
+  right: 20%;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 4px;
   color: ${RED};
 `;
 
+/* font-size:25px at 0.62-avg-char-width-ratio for bold sans-serif puts
+   "SPECIAL" at ~108px and "OFFERS" at ~93px — both comfortably inside the
+   ~180px available width (20%/20% margins on the button's 300px capped
+   size), so this is sized with real margin, not another guess. Weight is
+   700 (not 800) because that's the actual bold face loaded above — 800
+   has no real file and would silently fall back to a weaker synthetic
+   bold again. */
 const OfferText = styled.span`
   font-family: 'Montserrat', sans-serif;
   font-size: 25px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: ${RED};
