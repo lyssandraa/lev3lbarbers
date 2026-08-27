@@ -146,18 +146,23 @@ const Home = () => {
           onClick={() => navigate('/whats-on?filter=PROMOTION')}
           aria-label="Special Offers"
         >
-          {/* Ribbon stays exactly as before (same fork-tail technique), but
-              now the circle is the dominant element — big enough to hold
-              the icon + two lines of text — with the ribbon just showing
-              as tails either side of it, same as a classic seal-on-a-
-              ribbon badge. */}
+          {/* Ribbon stays as before. Circle is now a scalloped seal shape
+              (20-bump path, generated from exact trig coordinates rather
+              than hand-drawn) for the textured-edge look, in place of the
+              plain smooth circle. */}
           <svg width="100%" height="100%" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
             <path d="M0,44 L56,44 L56,76 L0,76 L14,60 Z" fill={RED} />
             <path d="M144,44 L200,44 L186,60 L200,76 L144,76 Z" fill={RED} />
-            <circle cx="100" cy="60" r="52" fill={CREAM} stroke={RED} strokeWidth="3" />
+            <path
+              d="M100.0,4.0 L107.8,10.6 L117.3,6.7 L122.7,15.4 L132.9,14.7 L135.4,24.6 L145.3,27.1 L144.6,37.3 L153.3,42.7 L149.4,52.2 L156.0,60.0 L149.4,67.8 L153.3,77.3 L144.6,82.7 L145.3,92.9 L135.4,95.4 L132.9,105.3 L122.7,104.6 L117.3,113.3 L107.8,109.4 L100.0,116.0 L92.2,109.4 L82.7,113.3 L77.3,104.6 L67.1,105.3 L64.6,95.4 L54.7,92.9 L55.4,82.7 L46.7,77.3 L50.6,67.8 L44.0,60.0 L50.6,52.2 L46.7,42.7 L55.4,37.3 L54.7,27.1 L64.6,24.6 L67.1,14.7 L77.3,15.4 L82.7,6.7 L92.2,10.6 Z"
+              fill={CREAM}
+              stroke={RED}
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+            />
           </svg>
           <OfferLabel>
-            <TagIcon width={18} height={18} />
+            <TagIcon width={14} height={14} />
             <OfferText>Special</OfferText>
             <OfferText>Offers</OfferText>
           </OfferLabel>
@@ -355,7 +360,7 @@ const GhostBtn = styled.button`
 const OfferBtn = styled(motion.button)`
   position: relative;
   display: block;
-  width: min(260px, 70%);
+  width: min(300px, 75%);
   aspect-ratio: 200 / 120;
   margin: 18px auto 0;
   background: none;
@@ -369,30 +374,32 @@ const OfferBtn = styled(motion.button)`
   &:hover { transform: scale(1.03); }
 `;
 
-/* Positioned as percentages matching the circle's own bounding box within
-   the 200×120 viewBox, so the text/icon stack scales in lockstep with the
-   SVG and stays centred inside the circle at any size. */
+/* Centered via top:50%/translateY rather than top+bottom percentages —
+   only depends on this element's own (auto, content-driven) height, not
+   on the browser resolving a percentage height against the button's
+   aspect-ratio-derived box, which is one less thing that can go wrong.
+   Content is sized conservatively small on purpose so it can't outgrow
+   the circle's inner (valley) radius regardless. */
 const OfferLabel = styled.span`
   position: absolute;
-  left: 24%;
-  right: 24%;
-  top: 6.7%;
-  bottom: 6.7%;
+  left: 25%;
+  right: 25%;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
+  gap: 1px;
   color: ${RED};
 `;
 
 const OfferText = styled.span`
   font-family: 'Montserrat', sans-serif;
-  font-size: clamp(11px, 4vw, 14px);
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: ${RED};
-  line-height: 1.15;
+  line-height: 1.1;
   white-space: nowrap;
 `;
