@@ -6,6 +6,7 @@ import Seo from '../common/Seo';
 import heroImg from '../assets/heroShop.jpeg';
 import api from '../utils/api';
 import { resolveImageUrl } from '../config';
+import { TagIcon } from '../common/icons';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -138,14 +139,18 @@ const Home = () => {
           <GhostBtn onClick={() => navigate('/services')}>Our Services</GhostBtn>
         </BtnRow>
 
-        <WhatsOnLink
+        <OfferBtn
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.05, duration: 0.55, ease: EASE }}
           onClick={() => navigate('/whats-on?filter=PROMOTION')}
         >
-          <FlameIcon>🔥</FlameIcon> Fresh Drops <span>→</span>
-        </WhatsOnLink>
+          <OfferBadge>
+            <TagIcon width={20} height={20} />
+          </OfferBadge>
+          <OfferText>Special Offers</OfferText>
+          <OfferArrow>→</OfferArrow>
+        </OfferBtn>
       </Hero>
     </PageWrap>
   );
@@ -338,31 +343,69 @@ const pulseGlow = keyframes`
   50%      { box-shadow: 0 0 0 6px rgba(196, 30, 58, 0); }
 `;
 
-const WhatsOnLink = styled(motion.button)`
+const OfferBtn = styled(motion.button)`
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  margin-top: 16px;
-  background: rgba(196, 30, 58, 0.06);
-  border: 1.5px solid ${RED};
+  gap: 10px;
+  margin-top: 20px;
+  padding: 14px 30px 14px 40px;
+  background: ${RED};
+  border: none;
   border-radius: 999px;
-  padding: 10px 22px;
   cursor: pointer;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: ${RED};
+  box-shadow: 0 8px 24px rgba(196, 30, 58, 0.35);
   animation: ${pulseGlow} 2.6s ease-in-out infinite;
-  transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
 
-  span { display: inline-block; transition: transform 0.2s; }
-  &:hover { background: ${RED}; color: #fff; transform: scale(1.04); }
-  &:hover span { transform: translateX(3px); }
+  &:hover { transform: scale(1.03); background: #a8182f; box-shadow: 0 10px 28px rgba(196, 30, 58, 0.45); }
 `;
 
-const FlameIcon = styled.span`
-  font-size: 13px;
-  line-height: 1;
+const OfferBadge = styled.span`
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: ${CREAM};
+  color: ${RED};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  border: 2px solid ${RED};
+
+  /* small ribbon-tail flourishes peeking out from behind the badge, like a
+     classic seal-and-ribbon offer badge */
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    width: 9px;
+    height: 14px;
+    background: #8f1626;
+    z-index: -1;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+  &::before { left: 3px;  transform: rotate(24deg); }
+  &::after  { right: 3px; transform: rotate(-24deg); }
+`;
+
+const OfferText = styled.span`
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+`;
+
+const OfferArrow = styled.span`
+  display: inline-block;
+  color: #fff;
+  font-weight: 700;
+  transition: transform 0.2s;
+  ${OfferBtn}:hover & { transform: translateX(3px); }
 `;
