@@ -12,7 +12,7 @@ import Seo from '../common/Seo';
 import heroImg from '../assets/heroShop.jpeg';
 import api from '../utils/api';
 import { resolveImageUrl } from '../config';
-import { TagIcon } from '../common/icons';
+// import { TagIcon } from '../common/icons';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -152,10 +152,6 @@ const Home = () => {
           onClick={() => navigate('/whats-on?filter=PROMOTION')}
           aria-label="Special Offers"
         >
-          {/* Ribbon stays as before. Circle is now a scalloped seal shape
-              (20-bump path, generated from exact trig coordinates rather
-              than hand-drawn) for the textured-edge look, in place of the
-              plain smooth circle. */}
           <svg width="100%" height="100%" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
             <defs>
               <linearGradient id="offerRibbonGradient" x1="0" y1="0" x2="0" y2="1">
@@ -176,7 +172,7 @@ const Home = () => {
           </svg>
           <OfferLabel>
             <OfferTopRow>
-              <TagIcon width={13} height={13} />
+              {/* <TagIcon width={13} height={13} /> */}
               <OfferText>Special</OfferText>
             </OfferTopRow>
             <OfferText>Offers</OfferText>
