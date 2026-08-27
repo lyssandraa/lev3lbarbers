@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+// Site-wide Montserrat import (Header.jsx) only loads weight 400 — every
+// font-weight:600+ elsewhere on the site has actually been rendering as a
+// synthetic/faux bold this whole time (no real bold file to use), which
+// reads noticeably weaker/thinner than true bold. Loading 700 here for a
+// properly bold face instead of another synthetic approximation.
+import '@fontsource/montserrat/700.css';
 import Seo from '../common/Seo';
 import heroImg from '../assets/heroShop.jpeg';
 import api from '../utils/api';
@@ -407,11 +413,11 @@ const OfferLabel = styled.span`
 
 const OfferText = styled.span`
   font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: ${RED};
-  line-height: 1.1;
+  line-height: 1.15;
   white-space: nowrap;
 `;
