@@ -370,9 +370,20 @@ const GhostBtn = styled.button`
    glow hugs the scalloped seal + ribbon outline. box-shadow would just
    glow around the button's rectangular bounding box instead, which
    wouldn't match the irregular badge shape at all. */
+/* Pulses both scale AND glow together for a clearly visible "breathing"
+   effect, not just a subtle brightness change. Hover pauses the loop and
+   snaps to its own bigger, static state instead of also setting
+   `transform` — animating transform continuously while a :hover rule also
+   wants to set transform would fight every frame and never settle. */
 const pulseGlow = keyframes`
-  0%, 100% { filter: drop-shadow(0 4px 10px rgba(196, 30, 58, 0.32)); }
-  50%      { filter: drop-shadow(0 4px 20px rgba(196, 30, 58, 0.68)); }
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 4px 10px rgba(196, 30, 58, 0.32));
+  }
+  50% {
+    transform: scale(1.07);
+    filter: drop-shadow(0 6px 22px rgba(196, 30, 58, 0.7));
+  }
 `;
 
 const OfferBtn = styled(motion.button)`
@@ -385,8 +396,7 @@ const OfferBtn = styled(motion.button)`
   border: none;
   padding: 0;
   cursor: pointer;
-  animation: ${pulseGlow} 2.4s ease-in-out infinite;
-  transition: transform 0.15s ease;
+  animation: ${pulseGlow} 1.8s ease-in-out infinite;
 
   /* Direct-child combinator, not a bare descendant selector — this must
      only size the top-level ribbon SVG. A bare "svg { ... }" here was
@@ -394,7 +404,12 @@ const OfferBtn = styled(motion.button)`
      force-stretching it to 100% of the button, which is why the icon
      rendered huge despite its own explicit width/height props. */
   > svg { display: block; width: 100%; height: 100%; }
-  &:hover { transform: scale(1.03); }
+
+  &:hover {
+    animation-play-state: paused;
+    transform: scale(1.1);
+    filter: drop-shadow(0 8px 24px rgba(196, 30, 58, 0.75));
+  }
 `;
 
 /* Centered via top:50%/translateY rather than top+bottom percentages —
