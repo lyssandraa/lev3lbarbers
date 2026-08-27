@@ -9,11 +9,34 @@ const Banner = ({ lightMode = false }) => {
   const [messages, setMessages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [ready, setReady] = useState(false);
+  const [viewportKey, setViewportKey] = useState(0);
   const navigate = useNavigate();
   const bannerRef = useRef(null);
 
   useEffect(() => {
     fetchBanners();
+  }, []);
+
+  // A CSS keyframe animation mid-flight doesn't cleanly recalculate its
+  // vw-based off-screen distances when the viewport itself changes size —
+  // rotating a tablet/phone while the banner is between keyframes leaves it
+  // frozen at a position computed for the old orientation, which then reads
+  // as skewed off to one side against the new one. Forcing a remount (via
+  // `key`) restarts the animation from scratch with the current dimensions
+  // instead of relying on the browser to reconcile it mid-transition.
+  // Debounced so a manual desktop window drag-resize doesn't restart it on
+  // every intermediate pixel — only once movement settles.
+  useEffect(() => {
+    let timer;
+    const onResize = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => setViewportKey((k) => k + 1), 250);
+    };
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      clearTimeout(timer);
+    };
   }, []);
 
   const fetchBanners = async () => {
@@ -48,7 +71,7 @@ const Banner = ({ lightMode = false }) => {
     <BannerWrapper $lightMode={lightMode}>
       {ready && (
         <BannerItem
-          key={currentIndex}
+          key={`${currentIndex}-${viewportKey}`}
           ref={bannerRef}
           $duration={DURATION}
           $lightMode={lightMode}

@@ -245,9 +245,13 @@ const GhostFade = styled.div`
 `;
 
 const MainFrame = styled.div`
-  flex: 0 0 min(580px, 78vw);
-  width: min(580px, 78vw);
-  height: clamp(280px, 46vh, 520px);
+  /* min(580px, 78vw) capped out at exactly 580px for every screen wider than
+     ~744px — tablets, laptops, and ultra-wide monitors all rendered the
+     identical, tiny hero. clamp() scales it properly across the full range
+     instead of flatlining past one specific width. */
+  flex: 0 0 clamp(260px, 78vw, 900px);
+  width: clamp(260px, 78vw, 900px);
+  height: clamp(280px, 46vh, 600px);
   overflow: hidden;
   border-radius: 14px;
   box-shadow: 0 10px 50px rgba(26, 26, 26, 0.18);
