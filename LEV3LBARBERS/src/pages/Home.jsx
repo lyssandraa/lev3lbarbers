@@ -175,8 +175,10 @@ const Home = () => {
             />
           </svg>
           <OfferLabel>
-            <TagIcon width={16} height={16} />
-            <OfferText>Special</OfferText>
+            <OfferTopRow>
+              <TagIcon width={13} height={13} />
+              <OfferText>Special</OfferText>
+            </OfferTopRow>
             <OfferText>Offers</OfferText>
           </OfferLabel>
         </OfferBtn>
@@ -367,15 +369,16 @@ const GhostBtn = styled.button`
   &:hover { background: rgba(26,26,26,0.06); border-color: ${INK}; }
 `;
 
-/* The ribbon+circle SVG IS the button — sized so the circle is the
-   dominant element (big enough for icon + two lines of text), with the
-   ribbon showing only as tails either side of it. */
+/* Scaled down considerably from earlier iterations — at 300px this stood
+   noticeably taller than the two buttons above it (they're ~46px tall);
+   190px keeps it a clear standout accent without dwarfing the rest of the
+   button row. */
 const OfferBtn = styled(motion.button)`
   position: relative;
   display: block;
-  width: min(300px, 75%);
+  width: min(190px, 50%);
   aspect-ratio: 200 / 120;
-  margin: 18px auto 0;
+  margin: 16px auto 0;
   background: none;
   border: none;
   padding: 0;
@@ -407,20 +410,28 @@ const OfferLabel = styled.span`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   color: ${RED};
 `;
 
-/* font-size:25px at 0.62-avg-char-width-ratio for bold sans-serif puts
-   "SPECIAL" at ~108px and "OFFERS" at ~93px — both comfortably inside the
-   ~180px available width (20%/20% margins on the button's 300px capped
-   size), so this is sized with real margin, not another guess. Weight is
-   700 (not 800) because that's the actual bold face loaded above — 800
-   has no real file and would silently fall back to a weaker synthetic
-   bold again. */
+/* Icon now sits inline with "Special" instead of floating alone above both
+   lines — reads as one paired label instead of an orphaned icon on top. */
+const OfferTopRow = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+/* font-size scaled down in proportion with the button (300px -> 190px,
+   ~0.63x) from the previously-verified 25px, landing at 16px. At that
+   size "SPECIAL"/"OFFERS" render at ~69px/~60px (0.62×fontSize per
+   character, bold sans-serif estimate), comfortably inside the ~114px
+   available width (20%/20% margins on 190px). Weight is 700, not 800 —
+   800 has no real font file loaded and silently falls back to a weaker
+   synthetic bold. */
 const OfferText = styled.span`
   font-family: 'Montserrat', sans-serif;
-  font-size: 25px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
