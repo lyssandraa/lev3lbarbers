@@ -146,22 +146,20 @@ const Home = () => {
           onClick={() => navigate('/whats-on?filter=PROMOTION')}
           aria-label="Special Offers"
         >
-          {/* The ribbon (fixed path coords, same verified technique as
-              before, just wider) IS the button now — no separate pill
-              behind it. Circle drawn last so it covers the ribbon's left
-              portion, leaving only the forked tail tip visible past it. */}
-          <svg width="100%" height="100%" viewBox="0 0 340 64" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-            <path d="M0,20 L28,20 L28,44 L0,44 L10,32 Z" fill={RED} />
-            <path d="M304,20 L340,20 L330,32 L340,44 L304,44 Z" fill={RED} />
-            <rect x="40" y="20" width="272" height="24" fill={RED} />
-            <circle cx="48" cy="32" r="26" fill={CREAM} stroke={RED} strokeWidth="2.5" />
+          {/* Ribbon stays exactly as before (same fork-tail technique), but
+              now the circle is the dominant element — big enough to hold
+              the icon + two lines of text — with the ribbon just showing
+              as tails either side of it, same as a classic seal-on-a-
+              ribbon badge. */}
+          <svg width="100%" height="100%" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <path d="M0,44 L56,44 L56,76 L0,76 L14,60 Z" fill={RED} />
+            <path d="M144,44 L200,44 L186,60 L200,76 L144,76 Z" fill={RED} />
+            <circle cx="100" cy="60" r="52" fill={CREAM} stroke={RED} strokeWidth="3" />
           </svg>
-          <OfferBadgeIcon>
-            <TagIcon width={20} height={20} />
-          </OfferBadgeIcon>
           <OfferLabel>
-            <OfferText>Special Offers</OfferText>
-            <OfferArrow>→</OfferArrow>
+            <TagIcon width={18} height={18} />
+            <OfferText>Special</OfferText>
+            <OfferText>Offers</OfferText>
           </OfferLabel>
         </OfferBtn>
       </Hero>
@@ -351,16 +349,15 @@ const GhostBtn = styled.button`
   &:hover { background: rgba(26,26,26,0.06); border-color: ${INK}; }
 `;
 
-/* The whole ribbon+badge SVG IS the button now — no separate pill behind
-   it. width: min(340px, 92%) with aspect-ratio scales the entire graphic
-   (and the percentage-positioned overlays below, which share the same
-   coordinate space) together as one unit on narrow screens. */
+/* The ribbon+circle SVG IS the button — sized so the circle is the
+   dominant element (big enough for icon + two lines of text), with the
+   ribbon showing only as tails either side of it. */
 const OfferBtn = styled(motion.button)`
   position: relative;
   display: block;
-  width: min(340px, 92%);
-  aspect-ratio: 340 / 64;
-  margin: 22px auto 0;
+  width: min(260px, 70%);
+  aspect-ratio: 200 / 120;
+  margin: 18px auto 0;
   background: none;
   border: none;
   padding: 0;
@@ -369,47 +366,33 @@ const OfferBtn = styled(motion.button)`
   transition: transform 0.15s ease;
 
   svg { display: block; width: 100%; height: 100%; }
-  &:hover { transform: scale(1.02); }
+  &:hover { transform: scale(1.03); }
 `;
 
-/* Positioned as percentages of the button's own box so it scales in
-   lockstep with the SVG (which uses the same 340×64 coordinate space via
-   its viewBox) regardless of the button's rendered size. */
-const OfferBadgeIcon = styled.span`
-  position: absolute;
-  left: 14.12%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  color: ${RED};
-`;
-
+/* Positioned as percentages matching the circle's own bounding box within
+   the 200×120 viewBox, so the text/icon stack scales in lockstep with the
+   SVG and stays centred inside the circle at any size. */
 const OfferLabel = styled.span`
   position: absolute;
-  left: 24.7%;
-  right: 13%;
-  top: 0;
-  bottom: 0;
+  left: 24%;
+  right: 24%;
+  top: 6.7%;
+  bottom: 6.7%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 2px;
+  color: ${RED};
 `;
 
 const OfferText = styled.span`
   font-family: 'Montserrat', sans-serif;
-  font-size: clamp(11px, 3.2vw, 15px);
+  font-size: clamp(11px, 4vw, 14px);
   font-weight: 800;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: #fff;
+  color: ${RED};
+  line-height: 1.15;
   white-space: nowrap;
-`;
-
-const OfferArrow = styled.span`
-  color: #fff;
-  font-weight: 700;
-  font-size: clamp(13px, 3.2vw, 16px);
-  transition: transform 0.2s;
-  ${OfferBtn}:hover & { transform: translateX(3px); }
 `;
