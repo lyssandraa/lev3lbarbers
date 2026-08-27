@@ -376,21 +376,6 @@ const OfferBadge = styled.span`
   justify-content: center;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   border: 2px solid ${RED};
-
-  /* small ribbon-tail flourishes peeking out from behind the badge, like a
-     classic seal-and-ribbon offer badge */
-  &::before, &::after {
-    content: '';
-    position: absolute;
-    bottom: -7px;
-    width: 9px;
-    height: 14px;
-    background: #8f1626;
-    z-index: -1;
-    clip-path: polygon(0 0, 100% 0, 50% 100%);
-  }
-  &::before { left: 3px;  transform: rotate(24deg); }
-  &::after  { right: 3px; transform: rotate(-24deg); }
 `;
 
 const OfferText = styled.span`
