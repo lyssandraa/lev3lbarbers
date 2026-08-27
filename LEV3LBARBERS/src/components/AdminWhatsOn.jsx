@@ -19,8 +19,19 @@ const CAT_COLOR = { ARTICLE: '#C4922A', PROMOTION: '#C41E3A', NEWS: '#3576a8' };
 const emptyForm = () => ({
   title: '', category: 'ARTICLE', authorName: '',
   excerpt: '', body: '', tags: [],
-  pinned: false, published: true,
+  pinned: false, published: true, expiresAt: '',
 });
+
+/* datetime-local inputs need "YYYY-MM-DDTHH:mm" in local time */
+const toDateTimeLocal = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+const formatExpiry = (iso) =>
+  new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 
 /* ─── Component ─────────────────────────────────────────────────────────────── */
 
@@ -67,6 +78,7 @@ const AdminWhatsOn = () => {
       tags:       post.tags        || [],
       pinned:     post.pinned,
       published:  post.published,
+      expiresAt:  toDateTimeLocal(post.expiresAt),
     });
     setEditingId(post.id);
     setFile(null); setPreview(null);
@@ -112,6 +124,7 @@ const AdminWhatsOn = () => {
       fd.append('tags',      JSON.stringify(form.tags));
       fd.append('pinned',    String(form.pinned));
       fd.append('published', String(form.published));
+      fd.append('expiresAt', form.expiresAt ? new Date(form.expiresAt).toISOString() : '');
       if (file)        fd.append('coverImage',  file);
       if (removeImg)   fd.append('removeImage', 'true');
 
@@ -141,6 +154,9 @@ const AdminWhatsOn = () => {
   /* ── Quick toggle published ── */
   const togglePublished = async (post) => {
     try {
+      const reactivating = !post.published;
+      const isStaleExpiry = post.expiresAt && new Date(post.expiresAt) <= new Date();
+
       const fd = new FormData();
       fd.append('title',    post.title);
       fd.append('category', post.category);
@@ -148,6 +164,10 @@ const AdminWhatsOn = () => {
       fd.append('tags',     JSON.stringify(post.tags || []));
       fd.append('pinned',   String(post.pinned));
       fd.append('published', String(!post.published));
+      // Reactivating a post whose expiry date has already passed would just
+      // get it auto-expired again on the next job run — clear the stale
+      // date so it stays live until the admin sets a new one.
+      if (reactivating && isStaleExpiry) fd.append('expiresAt', '');
       await api.put(`/whats-on/posts/${post.id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       loadPosts();
     } catch { alert('Update failed.'); }
@@ -248,6 +268,18 @@ const AdminWhatsOn = () => {
             )}
           </FullField>
 
+          <HalfField>
+            <Label>Expires <Hint>optional — auto-hides after this time, stays saved for later</Hint></Label>
+            <Input
+              type="datetime-local"
+              value={form.expiresAt}
+              onChange={e => set('expiresAt', e.target.value)}
+            />
+            {form.expiresAt && (
+              <ClearExpiryBtn type="button" onClick={() => set('expiresAt', '')}>✕ Clear expiration</ClearExpiryBtn>
+            )}
+          </HalfField>
+
           <ToggleRow>
             <ToggleLabel>
               <Toggle type="checkbox" checked={form.pinned} onChange={e => set('pinned', e.target.checked)} />
@@ -297,6 +329,11 @@ const AdminWhatsOn = () => {
                 <PostMetaTop>
                   <CatBadge $color={CAT_COLOR[post.category]}>{post.category}</CatBadge>
                   {post.pinned && <PinnedTag>★ PINNED</PinnedTag>}
+                  {post.expiresAt && (
+                    new Date(post.expiresAt) <= new Date()
+                      ? <ExpiryTag $expired>⚠ Expired {formatExpiry(post.expiresAt)}</ExpiryTag>
+                      : <ExpiryTag>⏳ Expires {formatExpiry(post.expiresAt)}</ExpiryTag>
+                  )}
                 </PostMetaTop>
                 <PostTitle>{post.title}</PostTitle>
                 {post.excerpt && <PostExcerpt>{post.excerpt}</PostExcerpt>}
@@ -407,6 +444,13 @@ const inputStyles = css`
   &::placeholder { color: rgba(26,26,26,0.35); }
 `;
 const Input    = styled.input`${inputStyles}`;
+const ClearExpiryBtn = styled.button`
+  align-self: flex-start;
+  background: none; border: none; padding: 0;
+  color: rgba(26,26,26,0.45); font-size: 0.76rem; font-weight: 600;
+  font-family: 'Montserrat', sans-serif; cursor: pointer; text-decoration: underline;
+  &:hover { color: ${RED}; }
+`;
 const Select   = styled.select`${inputStyles} cursor: pointer; option { background: #fff; color: ${INK}; }`;
 const Textarea = styled.textarea`${inputStyles} resize: vertical; min-height: 70px; line-height: 1.6;`;
 
@@ -527,6 +571,11 @@ const CatBadge = styled.span`
 const PinnedTag = styled.span`
   font-family: 'Montserrat', sans-serif;
   font-size: 0.67rem; color: #C4922A; letter-spacing: 1px; font-weight: 700;
+`;
+const ExpiryTag = styled.span`
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.67rem; letter-spacing: 0.5px; font-weight: 700;
+  color: ${({ $expired }) => $expired ? RED : 'rgba(26,26,26,0.5)'};
 `;
 const PostTitle = styled.p`
   font-family: 'Montserrat', sans-serif;
