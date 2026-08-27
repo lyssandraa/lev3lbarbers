@@ -151,8 +151,15 @@ const Home = () => {
               than hand-drawn) for the textured-edge look, in place of the
               plain smooth circle. */}
           <svg width="100%" height="100%" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-            <path d="M0,44 L56,44 L56,76 L0,76 L14,60 Z" fill={RED} />
-            <path d="M144,44 L200,44 L186,60 L200,76 L144,76 Z" fill={RED} />
+            <defs>
+              <linearGradient id="offerRibbonGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#e14f68" />
+                <stop offset="55%" stopColor={RED} />
+                <stop offset="100%" stopColor="#8f1626" />
+              </linearGradient>
+            </defs>
+            <path d="M0,44 L56,44 L56,76 L0,76 L14,60 Z" fill="url(#offerRibbonGradient)" />
+            <path d="M144,44 L200,44 L186,60 L200,76 L144,76 Z" fill="url(#offerRibbonGradient)" />
             <path
               d="M100.0,4.0 L107.8,10.6 L117.3,6.7 L122.7,15.4 L132.9,14.7 L135.4,24.6 L145.3,27.1 L144.6,37.3 L153.3,42.7 L149.4,52.2 L156.0,60.0 L149.4,67.8 L153.3,77.3 L144.6,82.7 L145.3,92.9 L135.4,95.4 L132.9,105.3 L122.7,104.6 L117.3,113.3 L107.8,109.4 L100.0,116.0 L92.2,109.4 L82.7,113.3 L77.3,104.6 L67.1,105.3 L64.6,95.4 L54.7,92.9 L55.4,82.7 L46.7,77.3 L50.6,67.8 L44.0,60.0 L50.6,52.2 L46.7,42.7 L55.4,37.3 L54.7,27.1 L64.6,24.6 L67.1,14.7 L77.3,15.4 L82.7,6.7 L92.2,10.6 Z"
               fill={CREAM}
@@ -370,7 +377,12 @@ const OfferBtn = styled(motion.button)`
   filter: drop-shadow(0 6px 14px rgba(26, 26, 26, 0.28));
   transition: transform 0.15s ease;
 
-  svg { display: block; width: 100%; height: 100%; }
+  /* Direct-child combinator, not a bare descendant selector — this must
+     only size the top-level ribbon SVG. A bare "svg { ... }" here was
+     also matching TagIcon's own nested <svg> deeper inside OfferLabel and
+     force-stretching it to 100% of the button, which is why the icon
+     rendered huge despite its own explicit width/height props. */
+  > svg { display: block; width: 100%; height: 100%; }
   &:hover { transform: scale(1.03); }
 `;
 
