@@ -216,7 +216,11 @@ const Hero = styled.section`
   justify-content: center;
   gap: 16px;
   text-align: center;
-  padding: 200px 6% 0;
+  /* Bottom padding was 0 — the offer button sat flush against the sticky
+     Hero's own bottom edge, so barely any scroll was needed before the
+     next (black) Availability section started covering it, making it hard
+     to see the whole button before it got cut off. */
+  padding: 200px 6% 40px;
   overflow: hidden;
 
   /* Header.jsx tracks its own real rendered height (banner + nav rows) via
@@ -225,7 +229,7 @@ const Hero = styled.section`
      regardless of banner state/breakpoint, instead of the hardcoded 20px
      that was overlapping the header on mobile. */
   @media (max-width: 600px) {
-    padding: calc(var(--site-header-h, 160px) + 16px) 6% 0;
+    padding: calc(var(--site-header-h, 160px) + 16px) 6% 30px;
     gap: 12px;
   }
 `;
@@ -401,7 +405,11 @@ const OfferBtn = styled(motion.button)`
   border: none;
   padding: 0;
   cursor: pointer;
-  animation: ${pulseGlow} 1.8s ease-in-out infinite;
+  /* 2.6s to match Availability.jsx's SpotlightGlow (the pulsing glow
+     behind active barber chairs in "Who's In Today", the section right
+     below this one) — same cycle length so the two pulses read as
+     related rather than randomly drifting relative to each other. */
+  animation: ${pulseGlow} 2.6s ease-in-out infinite;
 
   /* Direct-child combinator, not a bare descendant selector — this must
      only size the top-level ribbon SVG. A bare "svg { ... }" here was
