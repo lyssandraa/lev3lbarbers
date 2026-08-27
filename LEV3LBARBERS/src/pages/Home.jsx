@@ -365,16 +365,12 @@ const GhostBtn = styled.button`
   &:hover { background: rgba(26,26,26,0.06); border-color: ${INK}; }
 `;
 
-/* Scaled down considerably from earlier iterations — at 300px this stood
-   noticeably taller than the two buttons above it (they're ~46px tall);
-   190px keeps it a clear standout accent without dwarfing the rest of the
-   button row. */
 const OfferBtn = styled(motion.button)`
   position: relative;
   display: block;
   width: min(190px, 50%);
   aspect-ratio: 200 / 120;
-  margin: 16px auto 0;
+  margin: 10px auto 0;
   background: none;
   border: none;
   padding: 0;
