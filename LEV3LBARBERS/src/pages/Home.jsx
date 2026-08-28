@@ -456,6 +456,11 @@ const OfferLabel = styled.span`
   align-items: center;
   gap: 3px;
   color: ${RED};
+  /* Needs an explicit value now that the SVG next to it has one (z-index:1,
+     added to sit above OfferGlow) — z-index:auto elements sort BELOW any
+     sibling with a real z-index regardless of DOM order, so without this
+     the seal SVG was painting over the text instead of behind it. */
+  z-index: 2;
 `;
 
 /* Icon now sits inline with "Special" instead of floating alone above both
