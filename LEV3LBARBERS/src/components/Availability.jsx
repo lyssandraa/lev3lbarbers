@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import barberChair from '../assets/barberChair.webp';
 import shopOpen from '../common/shopOpen';
 import { getPulsePhaseOffset } from '../utils/pulseSync';
@@ -39,10 +39,7 @@ const ChairCard = ({ name, active, pulseDelay = 0 }) => {
     <Chair as={motion.div} variants={itemV} $active={active}>
       <ChairImgWrap $active={active}>
         {active && (
-          <SpotlightGlow
-            animate={{ opacity: [0.4, 0.9, 0.4] }}
-            transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut', delay: phase + pulseDelay }}
-          />
+          <SpotlightGlow style={{ animationDelay: `${phase + pulseDelay}s` }} />
         )}
         <img src={barberChair} alt="barber chair" />
       </ChairImgWrap>
@@ -283,7 +280,19 @@ const ChairImgWrap = styled.div`
   @media (max-width: 480px) { width: 130px; }
 `;
 
-const SpotlightGlow = styled(motion.div)`
+const spotlightPulse = keyframes`
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.9; }
+`;
+
+/* Plain CSS animation, not framer-motion's `animate` prop — this component's
+   parent (Availability) re-renders every 10s from shopOpen()'s status poll,
+   and framer-motion was being handed a brand-new `animate`/`transition`
+   object literal on every one of those re-renders, which restarted the tween
+   mid-cycle each time and read as a stutter. A CSS animation only cares
+   about the animation-name/delay staying the same string, which they do
+   across re-renders, so it runs untouched by React entirely. */
+const SpotlightGlow = styled.div`
   position: absolute;
   inset: -20px;
   border-radius: 50%;
@@ -294,6 +303,7 @@ const SpotlightGlow = styled(motion.div)`
   );
   z-index: 0;
   pointer-events: none;
+  animation: ${spotlightPulse} 2.6s ease-in-out infinite;
 `;
 
 const ChairName = styled.span`
