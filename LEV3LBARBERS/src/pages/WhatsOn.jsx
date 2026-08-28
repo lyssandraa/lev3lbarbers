@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Seo from '../common/Seo';
 import api from '../utils/api';
@@ -40,6 +40,40 @@ const readingTime = (body) => {
   if (!body) return 1;
   const words = body.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
+};
+
+/* "3d 4h left" / "5h 12m left" / "42m left" / "Ending soon" — coarsest
+   unit that's still meaningful, since a promo with days left doesn't need
+   minute precision and one with minutes left doesn't need day precision. */
+const formatCountdown = (ms) => {
+  const mins  = Math.floor(ms / 60000);
+  const days  = Math.floor(mins / 1440);
+  const hours = Math.floor((mins % 1440) / 60);
+  const minutes = mins % 60;
+  if (days > 0)    return `${days}d ${hours}h left`;
+  if (hours > 0)   return `${hours}h ${minutes}m left`;
+  if (minutes > 0) return `${minutes}m left`;
+  return 'Ending soon';
+};
+
+/* Ticks on a 30s interval — coarse enough to be cheap with a card grid full
+   of these, fine enough that "Xm left" values still feel live. Returns null
+   once expiresAt has actually passed so the badge just disappears rather
+   than showing a stale/negative countdown (the backend also auto-unpublishes
+   expired posts, but this covers the window between expiry and the next
+   poll/reload). */
+const useCountdown = (expiresAt) => {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!expiresAt) return;
+    const id = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(id);
+  }, [expiresAt]);
+
+  if (!expiresAt) return null;
+  const remaining = new Date(expiresAt).getTime() - now;
+  if (remaining <= 0) return null;
+  return { text: formatCountdown(remaining), urgent: remaining < 24 * 60 * 60 * 1000 };
 };
 
 /* Lightweight body formatting: blank line = paragraph, "## " = heading,
@@ -238,6 +272,7 @@ const ArticleCard = ({ post, index, featured, onOpen }) => {
   const cat = CAT[post.category] || CAT.NEWS;
   const [hovered, setHovered] = useState(false);
   const d = new Date(post.createdAt);
+  const countdown = useCountdown(post.expiresAt);
 
   const rawX    = useMotionValue(0);
   const rawY    = useMotionValue(0);
@@ -303,6 +338,12 @@ const ArticleCard = ({ post, index, featured, onOpen }) => {
         {featured && <GhostStar>★</GhostStar>}
         <CardTitle $featured={featured}>{post.title}</CardTitle>
         <ReadTime>{readingTime(post.body)} min read</ReadTime>
+        {countdown && (
+          <CountdownRow $urgent={countdown.urgent}>
+            <CountdownDot $urgent={countdown.urgent} />
+            {countdown.text}
+          </CountdownRow>
+        )}
         {post.excerpt && <CardExcerpt>{post.excerpt}</CardExcerpt>}
         {post.tags?.length > 0 && (
           <TagRow>
@@ -320,6 +361,7 @@ const ArticleCard = ({ post, index, featured, onOpen }) => {
 
 const ArticleReader = ({ post, onClose }) => {
   const cat = CAT[post.category] || CAT.NEWS;
+  const countdown = useCountdown(post.expiresAt);
   return (
     <Backdrop
       initial={{ opacity: 0 }}
@@ -353,6 +395,12 @@ const ArticleReader = ({ post, onClose }) => {
             </CatBadge>
             <ReaderDate>{fmtDate(post.createdAt)} · {readingTime(post.body)} min read</ReaderDate>
             {post.authorName && <ReaderAuthor>by {post.authorName}</ReaderAuthor>}
+            {countdown && (
+              <CountdownRow $urgent={countdown.urgent}>
+                <CountdownDot $urgent={countdown.urgent} />
+                {countdown.text}
+              </CountdownRow>
+            )}
           </ReaderMeta>
           <ReaderTitle>{post.title}</ReaderTitle>
           <ReaderText>
@@ -688,6 +736,27 @@ const ReadTime = styled.p`
   color: rgba(26, 26, 26, 0.4);
   letter-spacing: 0.5px;
   margin: 0;
+`;
+
+const pulseDot = keyframes`
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50%      { opacity: 1;   transform: scale(1); }
+`;
+const CountdownRow = styled.p`
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.3px;
+  margin: 0;
+  color: ${({ $urgent }) => $urgent ? RED : 'rgba(26,26,26,0.45)'};
+`;
+const CountdownDot = styled.span`
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  background: ${({ $urgent }) => $urgent ? RED : GOLD};
+  /* Only pulses once it's actually urgent (<24h) — a constantly-animating
+     dot on every promo card regardless of urgency would be the "too grand"
+     result the customer-facing ask specifically wanted to avoid. */
+  ${({ $urgent }) => $urgent && css`animation: ${pulseDot} 1.4s ease-in-out infinite;`}
 `;
 const CardExcerpt = styled.p`
   font-family: 'Montserrat', sans-serif;
