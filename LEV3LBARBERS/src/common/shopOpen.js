@@ -1,8 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../utils/api';
 
+// Only used as a last resort when the server has no openingHours at all
+// (e.g. a brand-new shop that hasn't configured them yet) — every day gets
+// the same generic template rather than singling out Sunday as closed by
+// default, since that asymmetry is exactly what made a properly-configured
+// Sunday flash as "closed" before the real data loaded.
 const DEFAULT_HOURS = {
-  0: { closed: true,  open: '10:00', close: '16:00' },
+  0: { closed: false, open: '09:00', close: '18:00' },
   1: { closed: false, open: '09:00', close: '18:00' },
   2: { closed: false, open: '09:00', close: '18:00' },
   3: { closed: false, open: '09:00', close: '18:00' },

@@ -11,16 +11,6 @@ const EASE  = [0.22, 1, 0.36, 1];
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-const DEFAULT_HOURS = {
-  0: { closed: true,  open: '10:00', close: '16:00' },
-  1: { closed: false, open: '09:00', close: '18:00' },
-  2: { closed: false, open: '09:00', close: '18:00' },
-  3: { closed: false, open: '09:00', close: '18:00' },
-  4: { closed: false, open: '09:00', close: '18:00' },
-  5: { closed: false, open: '09:00', close: '19:00' },
-  6: { closed: false, open: '09:00', close: '19:00' },
-};
-
 function fmtTime(t) {
   if (!t) return '';
   const [h, m] = t.split(':').map(Number);
@@ -102,7 +92,10 @@ const EnvelopeFlap = (props) => (
 
 const ContactPage = () => {
   const [info,  setInfo]  = useState(null);
-  const [hours, setHours] = useState(DEFAULT_HOURS);
+  // null (not a hardcoded guess) until the real schedule loads — a fallback
+  // that assumed Sunday was closed by default was exactly what made a
+  // properly-configured Sunday flash as "Closed" before the fetch resolved.
+  const [hours, setHours] = useState(null);
   const [copied, setCopied] = useState(false);
   const todayIdx = new Date().getDay();
 
@@ -117,7 +110,7 @@ const ContactPage = () => {
     ]).then(([infoRes, statusRes]) => {
       setInfo(infoRes.data);
       if (statusRes.data.openingHours) {
-        setHours({ ...DEFAULT_HOURS, ...statusRes.data.openingHours });
+        setHours(statusRes.data.openingHours);
       }
     }).catch(() => {});
   }, []);
@@ -133,7 +126,7 @@ const ContactPage = () => {
     });
   };
 
-  const todayProgress = computeTodayProgress(hours[todayIdx]);
+  const todayProgress = hours ? computeTodayProgress(hours[todayIdx]) : null;
 
   return (
     <PageWrap>
@@ -336,7 +329,9 @@ const ContactPage = () => {
           <BlockLabel>Opening Hours</BlockLabel>
           <BlockTitle>When We're Here</BlockTitle>
           <HoursList ref={hoursRef}>
-            {DAY_NAMES.map((day, i) => {
+            {!hours ? (
+              <HoursLoading>Loading hours…</HoursLoading>
+            ) : DAY_NAMES.map((day, i) => {
               const dh = hours[i];
               const isToday = i === todayIdx;
               const timeText = dh?.closed ? 'Closed' : `${fmtTime(dh?.open)} – ${fmtTime(dh?.close)}`;
@@ -574,6 +569,11 @@ const EnvelopeIconSvg = styled.svg`
 `;
 
 const HoursList = styled.div`display: flex; flex-direction: column; gap: 0;`;
+
+const HoursLoading = styled.p`
+  font-family: 'Montserrat', sans-serif; font-size: 0.9rem; font-weight: 600;
+  color: rgba(26, 26, 26, 0.45); padding: 1.1rem 0;
+`;
 
 const HoursRow = styled.div`
   position: relative;

@@ -14,8 +14,12 @@ const waitLevels = [
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+// Blank-slate scaffold for a shop that hasn't configured hours yet — every
+// day gets the same generic template. Singling out Sunday as closed by
+// default here too would pre-fill the admin form with a misleading state
+// before they've touched anything.
 const DEFAULT_HOURS = {
-  0: { closed: true,  open: '10:00', close: '16:00' },
+  0: { closed: false, open: '09:00', close: '18:00' },
   1: { closed: false, open: '09:00', close: '18:00' },
   2: { closed: false, open: '09:00', close: '18:00' },
   3: { closed: false, open: '09:00', close: '18:00' },
