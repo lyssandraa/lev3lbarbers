@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import styled, { keyframes } from 'styled-components';
 import barberChair from '../assets/barberChair.webp';
@@ -27,14 +27,21 @@ const itemV = {
 };
 
 const ChairCard = ({ name, active, pulseDelay = 0 }) => {
-  // Computed once at mount, not recalculated on every re-render — this
-  // element only mounts once the async shop-status fetch resolves, at an
-  // unpredictable real time, so it needs its own phase-lock anchor rather
-  // than assuming it starts at the same moment as Home.jsx's badge glow.
-  // Combined with the existing pulseDelay stagger between chairs, so the
-  // three chairs still pulse offset from each other while the whole group
-  // stays phase-locked to the Special Offers badge. See pulseSync.js.
-  const [phase] = useState(getPulsePhaseOffset);
+  // `active` starts false (shopOpen()'s initial state) and flips true only
+  // once the status fetch resolves — the SpotlightGlow div doesn't exist in
+  // the DOM, and its CSS animation doesn't actually start, until that
+  // moment. Computing the phase once at ChairCard's own mount (before
+  // `active` flips) bakes in a stale timestamp from before the animation
+  // began, throwing the sync off by however long the fetch took. Keying
+  // this off `active` instead recomputes it exactly when the glow is about
+  // to appear — and won't recompute again on the 10s poll re-renders that
+  // follow, since `active`'s boolean value doesn't change on those. See
+  // pulseSync.js for why the recompute is always safe/correct regardless
+  // of the exact real time it happens at.
+  // `active` is intentionally a trigger-only dependency: the callback body
+  // doesn't read it, but its transition is what should cause the recompute.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const phase = useMemo(() => getPulsePhaseOffset(), [active]);
   return (
     <Chair as={motion.div} variants={itemV} $active={active}>
       <ChairImgWrap $active={active}>
