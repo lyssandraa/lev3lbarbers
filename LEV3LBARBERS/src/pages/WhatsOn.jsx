@@ -42,38 +42,49 @@ const readingTime = (body) => {
   return Math.max(1, Math.round(words / 200));
 };
 
-/* "3d 4h left" / "5h 12m left" / "42m left" / "Ending soon" — coarsest
-   unit that's still meaningful, since a promo with days left doesn't need
-   minute precision and one with minutes left doesn't need day precision. */
-const formatCountdown = (ms) => {
+const URGENT_MS = 24 * 60 * 60 * 1000;
+
+/* "3d 4h left" / "5h 12m left" while there's no real urgency — but once
+   under 24h, formatCountdown switches to an actual ticking "23:59:47"
+   clock instead, which is a lot harder to scroll past than static text. */
+const formatCountdown = (ms, urgent) => {
+  const totalSeconds = Math.floor(ms / 1000);
+  if (urgent) {
+    const pad = (n) => String(n).padStart(2, '0');
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    return `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
   const mins  = Math.floor(ms / 60000);
   const days  = Math.floor(mins / 1440);
   const hours = Math.floor((mins % 1440) / 60);
   const minutes = mins % 60;
-  if (days > 0)    return `${days}d ${hours}h left`;
-  if (hours > 0)   return `${hours}h ${minutes}m left`;
-  if (minutes > 0) return `${minutes}m left`;
-  return 'Ending soon';
+  if (days > 0)  return `${days}d ${hours}h left`;
+  if (hours > 0) return `${hours}h ${minutes}m left`;
+  return `${minutes}m left`;
 };
 
-/* Ticks on a 30s interval — coarse enough to be cheap with a card grid full
-   of these, fine enough that "Xm left" values still feel live. Returns null
-   once expiresAt has actually passed so the badge just disappears rather
-   than showing a stale/negative countdown (the backend also auto-unpublishes
-   expired posts, but this covers the window between expiry and the next
-   poll/reload). */
+/* Ticks every 30s normally (cheap with a whole grid of these, and "3d 4h
+   left" doesn't change second to second anyway) but switches to a real 1s
+   tick once inside the urgent window, so the HH:MM:SS display above
+   actually counts down live instead of just relabeling itself occasionally.
+   Returns null once expiresAt has passed so the badge disappears rather
+   than show a stale/negative countdown (the backend also auto-unpublishes
+   expired posts, but this covers the gap before the next poll/reload). */
 const useCountdown = (expiresAt) => {
   const [now, setNow] = useState(() => Date.now());
+  const remaining = expiresAt ? new Date(expiresAt).getTime() - now : null;
+  const urgent = remaining !== null && remaining > 0 && remaining < URGENT_MS;
+
   useEffect(() => {
     if (!expiresAt) return;
-    const id = setInterval(() => setNow(Date.now()), 30000);
+    const id = setInterval(() => setNow(Date.now()), urgent ? 1000 : 30000);
     return () => clearInterval(id);
-  }, [expiresAt]);
+  }, [expiresAt, urgent]);
 
-  if (!expiresAt) return null;
-  const remaining = new Date(expiresAt).getTime() - now;
-  if (remaining <= 0) return null;
-  return { text: formatCountdown(remaining), urgent: remaining < 24 * 60 * 60 * 1000 };
+  if (!expiresAt || remaining <= 0) return null;
+  return { text: formatCountdown(remaining, urgent), urgent };
 };
 
 /* Lightweight body formatting: blank line = paragraph, "## " = heading,
@@ -341,7 +352,7 @@ const ArticleCard = ({ post, index, featured, onOpen }) => {
         <ReadTime>{readingTime(post.body)} min read</ReadTime>
         {countdown && (
           <CountdownRow $urgent={countdown.urgent}>
-            <CountdownDot $urgent={countdown.urgent} />
+            <CountdownIcon $urgent={countdown.urgent}>{countdown.urgent ? '🔥' : '⏳'}</CountdownIcon>
             {countdown.text}
           </CountdownRow>
         )}
@@ -399,7 +410,7 @@ const ArticleReader = ({ post, onClose }) => {
             {post.authorName && <ReaderAuthor>by {post.authorName}</ReaderAuthor>}
             {countdown && (
               <CountdownRow $urgent={countdown.urgent}>
-                <CountdownDot $urgent={countdown.urgent} />
+                <CountdownIcon $urgent={countdown.urgent}>{countdown.urgent ? '🔥' : '⏳'}</CountdownIcon>
                 {countdown.text}
               </CountdownRow>
             )}
@@ -748,37 +759,59 @@ const ReadTime = styled.p`
   margin: 0;
 `;
 
-/* Countdown — a filled pill rather than plain text, per feedback that the
-   original version ("42m left" in a light grey line) didn't stand out.
-   Non-urgent is a gold-tinted badge (still visible, not alarming); inside
-   24h it flips to a solid red pill with the whole badge (not just the dot)
-   pulsing — deliberately more dramatic once it's actually time-sensitive. */
-const pulseDot = keyframes`
-  0%, 100% { opacity: 0.5; transform: scale(0.85); }
-  50%      { opacity: 1;   transform: scale(1); }
-`;
+/* Countdown — a filled pill, not plain text. Non-urgent is a calm
+   gold-tinted badge with an hourglass; inside 24h it goes full drama: a
+   diagonal hazard-stripe background that visibly crawls, a shaking flame
+   icon, and a stronger scale+glow pulse on the whole badge — plus the
+   text itself switches to a live-ticking HH:MM:SS clock (see
+   formatCountdown) rather than a static "23h left" that only relabels
+   itself once in a while. */
 const urgentPulse = keyframes`
-  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 rgba(196,30,58,0); }
-  50%      { transform: scale(1.05); box-shadow: 0 0 12px rgba(196,30,58,0.55); }
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 6px rgba(196,30,58,0.45); }
+  50%      { transform: scale(1.08); box-shadow: 0 0 22px rgba(196,30,58,0.95); }
+`;
+const stripeSlide = keyframes`
+  0%   { background-position: 0 0; }
+  100% { background-position: 34px 0; }
+`;
+const flameShake = keyframes`
+  0%, 100% { transform: rotate(0deg)   scale(1); }
+  20%      { transform: rotate(-16deg) scale(1.1); }
+  40%      { transform: rotate(12deg)  scale(1.05); }
+  60%      { transform: rotate(-10deg) scale(1.1); }
+  80%      { transform: rotate(7deg)   scale(1); }
 `;
 const CountdownRow = styled.span`
   display: inline-flex; align-items: center; gap: 6px;
   align-self: flex-start;
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.68rem; font-weight: 800;
+  font-weight: 800;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  padding: 4px 9px 4px 7px;
+  font-variant-numeric: tabular-nums;
   border-radius: 3px;
   color: ${({ $urgent }) => $urgent ? '#fff' : INK};
-  background: ${({ $urgent }) => $urgent ? RED : 'rgba(196,146,42,0.18)'};
-  border: 1px solid ${({ $urgent }) => $urgent ? RED : 'rgba(196,146,42,0.5)'};
-  ${({ $urgent }) => $urgent && css`animation: ${urgentPulse} 1.3s ease-in-out infinite;`}
+  border: 1px solid ${({ $urgent }) => $urgent ? '#ff5a5a' : 'rgba(196,146,42,0.5)'};
+
+  ${({ $urgent }) => $urgent ? css`
+    font-size: 0.8rem;
+    padding: 5px 11px;
+    background: repeating-linear-gradient(
+      -45deg, ${RED} 0px, ${RED} 9px, #8f1626 9px, #8f1626 18px
+    );
+    background-size: 200% 100%;
+    animation: ${urgentPulse} 1s ease-in-out infinite, ${stripeSlide} 0.7s linear infinite;
+  ` : css`
+    font-size: 0.68rem;
+    padding: 4px 9px 4px 7px;
+    background: rgba(196,146,42,0.18);
+  `}
 `;
-const CountdownDot = styled.span`
-  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
-  background: ${({ $urgent }) => $urgent ? '#fff' : GOLD};
-  ${({ $urgent }) => $urgent && css`animation: ${pulseDot} 1.3s ease-in-out infinite;`}
+const CountdownIcon = styled.span`
+  flex-shrink: 0;
+  line-height: 1;
+  font-size: ${({ $urgent }) => $urgent ? '0.9rem' : '0.7rem'};
+  ${({ $urgent }) => $urgent && css`animation: ${flameShake} 0.7s ease-in-out infinite;`}
 `;
 const CardExcerpt = styled.p`
   font-family: 'Montserrat', sans-serif;
