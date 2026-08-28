@@ -395,13 +395,27 @@ const pulseScale = keyframes`
 `;
 
 const glowPulse = keyframes`
-  0%, 100% { opacity: 0.35; transform: scale(1); }
-  50%      { opacity: 0.85; transform: scale(1.16); }
+  0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 0.85; transform: translate(-50%, -50%) scale(1.16); }
 `;
 
+/* Sized to the scalloped seal itself, not the full button box — the
+   button's own aspect-ratio (200/120) includes the ribbon tails on either
+   side, so an `inset` sized off that whole box stretched into a wide oval
+   reaching well past the seal. The seal in the SVG's 200x120 viewBox spans
+   112 units (44 to 156 horizontally, 4 to 116 vertically) — a true circle
+   56% of the box's width and ~93% of its height — so matching those two
+   percentages (with a little extra for glow spread) keeps the halo a
+   circle sized to just the badge, centered on it via left/top 50% +
+   translate rather than `inset` (which can't target an off-center or
+   non-matching aspect ratio). */
 const OfferGlow = styled.div`
   position: absolute;
-  inset: -18%;
+  left: 50%;
+  top: 50%;
+  width: 64%;
+  height: 107%;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
   background: radial-gradient(circle, rgba(196,30,58,0.55) 0%, rgba(196,30,58,0.16) 45%, transparent 72%);
   z-index: 0;
@@ -435,7 +449,7 @@ const OfferBtn = styled(motion.button)`
   &:hover ${OfferGlow} {
     animation-play-state: paused;
     opacity: 0.95;
-    transform: scale(1.3);
+    transform: translate(-50%, -50%) scale(1.3);
   }
 `;
 
