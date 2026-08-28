@@ -12,6 +12,7 @@ import Seo from '../common/Seo';
 import heroImg from '../assets/heroShop.jpeg';
 import api from '../utils/api';
 import { resolveImageUrl } from '../config';
+import { getPulsePhaseOffset } from '../utils/pulseSync';
 // import { TagIcon } from '../common/icons';
 
 const CREAM = '#f4f0e8';
@@ -32,6 +33,12 @@ const Home = () => {
   const [heroImages, setHeroImages] = useState([]);
   const [slideIdx,   setSlideIdx]   = useState(0);
   const [direction,  setDirection]  = useState(1);
+  // Computed once at mount and never touched again — the offset is only
+  // valid as a phase-lock if it's set at (or very near) actual mount time
+  // and left alone, since changing animation-delay on an already-running
+  // CSS animation on every re-render (the carousel re-renders this
+  // component every 4s) would fight the browser's own timeline tracking.
+  const [pulsePhase] = useState(getPulsePhaseOffset);
 
   useEffect(() => {
     api.get('/hero-slideshow/public')
@@ -149,6 +156,7 @@ const Home = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.05, duration: 0.55, ease: EASE }}
+          style={{ animationDelay: `${pulsePhase}s` }}
           onClick={() => navigate('/whats-on?filter=PROMOTION')}
           aria-label="Special Offers"
         >
@@ -408,7 +416,11 @@ const OfferBtn = styled(motion.button)`
   /* 2.6s to match Availability.jsx's SpotlightGlow (the pulsing glow
      behind active barber chairs in "Who's In Today", the section right
      below this one) — same cycle length so the two pulses read as
-     related rather than randomly drifting relative to each other. */
+     related rather than randomly drifting relative to each other.
+     animation-delay is set inline (see "pulsePhase") to phase-lock this
+     to the same wall-clock beat as that other animation, since matching
+     duration alone doesn't keep two independently-mounted animations in
+     sync — see src/utils/pulseSync.js. */
   animation: ${pulseGlow} 2.6s ease-in-out infinite;
 
   /* Direct-child combinator, not a bare descendant selector — this must

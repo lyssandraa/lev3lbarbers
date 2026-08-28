@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
 import barberChair from '../assets/barberChair.webp';
 import shopOpen from '../common/shopOpen';
+import { getPulsePhaseOffset } from '../utils/pulseSync';
 
 const DARK  = '#0c0c0c';
 const CREAM = '#EAE0CA';
@@ -25,22 +26,32 @@ const itemV = {
   show:   { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
 };
 
-const ChairCard = ({ name, active, pulseDelay = 0 }) => (
-  <Chair as={motion.div} variants={itemV} $active={active}>
-    <ChairImgWrap $active={active}>
-      {active && (
-        <SpotlightGlow
-          animate={{ opacity: [0.4, 0.9, 0.4] }}
-          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut', delay: pulseDelay }}
-        />
-      )}
-      <img src={barberChair} alt="barber chair" />
-    </ChairImgWrap>
-    <ChairName $active={active}>
-      {name || ''}
-    </ChairName>
-  </Chair>
-);
+const ChairCard = ({ name, active, pulseDelay = 0 }) => {
+  // Computed once at mount, not recalculated on every re-render — this
+  // element only mounts once the async shop-status fetch resolves, at an
+  // unpredictable real time, so it needs its own phase-lock anchor rather
+  // than assuming it starts at the same moment as Home.jsx's badge glow.
+  // Combined with the existing pulseDelay stagger between chairs, so the
+  // three chairs still pulse offset from each other while the whole group
+  // stays phase-locked to the Special Offers badge. See pulseSync.js.
+  const [phase] = useState(getPulsePhaseOffset);
+  return (
+    <Chair as={motion.div} variants={itemV} $active={active}>
+      <ChairImgWrap $active={active}>
+        {active && (
+          <SpotlightGlow
+            animate={{ opacity: [0.4, 0.9, 0.4] }}
+            transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut', delay: phase + pulseDelay }}
+          />
+        )}
+        <img src={barberChair} alt="barber chair" />
+      </ChairImgWrap>
+      <ChairName $active={active}>
+        {name || ''}
+      </ChairName>
+    </Chair>
+  );
+};
 
 const Availability = () => {
   const { isOpen, barbers, waitTime } = shopOpen();
