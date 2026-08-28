@@ -1,9 +1,8 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import barberChair from '../assets/barberChair.webp';
 import shopOpen from '../common/shopOpen';
-import { getPulsePhaseOffset } from '../utils/pulseSync';
 
 const DARK  = '#0c0c0c';
 const CREAM = '#EAE0CA';
@@ -26,36 +25,22 @@ const itemV = {
   show:   { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
 };
 
-const ChairCard = ({ name, active, pulseDelay = 0 }) => {
-  // `active` starts false (shopOpen()'s initial state) and flips true only
-  // once the status fetch resolves — the SpotlightGlow div doesn't exist in
-  // the DOM, and its CSS animation doesn't actually start, until that
-  // moment. Computing the phase once at ChairCard's own mount (before
-  // `active` flips) bakes in a stale timestamp from before the animation
-  // began, throwing the sync off by however long the fetch took. Keying
-  // this off `active` instead recomputes it exactly when the glow is about
-  // to appear — and won't recompute again on the 10s poll re-renders that
-  // follow, since `active`'s boolean value doesn't change on those. See
-  // pulseSync.js for why the recompute is always safe/correct regardless
-  // of the exact real time it happens at.
-  // `active` is intentionally a trigger-only dependency: the callback body
-  // doesn't read it, but its transition is what should cause the recompute.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const phase = useMemo(() => getPulsePhaseOffset(), [active]);
-  return (
-    <Chair as={motion.div} variants={itemV} $active={active}>
-      <ChairImgWrap $active={active}>
-        {active && (
-          <SpotlightGlow style={{ animationDelay: `${phase + pulseDelay}s` }} />
-        )}
-        <img src={barberChair} alt="barber chair" />
-      </ChairImgWrap>
-      <ChairName $active={active}>
-        {name || ''}
-      </ChairName>
-    </Chair>
-  );
-};
+const ChairCard = ({ name, active, pulseDelay = 0 }) => (
+  <Chair as={motion.div} variants={itemV} $active={active}>
+    <ChairImgWrap $active={active}>
+      {active && (
+        <SpotlightGlow
+          animate={{ opacity: [0.4, 0.9, 0.4] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut', delay: pulseDelay }}
+        />
+      )}
+      <img src={barberChair} alt="barber chair" />
+    </ChairImgWrap>
+    <ChairName $active={active}>
+      {name || ''}
+    </ChairName>
+  </Chair>
+);
 
 const Availability = () => {
   const { isOpen, barbers, waitTime } = shopOpen();
@@ -287,19 +272,7 @@ const ChairImgWrap = styled.div`
   @media (max-width: 480px) { width: 130px; }
 `;
 
-const spotlightPulse = keyframes`
-  0%, 100% { opacity: 0.4; }
-  50%      { opacity: 0.9; }
-`;
-
-/* Plain CSS animation, not framer-motion's `animate` prop — this component's
-   parent (Availability) re-renders every 10s from shopOpen()'s status poll,
-   and framer-motion was being handed a brand-new `animate`/`transition`
-   object literal on every one of those re-renders, which restarted the tween
-   mid-cycle each time and read as a stutter. A CSS animation only cares
-   about the animation-name/delay staying the same string, which they do
-   across re-renders, so it runs untouched by React entirely. */
-const SpotlightGlow = styled.div`
+const SpotlightGlow = styled(motion.div)`
   position: absolute;
   inset: -20px;
   border-radius: 50%;
@@ -310,7 +283,6 @@ const SpotlightGlow = styled.div`
   );
   z-index: 0;
   pointer-events: none;
-  animation: ${spotlightPulse} 2.6s ease-in-out infinite;
 `;
 
 const ChairName = styled.span`

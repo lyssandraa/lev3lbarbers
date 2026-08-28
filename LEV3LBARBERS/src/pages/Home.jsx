@@ -12,7 +12,6 @@ import Seo from '../common/Seo';
 import heroImg from '../assets/heroShop.jpeg';
 import api from '../utils/api';
 import { resolveImageUrl } from '../config';
-import { getPulsePhaseOffset } from '../utils/pulseSync';
 // import { TagIcon } from '../common/icons';
 
 const CREAM = '#f4f0e8';
@@ -33,12 +32,6 @@ const Home = () => {
   const [heroImages, setHeroImages] = useState([]);
   const [slideIdx,   setSlideIdx]   = useState(0);
   const [direction,  setDirection]  = useState(1);
-  // Computed once at mount and never touched again — the offset is only
-  // valid as a phase-lock if it's set at (or very near) actual mount time
-  // and left alone, since changing animation-delay on an already-running
-  // CSS animation on every re-render (the carousel re-renders this
-  // component every 4s) would fight the browser's own timeline tracking.
-  const [pulsePhase] = useState(getPulsePhaseOffset);
 
   useEffect(() => {
     api.get('/hero-slideshow/public')
@@ -156,10 +149,10 @@ const Home = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.05, duration: 0.55, ease: EASE }}
-          style={{ animationDelay: `${pulsePhase}s` }}
           onClick={() => navigate('/whats-on?filter=PROMOTION')}
           aria-label="Special Offers"
         >
+          <OfferGlow />
           <svg width="100%" height="100%" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
             <defs>
               <linearGradient id="offerRibbonGradient" x1="0" y1="0" x2="0" y2="1">
@@ -382,25 +375,38 @@ const GhostBtn = styled.button`
   &:hover { background: rgba(26,26,26,0.06); border-color: ${INK}; }
 `;
 
-/* Animates `filter: drop-shadow` rather than `box-shadow` — drop-shadow
-   follows the actual rendered (alpha) shape of the SVG content, so the
-   glow hugs the scalloped seal + ribbon outline. box-shadow would just
-   glow around the button's rectangular bounding box instead, which
-   wouldn't match the irregular badge shape at all. */
-/* Pulses both scale AND glow together for a clearly visible "breathing"
-   effect, not just a subtle brightness change. Hover pauses the loop and
-   snaps to its own bigger, static state instead of also setting
-   `transform` — animating transform continuously while a :hover rule also
-   wants to set transform would fight every frame and never settle. */
-const pulseGlow = keyframes`
-  0%, 100% {
-    transform: scale(1);
-    filter: drop-shadow(0 4px 10px rgba(196, 30, 58, 0.32));
-  }
-  50% {
-    transform: scale(1.07);
-    filter: drop-shadow(0 6px 22px rgba(196, 30, 58, 0.7));
-  }
+/* The glow ("light") used to be an animated `filter: drop-shadow` on the
+   SVG itself, on the same keyframes as the scale pulse. filter isn't
+   compositor-only — the browser has to repaint it every frame — and on
+   this multi-path/gradient SVG that repaint fell behind the buttery-smooth
+   transform-based scale, so the glow visibly lagged the pulse instead of
+   breathing with it (worse under any other main-thread load, e.g. the
+   carousel's own re-renders). Splitting them into two elements fixes that:
+   the button only ever animates `transform` (scale), and the glow is a
+   separate radial-gradient layer that only ever animates `opacity` +
+   `transform` — both compositor-only, no repaint, regardless of how
+   complex the SVG on top of it is. Since it's a sibling mounted in the
+   exact same render as the button (not a cross-component timing problem),
+   sharing one duration/easing keeps the two frame-perfectly locked with no
+   extra sync logic needed. */
+const pulseScale = keyframes`
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.07); }
+`;
+
+const glowPulse = keyframes`
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.16); }
+`;
+
+const OfferGlow = styled.div`
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,30,58,0.55) 0%, rgba(196,30,58,0.16) 45%, transparent 72%);
+  z-index: 0;
+  pointer-events: none;
+  animation: ${glowPulse} 2.6s ease-in-out infinite;
 `;
 
 const OfferBtn = styled(motion.button)`
@@ -413,27 +419,23 @@ const OfferBtn = styled(motion.button)`
   border: none;
   padding: 0;
   cursor: pointer;
-  /* 2.6s to match Availability.jsx's SpotlightGlow (the pulsing glow
-     behind active barber chairs in "Who's In Today", the section right
-     below this one) — same cycle length so the two pulses read as
-     related rather than randomly drifting relative to each other.
-     animation-delay is set inline (see "pulsePhase") to phase-lock this
-     to the same wall-clock beat as that other animation, since matching
-     duration alone doesn't keep two independently-mounted animations in
-     sync — see src/utils/pulseSync.js. */
-  animation: ${pulseGlow} 2.6s ease-in-out infinite;
+  animation: ${pulseScale} 2.6s ease-in-out infinite;
 
   /* Direct-child combinator, not a bare descendant selector — this must
      only size the top-level ribbon SVG. A bare "svg { ... }" here was
      also matching TagIcon's own nested <svg> deeper inside OfferLabel and
      force-stretching it to 100% of the button, which is why the icon
      rendered huge despite its own explicit width/height props. */
-  > svg { display: block; width: 100%; height: 100%; }
+  > svg { display: block; width: 100%; height: 100%; position: relative; z-index: 1; }
 
   &:hover {
     animation-play-state: paused;
     transform: scale(1.1);
-    filter: drop-shadow(0 8px 24px rgba(196, 30, 58, 0.75));
+  }
+  &:hover ${OfferGlow} {
+    animation-play-state: paused;
+    opacity: 0.95;
+    transform: scale(1.3);
   }
 `;
 
