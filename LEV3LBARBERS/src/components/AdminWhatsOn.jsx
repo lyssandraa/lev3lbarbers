@@ -19,7 +19,7 @@ const CAT_COLOR = { ARTICLE: '#C4922A', PROMOTION: '#C41E3A', NEWS: '#3576a8' };
 const emptyForm = () => ({
   title: '', category: 'ARTICLE', authorName: '',
   excerpt: '', body: '', tags: [],
-  pinned: false, published: true, expiresAt: '',
+  pinned: false, published: true, expiresAt: '', imageFocusY: 50,
 });
 
 /* datetime-local inputs need "YYYY-MM-DDTHH:mm" in local time */
@@ -79,6 +79,7 @@ const AdminWhatsOn = () => {
       pinned:     post.pinned,
       published:  post.published,
       expiresAt:  toDateTimeLocal(post.expiresAt),
+      imageFocusY: post.imageFocusY ?? 50,
     });
     setEditingId(post.id);
     setFile(null); setPreview(null);
@@ -125,6 +126,7 @@ const AdminWhatsOn = () => {
       fd.append('pinned',    String(form.pinned));
       fd.append('published', String(form.published));
       fd.append('expiresAt', form.expiresAt ? new Date(form.expiresAt).toISOString() : '');
+      fd.append('imageFocusY', String(form.imageFocusY));
       if (file)        fd.append('coverImage',  file);
       if (removeImg)   fd.append('removeImage', 'true');
 
@@ -230,10 +232,20 @@ const AdminWhatsOn = () => {
           <FullField>
             <Label>Cover Image</Label>
             {imgSrc ? (
-              <ImgPreviewWrap>
-                <PreviewImg src={imgSrc} alt="cover preview" />
-                <RemoveImgBtn onClick={handleRemoveImg}>✕ Remove</RemoveImgBtn>
-              </ImgPreviewWrap>
+              <>
+                <ImgPreviewWrap>
+                  <PreviewImg src={imgSrc} alt="cover preview" style={{ objectPosition: `center ${form.imageFocusY}%` }} />
+                  <RemoveImgBtn onClick={handleRemoveImg}>✕ Remove</RemoveImgBtn>
+                </ImgPreviewWrap>
+                <FocusSliderRow>
+                  <Hint style={{ marginLeft: 0 }}>Image position — drag to move the crop focus up or down</Hint>
+                  <FocusSlider
+                    type="range" min="0" max="100"
+                    value={form.imageFocusY}
+                    onChange={e => set('imageFocusY', parseInt(e.target.value, 10))}
+                  />
+                </FocusSliderRow>
+              </>
             ) : (
               <UploadLabel>
                 <UploadInner>
@@ -474,6 +486,12 @@ const ImgPreviewWrap = styled.div`
 `;
 const PreviewImg = styled.img`
   width: 100%; max-height: 220px; object-fit: cover; display: block;
+`;
+const FocusSliderRow = styled.div`
+  display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.5rem;
+`;
+const FocusSlider = styled.input`
+  width: 100%; accent-color: ${RED}; cursor: pointer;
 `;
 const RemoveImgBtn = styled.button`
   position: absolute; bottom: 0.5rem; right: 0.5rem;

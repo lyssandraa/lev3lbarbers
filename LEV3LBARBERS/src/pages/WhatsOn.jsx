@@ -307,6 +307,7 @@ const ArticleCard = ({ post, index, featured, onOpen }) => {
             <CardImg
               src={resolveImageUrl(post.imageUrl)}
               alt={post.title}
+              style={{ objectPosition: `center ${post.imageFocusY ?? 50}%` }}
               initial={{ clipPath: 'inset(100% 0 0 0)' }}
               animate={{ clipPath: 'inset(0% 0 0 0)' }}
               transition={{ duration: 0.6, ease: EASE, delay: index * 0.06 + 0.1 }}
@@ -381,6 +382,7 @@ const ArticleReader = ({ post, onClose }) => {
             <ReaderCover
               src={resolveImageUrl(post.imageUrl)}
               alt={post.title}
+              style={{ objectPosition: `center ${post.imageFocusY ?? 50}%` }}
               initial={{ clipPath: 'inset(100% 0 0 0)' }}
               animate={{ clipPath: 'inset(0% 0 0 0)' }}
               transition={{ duration: 0.5, ease: EASE, delay: 0.05 }}
@@ -678,10 +680,17 @@ const CatBadge = styled.span`
   transform: rotate(-3deg);
 `;
 
+/* box-shadow added on both stamps below — they have an opaque cream
+   background already, but with no shadow they visually merge into any
+   photo that happens to have light/white content behind them (a real
+   problem with promo graphics, which are often white-background). The
+   shadow keeps them reading as "stamped on top of" the image regardless of
+   what's underneath. */
 const CatBadgePositioned = styled(CatBadge)`
   position: absolute;
   top: 0.7rem; left: 0.7rem;
   z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 `;
 
 /* Calendar tear-off date stamp */
@@ -693,6 +702,7 @@ const CalendarStamp = styled.div`
   background: ${CREAM};
   border: 1px solid rgba(26, 26, 26, 0.12);
   padding: 4px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 `;
 const CalDay = styled.span`
   font-family: 'Bebas Neue', sans-serif;
@@ -732,37 +742,49 @@ const CardTitle = styled.h3`
 `;
 const ReadTime = styled.p`
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.7rem; font-weight: 600;
-  color: rgba(26, 26, 26, 0.4);
+  font-size: 0.7rem; font-weight: 700;
+  color: rgba(26, 26, 26, 0.55);
   letter-spacing: 0.5px;
   margin: 0;
 `;
 
+/* Countdown — a filled pill rather than plain text, per feedback that the
+   original version ("42m left" in a light grey line) didn't stand out.
+   Non-urgent is a gold-tinted badge (still visible, not alarming); inside
+   24h it flips to a solid red pill with the whole badge (not just the dot)
+   pulsing — deliberately more dramatic once it's actually time-sensitive. */
 const pulseDot = keyframes`
-  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  0%, 100% { opacity: 0.5; transform: scale(0.85); }
   50%      { opacity: 1;   transform: scale(1); }
 `;
-const CountdownRow = styled.p`
-  display: flex; align-items: center; gap: 5px;
+const urgentPulse = keyframes`
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 rgba(196,30,58,0); }
+  50%      { transform: scale(1.05); box-shadow: 0 0 12px rgba(196,30,58,0.55); }
+`;
+const CountdownRow = styled.span`
+  display: inline-flex; align-items: center; gap: 6px;
+  align-self: flex-start;
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.7rem; font-weight: 700;
-  letter-spacing: 0.3px;
-  margin: 0;
-  color: ${({ $urgent }) => $urgent ? RED : 'rgba(26,26,26,0.45)'};
+  font-size: 0.68rem; font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 4px 9px 4px 7px;
+  border-radius: 3px;
+  color: ${({ $urgent }) => $urgent ? '#fff' : INK};
+  background: ${({ $urgent }) => $urgent ? RED : 'rgba(196,146,42,0.18)'};
+  border: 1px solid ${({ $urgent }) => $urgent ? RED : 'rgba(196,146,42,0.5)'};
+  ${({ $urgent }) => $urgent && css`animation: ${urgentPulse} 1.3s ease-in-out infinite;`}
 `;
 const CountdownDot = styled.span`
   width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
-  background: ${({ $urgent }) => $urgent ? RED : GOLD};
-  /* Only pulses once it's actually urgent (<24h) — a constantly-animating
-     dot on every promo card regardless of urgency would be the "too grand"
-     result the customer-facing ask specifically wanted to avoid. */
-  ${({ $urgent }) => $urgent && css`animation: ${pulseDot} 1.4s ease-in-out infinite;`}
+  background: ${({ $urgent }) => $urgent ? '#fff' : GOLD};
+  ${({ $urgent }) => $urgent && css`animation: ${pulseDot} 1.3s ease-in-out infinite;`}
 `;
 const CardExcerpt = styled.p`
   font-family: 'Montserrat', sans-serif;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.82rem;
-  color: rgba(26, 26, 26, 0.6);
+  color: rgba(26, 26, 26, 0.75);
   margin: 0;
   line-height: 1.55;
   display: -webkit-box;
@@ -777,10 +799,11 @@ const TagRow = styled.div`
 const TagPill = styled.span`
   font-family: 'Montserrat', sans-serif;
   font-size: 0.68rem;
+  font-weight: 700;
   padding: 3px 8px;
   background: transparent;
-  color: rgba(26, 26, 26, 0.55);
-  border: 1px solid rgba(26, 26, 26, 0.15);
+  color: rgba(26, 26, 26, 0.7);
+  border: 1px solid rgba(26, 26, 26, 0.2);
   letter-spacing: 0.3px;
   transition: transform 0.15s, background 0.15s, color 0.15s, border-color 0.15s;
   display: inline-block;
@@ -868,11 +891,13 @@ const ReaderMeta = styled.div`
 `;
 const ReaderDate = styled.span`
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.75rem; color: rgba(26, 26, 26, 0.4); letter-spacing: 1.5px;
+  font-weight: 700;
+  font-size: 0.75rem; color: rgba(26, 26, 26, 0.6); letter-spacing: 1.5px;
 `;
 const ReaderAuthor = styled.span`
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.78rem; color: rgba(26, 26, 26, 0.55); letter-spacing: 1px;
+  font-weight: 600;
+  font-size: 0.78rem; color: rgba(26, 26, 26, 0.65); letter-spacing: 1px;
   font-style: italic;
 `;
 const ReaderTitle = styled.h2`
@@ -884,8 +909,9 @@ const ReaderTitle = styled.h2`
 `;
 const ReaderText = styled.div`
   font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
   font-size: 0.95rem; line-height: 1.85;
-  color: rgba(26, 26, 26, 0.7);
+  color: rgba(26, 26, 26, 0.82);
   margin-bottom: 1.5rem;
 
   p, ul, ol { margin: 0 0 1.25rem; &:last-child { margin-bottom: 0; } }
