@@ -118,6 +118,14 @@ const Shop = () => {
   const showTabs = online.length > 0 && inShop.length > 0;
   const activeList = !showTabs ? (online.length > 0 ? online : inShop) : (tab === 'online' ? online : inShop);
 
+  const hasProducts   = online.length > 0 || inShop.length > 0;
+  const hasGiftCards  = denominations.length > 0;
+  // Only worth showing once there's actually more than one section to jump
+  // between — with just one, there's nothing to navigate to.
+  const showQuickNav  = hasProducts && hasGiftCards;
+  const scrollToSection = (id) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
   return (
     <Wrap>
       <Seo title="Shop" description="Shop LEV3L Barbers products, merch, and gift cards." />
@@ -133,6 +141,13 @@ const Shop = () => {
           <ManageBtn onClick={() => setManageOpen(true)}>+ Manage Products</ManageBtn>
         )}
       </Hero>
+
+      {showQuickNav && (
+        <QuickNav>
+          <QuickNavBtn onClick={() => scrollToSection('shop-products')}>Products</QuickNavBtn>
+          <QuickNavBtn onClick={() => scrollToSection('shop-giftcards')}>Gift Cards</QuickNavBtn>
+        </QuickNav>
+      )}
 
       {loading ? (
         <LoadingGrid>
@@ -156,8 +171,10 @@ const Shop = () => {
         </ComingSoon>
       ) : (
         <Sections>
-          {(online.length > 0 || inShop.length > 0) && (
+          {hasProducts && (
             <Section
+              id="shop-products"
+              style={{ scrollMarginTop: 'calc(var(--site-header-h, 70px) + 60px)' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE }}
@@ -209,8 +226,10 @@ const Shop = () => {
             </Section>
           )}
 
-          {denominations.length > 0 && (
+          {hasGiftCards && (
             <Section
+              id="shop-giftcards"
+              style={{ scrollMarginTop: 'calc(var(--site-header-h, 70px) + 60px)' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.15, ease: EASE }}
@@ -584,6 +603,38 @@ const ManageBtn = styled.button`
   padding: 0.55rem 1.2rem; cursor: pointer;
   transition: background 0.2s, transform 0.1s;
   &:hover { background: #a51830; transform: scale(1.02); }
+`;
+
+/* Sticky quick-nav — lets a customer jump straight to Gift Cards instead of
+   relying on scrolling past however many "In Shop"/"Online" products there
+   are to discover them. Sticks just below the header (using the same
+   --site-header-h var Header.jsx maintains) so it stays reachable the
+   whole time you're on the page, not just at the top. */
+const QuickNav = styled.div`
+  position: sticky;
+  top: var(--site-header-h, 70px);
+  z-index: 15;
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.6rem 5%;
+  background: rgba(244, 240, 232, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+`;
+
+const QuickNavBtn = styled.button`
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  color: ${INK};
+  border: 1px solid rgba(26, 26, 26, 0.18);
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  &:hover { background: ${RED}; border-color: ${RED}; color: #fff; }
 `;
 
 const ManageGcBtn = styled.button`
