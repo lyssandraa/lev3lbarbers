@@ -101,9 +101,9 @@ const AdminBanners = () => {
         </Label>
 
         <Label>
-          Page
+          Page or Link
           <Input
-            placeholder="e.g. signup, rewards"
+            placeholder="e.g. signup, rewards, or https://apps.apple.com/..."
             value={newBanner.page}
             onChange={(e) =>
               setNewBanner({ ...newBanner, page: e.target.value })

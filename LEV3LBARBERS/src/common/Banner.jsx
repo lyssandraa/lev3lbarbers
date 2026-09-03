@@ -67,6 +67,17 @@ const Banner = ({ lightMode = false }) => {
 
   const currentMessage = messages[currentIndex];
 
+  // The "page" field always got treated as an internal route (navigate to
+  // `/${page}`), so a full URL typed in there — e.g. an App Store link —
+  // just tried to client-side-route to a nonsense path instead of actually
+  // opening it. An absolute URL now opens as an external link instead.
+  const isExternal = /^https?:\/\//i.test(currentMessage.page || '');
+  const handleBannerClick = () => {
+    if (!currentMessage.page) return;
+    if (isExternal) window.open(currentMessage.page, '_blank', 'noopener,noreferrer');
+    else navigate(`/${currentMessage.page}`);
+  };
+
   return (
     <BannerWrapper $lightMode={lightMode}>
       {ready && (
@@ -75,9 +86,7 @@ const Banner = ({ lightMode = false }) => {
           ref={bannerRef}
           $duration={DURATION}
           $lightMode={lightMode}
-          onClick={() =>
-            currentMessage.page && navigate(`/${currentMessage.page}`)
-          }
+          onClick={handleBannerClick}
           style={{ cursor: currentMessage.page ? "pointer" : "default" }}
         >
           {currentMessage.imageUrl && (
