@@ -139,11 +139,29 @@ const parseBlocks = (body) => {
   return blocks;
 };
 
+/* Matches http(s):// URLs and bare "www." ones; trims a trailing char that's
+   likely sentence punctuation rather than part of the URL (a period ending
+   a sentence, a comma, closing bracket/quote) so "check out our site." doesn't
+   swallow the period into the link. */
+const URL_SPLIT_REGEX = /((?:https?:\/\/|www\.)[^\s<]+[^\s<.,;:'")\]])/gi;
+const isUrl = (s) => /^(?:https?:\/\/|www\.)/i.test(s);
+
+const linkify = (text) =>
+  text.split(URL_SPLIT_REGEX).map((part, i) => {
+    if (!isUrl(part)) return part;
+    const href = part.startsWith('www.') ? `https://${part}` : part;
+    return (
+      <InlineLink key={i} href={href} target="_blank" rel="noopener noreferrer">
+        {part}
+      </InlineLink>
+    );
+  });
+
 const renderInline = (text) =>
   text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
     part.startsWith('**') && part.endsWith('**')
-      ? <strong key={i}>{part.slice(2, -2)}</strong>
-      : <React.Fragment key={i}>{part}</React.Fragment>
+      ? <strong key={i}>{linkify(part.slice(2, -2))}</strong>
+      : <React.Fragment key={i}>{linkify(part)}</React.Fragment>
   );
 
 /* ─── Main page ─────────────────────────────────────────────────────────────── */
@@ -949,6 +967,14 @@ const ReaderText = styled.div`
 
   p, ul, ol { margin: 0 0 1.25rem; &:last-child { margin-bottom: 0; } }
   strong { color: ${INK}; font-weight: 700; }
+`;
+
+const InlineLink = styled.a`
+  color: ${RED};
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-word;
+  &:hover { opacity: 0.75; }
 `;
 
 const LeadPara = styled(motion.p)`
