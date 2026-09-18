@@ -64,6 +64,7 @@ const UserProfile = () => {
   const [claimError, setClaimError]         = useState('');
   const [resendingVerification, setResendingVerification] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [newsletterSaving, setNewsletterSaving]   = useState(false);
   const [showLogoutPopup, setShowLogoutPopup]     = useState(false);
   const [referralSettings, setReferralSettings]   = useState(null);
   const [referralData, setReferralData]           = useState(null);
@@ -251,6 +252,19 @@ const UserProfile = () => {
   };
 
   const handleChangePassword = () => navigate('/change-password');
+
+  const toggleNewsletter = async () => {
+    const next = !profile.newsletterOptIn;
+    setNewsletterSaving(true);
+    try {
+      await api.put('/auth/profile', { newsletterOptIn: next });
+      setProfile(p => ({ ...p, newsletterOptIn: next }));
+    } catch {
+      alert('Could not update newsletter preference.');
+    } finally {
+      setNewsletterSaving(false);
+    }
+  };
 
   const handleSavePin = async () => {
     setPinSaving(true); setPinMsg('');
@@ -673,6 +687,19 @@ const UserProfile = () => {
                 <SectionTitle>Settings</SectionTitle>
                 <SettingButton onClick={handleChangePassword}>Change Password</SettingButton>
 
+                <NewsletterRow>
+                  <div>
+                    <Label style={{ marginBottom: 2 }}>Email Newsletter</Label>
+                    <PinHint style={{ margin: 0 }}>Occasional news, offers, and updates from LEV3L Barbers.</PinHint>
+                  </div>
+                  <NewsletterToggle
+                    type="checkbox"
+                    checked={!!profile.newsletterOptIn}
+                    onChange={toggleNewsletter}
+                    disabled={newsletterSaving}
+                  />
+                </NewsletterRow>
+
                 {isShopUser && (
                   <PinSection>
                     <Label>Quick-Login PIN</Label>
@@ -880,6 +907,16 @@ const PinSection = styled.div`
   border-top: 1px solid rgba(26, 26, 26, 0.1);
   padding-top: 1rem;
   margin-bottom: 1rem;
+`;
+
+const NewsletterRow = styled.div`
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  border-top: 1px solid rgba(26, 26, 26, 0.1);
+  padding-top: 1rem; margin-bottom: 1rem;
+`;
+const NewsletterToggle = styled.input`
+  width: 20px; height: 20px; flex-shrink: 0; cursor: pointer; accent-color: ${RED};
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 `;
 
 const PinHint = styled.p`

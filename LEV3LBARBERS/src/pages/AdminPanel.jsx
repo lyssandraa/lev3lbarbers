@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { MenuIcon, GridIcon, ScanIcon, GiftIcon, CalendarIcon, LayersIcon, GearIcon, UsersIcon, StoreIcon } from '../common/icons';
+import { MenuIcon, GridIcon, ScanIcon, GiftIcon, CalendarIcon, LayersIcon, GearIcon, UsersIcon } from '../common/icons';
 
 import ShopSettings     from '../components/ShopSettings';
 import AdminRewards     from '../components/AdminRewards';
@@ -29,6 +29,7 @@ import AdminPromos           from '../components/AdminPromos';
 import AdminBookings        from '../components/AdminBookings';
 import AdminDashboard       from '../components/AdminDashboard';
 import AdminHeroSlideshow   from '../components/AdminHeroSlideshow';
+import AdminNewsletter      from '../components/AdminNewsletter';
 
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
@@ -37,15 +38,14 @@ const EASE  = [0.22, 1, 0.36, 1];
 
 // ─── Menu structure ───────────────────────────────────────────────────────────
 // minRole: minimum role required to see this group / item
+// Order (per request): Operations first (it's the only group STAFF can see
+// at all, so it needs to be immediately reachable for them), then
+// Overview, Content, Settings, Rewards, Bookings & Barbers, Customers.
+// Barbers and Bookings used to be two separate top-level groups even
+// though AdminBarbers' own "Availability" tab manages the same booking
+// slots as the Booking System page — merged into one group so that
+// relationship is visible in the nav instead of hidden across two places.
 const MENU = [
-  {
-    group: 'Overview',
-    minRole: 'ADMIN',
-    Icon: GridIcon,
-    items: [
-      { id: 'dashboard', label: 'Dashboard', minRole: 'ADMIN' },
-    ],
-  },
   {
     group: 'Operations',
     minRole: 'STAFF',
@@ -56,37 +56,11 @@ const MENU = [
     ],
   },
   {
-    group: 'Rewards',
+    group: 'Overview',
     minRole: 'ADMIN',
-    Icon: GiftIcon,
+    Icon: GridIcon,
     items: [
-      { id: 'rewardPool', label: 'Reward Pool',      minRole: 'ADMIN' },
-      { id: 'referrals',  label: 'Referral System',  minRole: 'ADMIN' },
-      { id: 'birthday',   label: 'Birthday Rewards', minRole: 'ADMIN' },
-    ],
-  },
-  {
-    group: 'Customers',
-    minRole: 'ADMIN',
-    Icon: UsersIcon,
-    items: [
-      { id: 'customers', label: 'Customer Accounts', minRole: 'ADMIN' },
-    ],
-  },
-  {
-    group: 'Barbers',
-    minRole: 'ADMIN',
-    Icon: StoreIcon,
-    items: [
-      { id: 'barbers', label: 'Barbers', minRole: 'ADMIN' },
-    ],
-  },
-  {
-    group: 'Bookings',
-    minRole: 'ADMIN',
-    Icon: CalendarIcon,
-    items: [
-      { id: 'bookings', label: 'Booking System', minRole: 'ADMIN' },
+      { id: 'dashboard', label: 'Dashboard', minRole: 'ADMIN' },
     ],
   },
   {
@@ -103,6 +77,7 @@ const MENU = [
       { id: 'orders',       label: 'Orders',           minRole: 'ADMIN' },
       { id: 'giftCards',    label: 'Gift Cards',       minRole: 'ADMIN' },
       { id: 'promos',       label: 'Promo Codes',      minRole: 'ADMIN' },
+      { id: 'newsletter',   label: 'Newsletter',       minRole: 'ADMIN' },
     ],
   },
   {
@@ -118,6 +93,33 @@ const MENU = [
       { id: 'privacyNotice', label: 'Privacy Notice',   minRole: 'ADMIN' },
       { id: 'createStaff',   label: 'Create Staff',     minRole: 'ADMIN' },
       { id: 'createAdmin',   label: 'Create Admin',     minRole: 'DEVELOPER' },
+    ],
+  },
+  {
+    group: 'Rewards',
+    minRole: 'ADMIN',
+    Icon: GiftIcon,
+    items: [
+      { id: 'rewardPool', label: 'Reward Pool',      minRole: 'ADMIN' },
+      { id: 'referrals',  label: 'Referral System',  minRole: 'ADMIN' },
+      { id: 'birthday',   label: 'Birthday Rewards', minRole: 'ADMIN' },
+    ],
+  },
+  {
+    group: 'Bookings & Barbers',
+    minRole: 'ADMIN',
+    Icon: CalendarIcon,
+    items: [
+      { id: 'bookings', label: 'Booking System',        minRole: 'ADMIN' },
+      { id: 'barbers',  label: 'Barbers & Availability', minRole: 'ADMIN' },
+    ],
+  },
+  {
+    group: 'Customers',
+    minRole: 'ADMIN',
+    Icon: UsersIcon,
+    items: [
+      { id: 'customers', label: 'Customer Accounts', minRole: 'ADMIN' },
     ],
   },
 ];
@@ -243,6 +245,7 @@ const AdminPanel = ({ refreshShopStatus }) => {
             {activeTab === 'orders'       && <AdminOrders />}
             {activeTab === 'giftCards'    && <AdminGiftCards />}
             {activeTab === 'promos'       && <AdminPromos />}
+            {activeTab === 'newsletter'   && <AdminNewsletter />}
             {activeTab === 'bookings'     && <AdminBookings />}
             {activeTab === 'customers'    && <AdminUsers />}
             {activeTab === 'barbers'      && <AdminBarbers />}
