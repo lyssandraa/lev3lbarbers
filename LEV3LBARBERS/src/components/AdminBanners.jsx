@@ -7,11 +7,17 @@ import { ImageIcon, PencilIcon, TrashIcon, PlusIcon } from "../common/icons.jsx"
 const INK = "#1a1a1a";
 const RED = "#C41E3A";
 
+const PLATFORMS = [
+  { value: "BOTH",    label: "Website & App" },
+  { value: "WEBSITE", label: "Website only" },
+  { value: "APP",     label: "App only" },
+];
+
 const AdminBanners = () => {
   const [banners, setBanners] = useState([]);
-  const [newBanner, setNewBanner] = useState({ message: "", page: "", imageUrl: "" });
+  const [newBanner, setNewBanner] = useState({ message: "", page: "", imageUrl: "", platform: "BOTH" });
   const [editingId, setEditingId] = useState(null);
-  const [editValues, setEditValues] = useState({ message: "", page: "", imageUrl: "" });
+  const [editValues, setEditValues] = useState({ message: "", page: "", imageUrl: "", platform: "BOTH" });
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [expanded, setExpanded] = useState("active"); // default open
 
@@ -32,7 +38,7 @@ const AdminBanners = () => {
     if (!newBanner.message.trim()) return alert("Enter a banner message");
     try {
       await api.post("/banners/add-message", newBanner);
-      setNewBanner({ message: "", page: "", imageUrl: "" });
+      setNewBanner({ message: "", page: "", imageUrl: "", platform: "BOTH" });
       fetchBanners();
     } catch (err) {
       console.error("Failed to add banner", err);
@@ -60,12 +66,12 @@ const AdminBanners = () => {
 
   const startEditing = (banner) => {
     setEditingId(banner.id);
-    setEditValues({ message: banner.message, page: banner.page, imageUrl: banner.imageUrl || "" });
+    setEditValues({ message: banner.message, page: banner.page, imageUrl: banner.imageUrl || "", platform: banner.platform || "BOTH" });
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setEditValues({ message: "", page: "", imageUrl: "" });
+    setEditValues({ message: "", page: "", imageUrl: "", platform: "BOTH" });
   };
 
   const saveEdit = async (id) => {
@@ -122,6 +128,19 @@ const AdminBanners = () => {
           />
         </Label>
 
+        <Label>
+          Show On
+          <Select
+            value={newBanner.platform}
+            onChange={(e) =>
+              setNewBanner({ ...newBanner, platform: e.target.value })
+            }
+          >
+            {PLATFORMS.map((p) => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </Select>
+        </Label>
 
         <SaveButton onClick={addBanner}>
           <PlusIcon width={14} height={14} /> Add Banner
@@ -185,6 +204,19 @@ const AdminBanners = () => {
                               })
                             }
                           />
+                          <Select
+                            value={editValues.platform}
+                            onChange={(e) =>
+                              setEditValues({
+                                ...editValues,
+                                platform: e.target.value,
+                              })
+                            }
+                          >
+                            {PLATFORMS.map((p) => (
+                              <option key={p.value} value={p.value}>{p.label}</option>
+                            ))}
+                          </Select>
 
                           <SaveButtonSmall onClick={() => saveEdit(b.id)}>
                             Save
@@ -203,7 +235,10 @@ const AdminBanners = () => {
                             )}
                             <span>
                               {b.message}{" "}
-                              {b.page && <em style={{ color: RED }}>→ {b.page}</em>}
+                              {b.page && <em style={{ color: RED }}>→ {b.page}</em>}{" "}
+                              {b.platform && b.platform !== "BOTH" && (
+                                <PlatformTag>{b.platform === "APP" ? "App only" : "Website only"}</PlatformTag>
+                              )}
                             </span>
                           </BannerContent>
                           <div>
@@ -324,6 +359,27 @@ const Input = styled.input`
   &:focus {
     border-color: ${RED};
   }
+`;
+
+const Select = styled.select`
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0;
+  border: 1px solid rgba(26, 26, 26, 0.15);
+  background: #ffffff;
+  color: ${INK};
+  font-family: 'Montserrat', sans-serif;
+  outline: none;
+  cursor: pointer;
+
+  &:focus {
+    border-color: ${RED};
+  }
+`;
+
+const PlatformTag = styled.em`
+  color: rgba(26, 26, 26, 0.5);
+  font-size: 0.82em;
 `;
 
 const RewardList = styled.div`

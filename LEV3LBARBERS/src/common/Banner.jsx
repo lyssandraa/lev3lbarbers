@@ -42,7 +42,11 @@ const Banner = ({ lightMode = false }) => {
   const fetchBanners = async () => {
     try {
       const res = await api.get("/banners/public");
-      setMessages(res.data.data || []);
+      // Same list is fetched by the app too — each side keeps only what's
+      // actually meant for it. Older banners have no platform field at all
+      // (pre-dates this feature), so treat missing as "both" for safety.
+      const all = res.data.data || [];
+      setMessages(all.filter(b => !b.platform || b.platform === "BOTH" || b.platform === "WEBSITE"));
     } catch (err) {
       console.error(err);
     }
