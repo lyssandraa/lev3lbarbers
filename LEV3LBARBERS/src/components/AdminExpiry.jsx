@@ -10,10 +10,11 @@ const FIELDS = [
   { key: 'stampDays',      label: 'Stamp rewards',     hint: 'Default: 60 days' },
   { key: 'referralDays',   label: 'Referral rewards',  hint: 'Leave blank = never expire' },
   { key: 'mysteryBoxDays', label: 'Mystery box',        hint: 'Leave blank = never expire' },
+  { key: 'gameWinDays',    label: 'Weekly game prize',  hint: 'Days a winner has to redeem in store. Default: 7 days' },
 ];
 
 const AdminExpiry = () => {
-  const [settings, setSettings] = useState({ stampDays: 60, referralDays: '', mysteryBoxDays: '' });
+  const [settings, setSettings] = useState({ stampDays: 60, referralDays: '', mysteryBoxDays: '', gameWinDays: 7 });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg]       = useState('');
   const [error, setError]   = useState('');
@@ -28,6 +29,7 @@ const AdminExpiry = () => {
         stampDays:      s.stampDays      ?? '',
         referralDays:   s.referralDays   ?? '',
         mysteryBoxDays: s.mysteryBoxDays ?? '',
+        gameWinDays:    s.gameWinDays    ?? '',
       });
     } catch { setError('Failed to load settings'); }
   };
