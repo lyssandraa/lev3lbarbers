@@ -7,8 +7,8 @@ import { MenuIcon, GridIcon, ScanIcon, GiftIcon, CalendarIcon, LayersIcon, GearI
 
 import ShopSettings     from '../components/ShopSettings';
 import AdminRewards     from '../components/AdminRewards';
+import AdminWeeklyPrize from '../components/AdminWeeklyPrize';
 import AdminStamps      from '../components/AdminStamps';
-import VerifyClaim      from '../components/VerifyClaim';
 import AdminServices    from '../components/AdminServices';
 import AdminBanners     from '../components/AdminBanners';
 import AdminGallery     from '../components/AdminGallery';
@@ -52,7 +52,6 @@ const MENU = [
     Icon: ScanIcon,
     items: [
       { id: 'stamps',   label: 'Stamp Manager', minRole: 'STAFF' },
-      { id: 'verify',   label: 'Verify Claim',  minRole: 'STAFF' },
     ],
   },
   {
@@ -100,9 +99,10 @@ const MENU = [
     minRole: 'ADMIN',
     Icon: GiftIcon,
     items: [
-      { id: 'rewardPool', label: 'Reward Pool',      minRole: 'ADMIN' },
-      { id: 'referrals',  label: 'Referral System',  minRole: 'ADMIN' },
-      { id: 'birthday',   label: 'Birthday Rewards', minRole: 'ADMIN' },
+      { id: 'rewardPool',   label: 'Reward Pool',      minRole: 'ADMIN' },
+      { id: 'referrals',    label: 'Referral System',  minRole: 'ADMIN' },
+      { id: 'birthday',     label: 'Birthday Rewards', minRole: 'ADMIN' },
+      { id: 'weeklyPrize',  label: 'Weekly Game Prize', minRole: 'ADMIN' },
     ],
   },
   {
@@ -232,10 +232,10 @@ const AdminPanel = ({ refreshShopStatus }) => {
           >
             {activeTab === 'dashboard'    && <AdminDashboard onNavigate={selectTab} />}
             {activeTab === 'stamps'       && <AdminStamps />}
-            {activeTab === 'verify'       && <VerifyClaim />}
             {activeTab === 'rewardPool'   && <AdminRewards />}
             {activeTab === 'referrals'    && <AdminReferrals />}
             {activeTab === 'birthday'     && <AdminBirthday />}
+            {activeTab === 'weeklyPrize'  && <AdminWeeklyPrize />}
             {activeTab === 'services'     && <AdminServices />}
             {activeTab === 'banners'       && <AdminBanners />}
             {activeTab === 'heroSlideshow' && <AdminHeroSlideshow />}
