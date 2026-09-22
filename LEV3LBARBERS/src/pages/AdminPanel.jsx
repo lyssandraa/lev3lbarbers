@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { MenuIcon, GridIcon, ScanIcon, GiftIcon, CalendarIcon, LayersIcon, GearIcon, UsersIcon } from '../common/icons';
+import { MenuIcon, GridIcon, GiftIcon, CalendarIcon, LayersIcon, GearIcon, UsersIcon, BagIcon } from '../common/icons';
 
 import ShopSettings     from '../components/ShopSettings';
 import AdminRewards     from '../components/AdminRewards';
@@ -38,22 +38,16 @@ const EASE  = [0.22, 1, 0.36, 1];
 
 // ─── Menu structure ───────────────────────────────────────────────────────────
 // minRole: minimum role required to see this group / item
-// Order (per request): Operations first (it's the only group STAFF can see
-// at all, so it needs to be immediately reachable for them), then
-// Overview, Content, Settings, Rewards, Bookings & Barbers, Customers.
-// Barbers and Bookings used to be two separate top-level groups even
-// though AdminBarbers' own "Availability" tab manages the same booking
-// slots as the Booking System page — merged into one group so that
-// relationship is visible in the nav instead of hidden across two places.
+// Regrouped by actual job rather than by role — each group is now one
+// clear concept (Content, Shop, Rewards, Settings, Team & Bookings,
+// Customers & Communication) instead of a role-based "Operations" bucket
+// plus two junk-drawer groups (the old Content and Settings mixed several
+// unrelated concerns each). Stamp Manager moved into Rewards — stamps are
+// the loyalty mechanic, so it's a tighter fit than standing alone, and it
+// still works for STAFF: group and item visibility are filtered
+// independently below, so a STAFF user just sees a single "Rewards" group
+// containing only Stamp Manager — everything else in it stays hidden.
 const MENU = [
-  {
-    group: 'Operations',
-    minRole: 'STAFF',
-    Icon: ScanIcon,
-    items: [
-      { id: 'stamps',   label: 'Stamp Manager', minRole: 'STAFF' },
-    ],
-  },
   {
     group: 'Overview',
     minRole: 'ADMIN',
@@ -67,16 +61,36 @@ const MENU = [
     minRole: 'ADMIN',
     Icon: LayersIcon,
     items: [
-      { id: 'services',       label: 'Service Portal',   minRole: 'ADMIN' },
-      { id: 'banners',        label: 'Banner Manager',   minRole: 'ADMIN' },
-      { id: 'heroSlideshow',  label: 'Hero Slideshow',   minRole: 'ADMIN' },
-      { id: 'gallery',        label: 'Gallery',          minRole: 'ADMIN' },
-      { id: 'shopProducts', label: 'Shop Products',   minRole: 'ADMIN' },
-      { id: 'whatsOn',      label: "What's On",       minRole: 'ADMIN' },
-      { id: 'orders',       label: 'Orders',           minRole: 'ADMIN' },
-      { id: 'giftCards',    label: 'Gift Cards',       minRole: 'ADMIN' },
-      { id: 'promos',       label: 'Promo Codes',      minRole: 'ADMIN' },
-      { id: 'newsletter',   label: 'Newsletter',       minRole: 'ADMIN' },
+      { id: 'banners',       label: 'Banner Manager', minRole: 'ADMIN' },
+      { id: 'heroSlideshow', label: 'Hero Slideshow', minRole: 'ADMIN' },
+      { id: 'gallery',       label: 'Gallery',        minRole: 'ADMIN' },
+      { id: 'whatsOn',       label: "What's On",      minRole: 'ADMIN' },
+      { id: 'services',      label: 'Service Portal', minRole: 'ADMIN' },
+    ],
+  },
+  {
+    group: 'Shop',
+    minRole: 'ADMIN',
+    Icon: BagIcon,
+    items: [
+      { id: 'shopProducts', label: 'Shop Products', minRole: 'ADMIN' },
+      { id: 'orders',       label: 'Orders',        minRole: 'ADMIN' },
+      { id: 'giftCards',    label: 'Gift Cards',    minRole: 'ADMIN' },
+      { id: 'promos',       label: 'Promo Codes',   minRole: 'ADMIN' },
+    ],
+  },
+  {
+    group: 'Rewards',
+    minRole: 'STAFF',
+    Icon: GiftIcon,
+    items: [
+      { id: 'stamps',      label: 'Stamp Manager',     minRole: 'STAFF' },
+      { id: 'rewardPool',  label: 'Reward Pool',       minRole: 'ADMIN' },
+      { id: 'referrals',   label: 'Referral System',   minRole: 'ADMIN' },
+      { id: 'birthday',    label: 'Birthday Rewards',  minRole: 'ADMIN' },
+      { id: 'weeklyPrize', label: 'Weekly Game Prize', minRole: 'ADMIN' },
+      { id: 'expiry',      label: 'Reward Expiry',     minRole: 'ADMIN' },
+      { id: 'terms',       label: 'Reward T&C',        minRole: 'ADMIN' },
     ],
   },
   {
@@ -84,42 +98,30 @@ const MENU = [
     minRole: 'ADMIN',
     Icon: GearIcon,
     items: [
-      { id: 'shop',          label: 'Shop Settings',    minRole: 'ADMIN' },
-      { id: 'loyalty',       label: 'Loyalty Settings', minRole: 'ADMIN' },
-      { id: 'expiry',        label: 'Reward Expiry',    minRole: 'ADMIN' },
-      { id: 'terms',         label: 'Reward T&C',       minRole: 'ADMIN' },
+      { id: 'shop',          label: 'Shop Settings',     minRole: 'ADMIN' },
+      { id: 'loyalty',       label: 'Loyalty Settings',  minRole: 'ADMIN' },
       { id: 'generalTerms',  label: 'Terms & Conditions', minRole: 'ADMIN' },
-      { id: 'privacyNotice', label: 'Privacy Notice',   minRole: 'ADMIN' },
-      { id: 'createStaff',   label: 'Create Staff',     minRole: 'ADMIN' },
-      { id: 'createAdmin',   label: 'Create Admin',     minRole: 'DEVELOPER' },
+      { id: 'privacyNotice', label: 'Privacy Notice',    minRole: 'ADMIN' },
     ],
   },
   {
-    group: 'Rewards',
-    minRole: 'ADMIN',
-    Icon: GiftIcon,
-    items: [
-      { id: 'rewardPool',   label: 'Reward Pool',      minRole: 'ADMIN' },
-      { id: 'referrals',    label: 'Referral System',  minRole: 'ADMIN' },
-      { id: 'birthday',     label: 'Birthday Rewards', minRole: 'ADMIN' },
-      { id: 'weeklyPrize',  label: 'Weekly Game Prize', minRole: 'ADMIN' },
-    ],
-  },
-  {
-    group: 'Bookings & Barbers',
+    group: 'Team & Bookings',
     minRole: 'ADMIN',
     Icon: CalendarIcon,
     items: [
-      { id: 'bookings', label: 'Booking System',        minRole: 'ADMIN' },
-      { id: 'barbers',  label: 'Barbers & Availability', minRole: 'ADMIN' },
+      { id: 'createStaff', label: 'Create Staff',           minRole: 'ADMIN' },
+      { id: 'createAdmin', label: 'Create Admin',           minRole: 'DEVELOPER' },
+      { id: 'bookings',    label: 'Booking System',         minRole: 'ADMIN' },
+      { id: 'barbers',     label: 'Barbers & Availability', minRole: 'ADMIN' },
     ],
   },
   {
-    group: 'Customers',
+    group: 'Customers & Communication',
     minRole: 'ADMIN',
     Icon: UsersIcon,
     items: [
-      { id: 'customers', label: 'Customer Accounts', minRole: 'ADMIN' },
+      { id: 'customers',  label: 'Customer Accounts', minRole: 'ADMIN' },
+      { id: 'newsletter', label: 'Newsletter',        minRole: 'ADMIN' },
     ],
   },
 ];
@@ -146,7 +148,7 @@ const AdminPanel = ({ refreshShopStatus }) => {
   const isAdminRole = canSee(role, 'ADMIN');
   const [activeTab, setActiveTab] = useState(isAdminRole ? 'dashboard' : 'stamps');
   const [menuOpen, setMenuOpen]   = useState(false);
-  const [openGroups, setOpenGroups] = useState(() => new Set(isAdminRole ? ['Overview'] : ['Operations']));
+  const [openGroups, setOpenGroups] = useState(() => new Set(isAdminRole ? ['Overview'] : ['Rewards']));
 
   useEffect(() => {
     if (!isLoggedIn || !isShopUser) navigate('/login');
