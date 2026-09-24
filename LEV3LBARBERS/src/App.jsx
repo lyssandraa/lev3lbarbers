@@ -37,6 +37,7 @@ const GiftCardVerify = lazy(() => import('./pages/GiftCardVerify'));
 const MemberPay = lazy(() => import('./pages/MemberPay'));
 const Bookings = lazy(() => import('./pages/Bookings'));
 const LegalPage = lazy(() => import('./pages/LegalPage'));
+const DeleteAccount = lazy(() => import('./pages/DeleteAccount'));
 
 function App() {
   const location = useLocation();
@@ -93,6 +94,7 @@ function App() {
         <Route path="/bookings" element={<Bookings />} />
         <Route path="/privacy-notice" element={<LegalPage endpoint="/privacy-notice" dataKey="notice" title="Privacy Notice" emptyText="No privacy notice published yet." />} />
         <Route path="/general-terms" element={<LegalPage endpoint="/general-terms" dataKey="terms" title="Terms & Conditions" emptyText="No terms published yet." />} />
+        <Route path="/delete-account" element={<DeleteAccount />} />
       </Routes>
     </Suspense>
 
