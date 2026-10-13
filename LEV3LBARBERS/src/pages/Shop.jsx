@@ -13,6 +13,10 @@ import AdminGiftCards from '../components/AdminGiftCards';
 
 import { resolveImageUrl } from '../config';
 
+// Must match GIFT_CARD_MIN / GIFT_CARD_MAX in the backend's checkoutController
+const GIFT_CARD_MIN = 15;
+const GIFT_CARD_MAX = 1000;
+
 const CREAM = '#f4f0e8';
 const INK   = '#1a1a1a';
 const RED   = '#C41E3A';
@@ -97,7 +101,7 @@ const Shop = () => {
 
   const handleAddCustomGiftCard = (fromEl) => {
     const val = parseFloat(customAmount);
-    if (!val || val < 1) return;
+    if (!val || val < GIFT_CARD_MIN || val > GIFT_CARD_MAX) return;
     addItem({
       type:          'gift-card',
       productId:     null,
@@ -254,8 +258,8 @@ const Shop = () => {
                 </CustomBarBody>
                 <CustomAmountRow style={{ marginTop: 0, width: 'auto', flex: '0 1 140px' }}>
                   <CustomInput
-                    type="number" min="1" step="1"
-                    placeholder="£ Amount"
+                    type="number" min={GIFT_CARD_MIN} max={GIFT_CARD_MAX} step="1"
+                    placeholder={`£${GIFT_CARD_MIN}+`}
                     value={customAmount}
                     onChange={e => setCustomAmount(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleAddCustomGiftCard(e.target)}
@@ -265,7 +269,7 @@ const Shop = () => {
                   $added={addedId === 'gc-custom'}
                   whileTap={{ scale: 0.97 }}
                   onClick={(e) => handleAddCustomGiftCard(e.currentTarget)}
-                  disabled={!customAmount || parseFloat(customAmount) < 1}
+                  disabled={!customAmount || parseFloat(customAmount) < GIFT_CARD_MIN || parseFloat(customAmount) > GIFT_CARD_MAX}
                 >
                   {addedId === 'gc-custom' ? '✓ Added' : '+ Add to Cart'}
                 </AddToCartBtn>

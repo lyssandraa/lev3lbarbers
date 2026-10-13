@@ -325,7 +325,7 @@ const PaymentStep = ({ total, subtotal, discount, promoCode, orderId, items, onB
       if (error) { setPayErr(error.message); setPaying(false); return; }
 
       if (paymentIntent?.status === 'succeeded') {
-        const confirm = await api.post('/checkout/confirm-order', { orderId });
+        const confirm = await api.post('/checkout/confirm-order', { orderId, clientSecret: paymentIntent.client_secret });
         onSuccess();
         sessionStorage.removeItem('pending_order_id');
         navigate('/order-success', { state: { order: confirm.data.order, giftCodes: confirm.data.giftCodes || [] } });

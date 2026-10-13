@@ -49,7 +49,10 @@ const OrderSuccess = () => {
     if (!pendingOrderId) return;
 
     setConfirming(true);
-    api.post('/checkout/confirm-order', { orderId: parseInt(pendingOrderId, 10) })
+    api.post('/checkout/confirm-order', {
+      orderId:      parseInt(pendingOrderId, 10),
+      clientSecret: searchParams.get('payment_intent_client_secret'),
+    })
       .then(res => {
         setOrder(res.data.order);
         setGiftCodes(res.data.giftCodes || []);
