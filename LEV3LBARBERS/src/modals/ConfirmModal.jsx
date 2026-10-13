@@ -2,13 +2,13 @@
 import React from "react";
 import styled from "styled-components";
 
-const ConfirmModal = ({ message, onCancel, onConfirm }) => (
+const ConfirmModal = ({ message, onCancel, onConfirm, confirmLabel = 'Yes', cancelLabel = 'Cancel' }) => (
   <ModalOverlay>
     <ModalCard>
       <ModalMessage>{message}</ModalMessage>
       <ModalActions>
-        <ConfirmButton onClick={onConfirm}>Yes</ConfirmButton>
-        <CancelModalButton onClick={onCancel}>Cancel</CancelModalButton>
+        <ConfirmButton onClick={onConfirm}>{confirmLabel}</ConfirmButton>
+        <CancelModalButton onClick={onCancel}>{cancelLabel}</CancelModalButton>
       </ModalActions>
     </ModalCard>
   </ModalOverlay>

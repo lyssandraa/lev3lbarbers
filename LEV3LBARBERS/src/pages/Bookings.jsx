@@ -161,16 +161,16 @@ function BookingFlow({ settings }) {
 
   // Load services + barbers
   useEffect(() => {
-    api.get('/services').then(r => setServices(r.data.filter(s => s.type === 'public' || s.type === 'booking'))).catch(() => {});
+    api.get('/services/public-services').then(r => setServices(r.data.services || [])).catch(() => {});
     api.get('/barber-profiles').then(r => setBarbers(r.data.filter(b => b.isBookable))).catch(() => {});
   }, []);
 
   // Pre-fill details for logged-in users
   useEffect(() => {
     if (isLoggedIn) {
-      api.get('/protected/profile').then(r => {
-        setProfile(r.data);
-        setDetails(d => ({ ...d, name: r.data.name || '', email: r.data.email || '' }));
+      api.get('/auth/profile').then(r => {
+        setProfile(r.data.user);
+        setDetails(d => ({ ...d, name: r.data.user?.name || '', email: r.data.user?.email || '' }));
       }).catch(() => {});
     }
   }, [isLoggedIn]);

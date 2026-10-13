@@ -64,6 +64,8 @@ const UserProfile = () => {
   const [claimError, setClaimError]         = useState('');
   const [resendingVerification, setResendingVerification] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  // Wallet credit the customer is warned about (and must agree to forfeit) before deleting
+  const [forfeitBalance,    setForfeitBalance]    = useState(0);
   const [newsletterSaving, setNewsletterSaving]   = useState(false);
   const [showLogoutPopup, setShowLogoutPopup]     = useState(false);
   const [referralSettings, setReferralSettings]   = useState(null);
@@ -333,12 +335,22 @@ const UserProfile = () => {
     } finally { setGcLoading(false); }
   };
 
+  const openDeleteConfirm = () => {
+    setForfeitBalance(wallet.balance > 0 ? wallet.balance : 0);
+    setShowDeleteConfirm(true);
+  };
+
   const handleDeleteAccount = async () => {
     try {
-      await api.delete('/auth/delete');
+      await api.delete('/auth/delete', { data: { forfeitWalletBalance: forfeitBalance } });
       localStorage.removeItem('token');
       navigate('/');
-    } catch {
+    } catch (err) {
+      // The balance changed since the warning was shown: warn again with the real amount
+      if (err.response?.data?.code === 'WALLET_BALANCE') {
+        setForfeitBalance(err.response.data.balance);
+        return;
+      }
       alert('Failed to delete account.');
     }
   };
@@ -720,7 +732,7 @@ const UserProfile = () => {
                   </PinSection>
                 )}
 
-                <DeleteButton onClick={() => setShowDeleteConfirm(true)}>Delete Account</DeleteButton>
+                <DeleteButton onClick={openDeleteConfirm}>Delete Account</DeleteButton>
               </Card>
             )}
           </motion.div>
@@ -744,11 +756,21 @@ const UserProfile = () => {
       />
 
       {showDeleteConfirm && (
-        <ConfirmModal
-          message="Are you sure you want to delete your account? This action is permanent."
-          onCancel={() => setShowDeleteConfirm(false)}
-          onConfirm={handleDeleteAccount}
-        />
+        forfeitBalance > 0 ? (
+          <ConfirmModal
+            message={`You still have £${forfeitBalance.toFixed(2)} in your wallet. Deleting your account permanently forfeits this credit: it can't be refunded or moved to another account. If you'd rather use it, keep your account and spend it in the shop first.`}
+            confirmLabel={`Delete & forfeit £${forfeitBalance.toFixed(2)}`}
+            cancelLabel="Keep my account"
+            onCancel={() => setShowDeleteConfirm(false)}
+            onConfirm={handleDeleteAccount}
+          />
+        ) : (
+          <ConfirmModal
+            message="Are you sure you want to delete your account? This action is permanent."
+            onCancel={() => setShowDeleteConfirm(false)}
+            onConfirm={handleDeleteAccount}
+          />
+        )
       )}
 
       {showLogoutPopup && (

@@ -38,7 +38,9 @@ const DeleteAccount = () => (
         <SectionTitle>What gets deleted</SectionTitle>
         <Body>
           Deleting your account removes your profile, loyalty stamps, rewards, wallet
-          balance, and saved details. Records the shop is legally required to keep
+          balance, and saved details. Any wallet credit left is forfeited and can't be
+          refunded or transferred, so spend it before deleting if you'd like to use it;
+          you'll be shown the amount and asked to confirm. Records the shop is legally required to keep
           (such as past bookings and payment records for tax/accounting purposes) may
           be retained in anonymised form, as described in our{" "}
           <a href="/privacy-notice">Privacy Notice</a>.
