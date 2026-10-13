@@ -10,6 +10,8 @@ const FONT_HEAD = "'Bebas Neue', sans-serif";
 const FONT_BODY = "'Montserrat', sans-serif";
 
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+// Working-day picker, Monday first (values are JS weekdays: 0 = Sunday)
+const WEEK = [[1,'Mon'],[2,'Tue'],[3,'Wed'],[4,'Thu'],[5,'Fri'],[6,'Sat'],[0,'Sun']];
 
 const fmt = (iso) =>
   new Date(iso).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
@@ -48,12 +50,28 @@ function WhosInTab() {
   };
   useEffect(load, []);
 
+  // Replace one barber with the server's copy (it works out workingToday)
+  const applyUpdate = (updated) =>
+    setBarbers(prev => prev.map(x => x.id === updated.id ? { ...x, ...updated } : x));
+
+  // "Today only" change: lapses at midnight, then the regular days apply again
   const toggle = async (b) => {
-    setBusyId(b.id);
+    setBusyId(b.id); setMsg('');
     try {
-      await api.put(`/barber-profiles/${b.id}/working-today`, { workingToday: !b.workingToday });
-      setBarbers(prev => prev.map(x => x.id === b.id ? { ...x, workingToday: !x.workingToday } : x));
-    } catch { /* ignore */ }
+      const { data } = await api.put(`/barber-profiles/${b.id}/working-today`, { workingToday: !b.workingToday });
+      applyUpdate(data);
+    } catch { setMsg('Could not update today. Please try again.'); }
+    finally { setBusyId(null); }
+  };
+
+  const toggleDay = async (b, day) => {
+    const current = b.workingDays || [];
+    const workingDays = current.includes(day) ? current.filter(d => d !== day) : [...current, day];
+    setBusyId(b.id); setMsg('');
+    try {
+      const { data } = await api.put(`/barber-profiles/${b.id}/working-days`, { workingDays });
+      applyUpdate(data);
+    } catch { setMsg('Could not save working days. Please try again.'); }
     finally { setBusyId(null); }
   };
 
@@ -77,10 +95,11 @@ function WhosInTab() {
     <Card>
       <SectionTitle>Who's In Today</SectionTitle>
       <SubHint>
-        Add barbers to the general roster below, then tick who's actually working today —
-        this feeds the "Who's In Today" section on the homepage. Quick-added barbers don't need
-        a login account; add photo/price/bio for them later under Profiles if you want them
-        bookable online.
+        Pick the days each barber normally works and the "Who's In Today" section on the
+        homepage and app updates itself every day. For a one-off change (sick day, swapped
+        shift) use the In Today button: it only affects today and resets at midnight.
+        Quick-added barbers don't need a login account; add photo/price/bio for them later
+        under Profiles if you want them bookable online.
       </SubHint>
 
       <AddRow>
@@ -108,14 +127,33 @@ function WhosInTab() {
               }
               <BarberInfo>
                 <strong>{b.displayName}</strong>
+                <DayPicker role="group" aria-label={`${b.displayName}'s working days`}>
+                  {WEEK.map(([day, label]) => (
+                    <DayChip
+                      key={day}
+                      type="button"
+                      $on={(b.workingDays || []).includes(day)}
+                      aria-pressed={(b.workingDays || []).includes(day)}
+                      disabled={busyId === b.id}
+                      onClick={() => toggleDay(b, day)}
+                    >
+                      {label}
+                    </DayChip>
+                  ))}
+                </DayPicker>
+                {!(b.workingDays || []).length && <DayHint>No working days set yet</DayHint>}
               </BarberInfo>
-              <CheckToggle
-                $on={b.workingToday}
-                disabled={busyId === b.id}
-                onClick={() => toggle(b)}
-              >
-                {b.workingToday ? '✓ In Today' : 'Not In'}
-              </CheckToggle>
+              <TodayCol>
+                <CheckToggle
+                  $on={b.workingToday}
+                  disabled={busyId === b.id}
+                  onClick={() => toggle(b)}
+                  title="Changes today only; resets at midnight"
+                >
+                  {b.workingToday ? '✓ In Today' : 'Not In Today'}
+                </CheckToggle>
+                {b.todayIsOverride && <DayHint>Today only · back to schedule tomorrow</DayHint>}
+              </TodayCol>
             </BarberRow>
           ))}
         </BarberList>
@@ -609,6 +647,29 @@ const CheckToggle = styled.button`
   transition: all 0.18s;
   flex-shrink: 0;
   &:disabled { opacity: 0.5; cursor: default; }
+`;
+
+const DayPicker = styled.div`
+  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;
+`;
+
+const DayChip = styled.button`
+  min-width: 40px; padding: 4px 6px; border-radius: 0; cursor: pointer;
+  font-family: ${FONT_BODY}; font-weight: 700; font-size: 0.7rem; letter-spacing: 0.5px;
+  border: 1px solid ${({ $on }) => $on ? INK : 'rgba(26,26,26,0.2)'};
+  color: ${({ $on }) => $on ? CREAM : 'rgba(26,26,26,0.55)'};
+  background: ${({ $on }) => $on ? INK : 'transparent'};
+  transition: all 0.15s;
+  &:disabled { opacity: 0.5; cursor: default; }
+`;
+
+const DayHint = styled.span`
+  font-family: ${FONT_BODY}; font-size: 0.7rem; color: rgba(26,26,26,0.5); margin-top: 4px;
+`;
+
+const TodayCol = styled.div`
+  display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0;
+  @media (max-width: 640px) { align-items: flex-start; }
 `;
 
 const SaveBtn = styled.button`
