@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled, { keyframes } from 'styled-components';
@@ -31,6 +31,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
+  const [searchParams] = useSearchParams();
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
@@ -43,7 +44,11 @@ const Login = () => {
       login(token, role);
       setStatus('success');
       setShowPopup(true);
-      const dest = ['STAFF', 'ADMIN', 'DEVELOPER'].includes(role) ? '/admin' : '/profile';
+      // Pages like the wallet charge screen send people here with ?redirect=
+      // so they come straight back after logging in (same-site paths only)
+      const redirect = searchParams.get('redirect');
+      const safeRedirect = redirect && redirect.startsWith('/') && !redirect.startsWith('//') && !redirect.includes('\\') ? redirect : null;
+      const dest = safeRedirect || (['STAFF', 'ADMIN', 'DEVELOPER'].includes(role) ? '/admin' : '/profile');
       setTimeout(() => { setShowPopup(false); navigate(dest); }, 2000);
     } catch (err) {
       setStatus('idle');

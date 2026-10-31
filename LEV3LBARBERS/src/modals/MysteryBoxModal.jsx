@@ -52,21 +52,29 @@ const MysteryBoxModal = ({ isOpen, onClose }) => {
       // Reveal the reward value (works before email is verified)
       const revealRes = await api.post("/rewards/reveal-reward", { rewardType: "Mystery box" });
       setRewardValue(revealRes.data.rewardValue);
+      // The server says which box it revealed; claim that same one (a customer
+      // can hold several boxes, and the list lookup below could pick another)
+      if (revealRes.data.rewardId) {
+        setRewardId(revealRes.data.rewardId);
+        setStatus(revealRes.data.status);
+      }
 
       setTimeout(() => {
         confetti({ particleCount: 180, spread: 100, origin: { y: 0.5 } });
       }, 1200);
 
-      // Check whether the reward is claimable yet
-      const rewardsRes = await api.get("/rewards/user-rewards");
-      const mysteryReward = rewardsRes.data.rewards.find(
-        (r) =>
-          r.rewardType?.toLowerCase().includes("mystery") &&
-          r.status !== "CLAIMED"
-      );
-      if (mysteryReward) {
-        setRewardId(mysteryReward.id);
-        setStatus(mysteryReward.status);
+      // Older backend without rewardId in the reply: fall back to the list
+      if (!revealRes.data.rewardId) {
+        const rewardsRes = await api.get("/rewards/user-rewards");
+        const mysteryReward = rewardsRes.data.rewards.find(
+          (r) =>
+            r.rewardType?.toLowerCase().includes("mystery") &&
+            ["LOCKED", "UNCLAIMED"].includes(r.status)
+        );
+        if (mysteryReward) {
+          setRewardId(mysteryReward.id);
+          setStatus(mysteryReward.status);
+        }
       }
     } catch {
       setRewardValue("Mystery reward unlocked!");

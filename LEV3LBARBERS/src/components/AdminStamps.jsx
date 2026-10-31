@@ -45,6 +45,11 @@ const AdminStamps = () => {
     if (!detectedCodes?.length) return;
     const scannedEmail = detectedCodes[0].rawValue;
     setIsScanning(false);
+    // The wallet payment QR (a /pay/ link) sits next to the stamp QR
+    if (scannedEmail.includes('/pay/')) {
+      setError("That's the customer's wallet QR. Open it to charge their wallet, or scan their Stamps QR here.");
+      return;
+    }
     await addStampForEmail(scannedEmail, true);
   };
 
