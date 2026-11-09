@@ -37,7 +37,28 @@ const AdminStamps = () => {
   const [bdSaving, setBdSaving]             = useState(false);
   const [bdMsg, setBdMsg]                   = useState('');
 
+  // Wallet credit shown on the customer panel
+  const [chargeAmount, setChargeAmount] = useState('');
+  const [charging, setCharging]         = useState(false);
+
   const clearMessages = () => { setSuccess(''); setError(''); };
+
+  const chargeWallet = async () => {
+    const amount = Math.round(parseFloat(chargeAmount) * 100) / 100;
+    clearMessages();
+    if (!amount || amount <= 0) { setError('Enter an amount to charge.'); return; }
+    if (amount > userData.walletBalance) { setError(`Only £${userData.walletBalance.toFixed(2)} in this wallet.`); return; }
+    if (!window.confirm(`Take £${amount.toFixed(2)} from ${userData.name || 'this customer'}'s wallet?`)) return;
+    setCharging(true);
+    try {
+      const res = await api.post('/wallet/charge', { qrCode: userData.walletCode, amount });
+      setUserData(u => ({ ...u, walletBalance: res.data.remainingBalance }));
+      setChargeAmount('');
+      setSuccess(`£${res.data.charged.toFixed(2)} taken from wallet. £${res.data.remainingBalance.toFixed(2)} left.`);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not charge the wallet.');
+    } finally { setCharging(false); }
+  };
 
   /* ─── Scan flow ─────────────────────────────── */
 
@@ -274,6 +295,16 @@ const AdminStamps = () => {
             </PendingBox>
           )}
 
+          {userData.walletBalance > 0 && (
+            <WalletBox>
+              <strong>Wallet credit: £{userData.walletBalance.toFixed(2)}</strong>
+              <WalletRow>
+                <Input type="number" min="0" step="0.01" placeholder="£ amount" value={chargeAmount} onChange={e => setChargeAmount(e.target.value)} />
+                <AddButton onClick={chargeWallet} disabled={charging}>{charging ? 'Charging…' : 'Charge'}</AddButton>
+              </WalletRow>
+            </WalletBox>
+          )}
+
           <AddButton onClick={() => addStampForEmail(userData.email)} disabled={adding}>
             {adding ? 'Adding…' : '+ Add Stamp'}
           </AddButton>
@@ -415,6 +446,8 @@ const ScannerWrapper = styled.div`
 
 const StatusMsg = styled.p`color: ${RED}; font-family: 'Montserrat', sans-serif; font-size: 0.92rem; margin-top: 0.5rem;`;
 const SuccessMsg = styled.p`color: #2e7d32; font-family: 'Montserrat', sans-serif; font-size: 0.88rem; margin: 0.5rem 0; text-align: center;`;
+const WalletBox  = styled.div`margin: 0.75rem 0; padding: 0.75rem; border: 1px solid rgba(26,26,26,0.15); font-family: 'Montserrat', sans-serif; font-size: 0.9rem;`;
+const WalletRow  = styled.div`display: flex; gap: 8px; margin-top: 8px; align-items: stretch;`;
 const ErrorMsg   = styled.p`color: ${RED}; font-family: 'Montserrat', sans-serif; font-size: 0.88rem; margin: 0.5rem 0; text-align: center;`;
 
 const SearchRow = styled.div`display: flex; gap: 0.6rem; width: 100%; margin-bottom: 0.5rem;`;

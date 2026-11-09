@@ -394,7 +394,7 @@ const UserProfile = () => {
                 {!isShopUser && stampData && (
                   <Card $pad="loose">
                     <SectionTitle>Loyalty Card</SectionTitle>
-                    <LoyaltyCard data={stampData} email={profile.email} walletQrCode={profile.qrCode} />
+                    <LoyaltyCard data={stampData} email={profile.email} />
                   </Card>
                 )}
 

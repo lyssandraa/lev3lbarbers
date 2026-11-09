@@ -34,7 +34,7 @@ const useCountUp = (target, duration = 700) => {
   return val;
 };
 
-const LoyaltyCard = ({ data, email, walletQrCode }) => {
+const LoyaltyCard = ({ data, email }) => {
   const [face, setFace] = useState('front'); // 'front' | 'back'
   const [hovered, setHovered] = useState(false);
   const firedConfetti = useRef(false);
@@ -84,7 +84,7 @@ const LoyaltyCard = ({ data, email, walletQrCode }) => {
   };
   const onMouseLeave = () => { setHovered(false); rawY.set(0); };
 
-  const hasBack = !!(email || walletQrCode);
+  const hasBack = !!email;
 
   const handleFlip = () => {
     if (!hasBack) return;
@@ -201,19 +201,6 @@ const LoyaltyCard = ({ data, email, walletQrCode }) => {
               </QRBlock>
             )}
 
-            {walletQrCode && (
-              <QRBlock>
-                <QRSmallLabel>Wallet Payment</QRSmallLabel>
-                <QRWrap>
-                  <QRCodeWithLogo
-                    value={`${window.location.origin}/pay/${encodeURIComponent(walletQrCode)}`}
-                    size={128}
-                    bgColor="#ffffff"
-                    fgColor={INK}
-                  />
-                </QRWrap>
-              </QRBlock>
-            )}
 
             <FlipHint>← Tap to flip back</FlipHint>
           </CardFace>
