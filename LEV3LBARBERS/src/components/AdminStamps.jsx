@@ -198,7 +198,7 @@ const AdminStamps = () => {
           <CameraIcon width={14} height={14} style={{ color: 'inherit' }} /> Scan QR
         </ModeBtn>
         <ModeBtn $active={mode === 'email'} onClick={() => { setMode('email'); resetAll(); }}>
-          <MailIcon width={14} height={14} style={{ color: 'inherit' }} /> Search Email
+          <MailIcon width={14} height={14} style={{ color: 'inherit' }} /> Search Email or Username
         </ModeBtn>
       </ModeToggle>
 
@@ -224,7 +224,7 @@ const AdminStamps = () => {
       {/* ── Email mode ─────────────────────────── */}
       {mode === 'email' && !userData && (
         <SearchRow>
-          <Input placeholder="Customer email address" value={email}
+          <Input placeholder="Customer email or username" value={email}
             onChange={e => setEmail(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && lookupUser()} />
           <LookupButton onClick={lookupUser} disabled={loading}>
